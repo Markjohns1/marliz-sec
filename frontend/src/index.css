@@ -1,0 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@tailwind base;
+@tailwind components; 
+@tailwind utilities;
+
+@layer base {
+  html, body {
+    @apply m-0 p-0; 
+  }
+  
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased;
+  }
+}
+
+@layer components {
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  .btn-primary {
+    @apply bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 shadow-sm hover:shadow-md;
+  }
+  
+  .btn-secondary {
+    @apply bg-white hover:bg-slate-50 text-slate-700 px-6 py-3 rounded-lg font-medium border border-slate-300 transition-colors duration-200;
+  }
+  
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow duration-300;
+  }
+  
+  .threat-badge-low {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-success-100 text-success-600;
+  }
+  
+  .threat-badge-medium {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-warning-100 text-warning-600;
+  }
+  
+  .threat-badge-high {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-danger-100 text-danger-600;
+  }
+  
+  .threat-badge-critical {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-danger-600 text-white;
+  }
+}
