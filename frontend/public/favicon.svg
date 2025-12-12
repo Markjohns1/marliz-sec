@@ -1,0 +1,20 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background with rounded corners for app-icon look -->
+  <rect width="512" height="512" rx="120" fill="#1a1a3e"/>
+  
+  <!-- Content Group -->
+  <g transform="translate(256, 256)" text-anchor="middle" font-family="Arial, sans-serif" font-weight="bold">
+    
+    <!-- Stylized Shield Background Effect (Optional, subtle) -->
+    <!-- <path d="M0 -200 L160 -120 V0 C160 120 0 240 0 240 C0 240 -160 120 -160 0 V-120 Z" fill="#ef4444" opacity="0.1"/> -->
+
+    <!-- "Marliz" - White -->
+    <text x="0" y="-40" font-size="110" fill="#ffffff">Marliz</text>
+    
+    <!-- "Intel" - Red -->
+    <text x="0" y="80" font-size="110" fill="#ef4444">Intel</text>
+    
+    <!-- Decorative underline/accent -->
+    <rect x="-100" y="110" width="200" height="15" rx="8" fill="#ef4444"/>
+  </g>
+</svg>
