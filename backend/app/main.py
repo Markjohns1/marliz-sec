@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 import logging
 
 from app.database import init_db
-from app.routes import articles, categories, subscribers
+from app.routes import articles, categories, subscribers, seo
 from app.services.scheduler import start_scheduler, stop_scheduler
 
 logging.basicConfig(
@@ -58,6 +58,7 @@ app.add_middleware(
 app.include_router(articles.router)
 app.include_router(categories.router)
 app.include_router(subscribers.router)
+app.include_router(seo.router)
 
 @app.get("/")
 def root():

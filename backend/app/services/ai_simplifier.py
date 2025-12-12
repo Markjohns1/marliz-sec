@@ -48,7 +48,7 @@ class AISimplifier:
                         db.commit()
                     
                     # Add delay to avoid rate limits (500ms between requests)
-                    await asyncio.sleep(0.5)
+                    await asyncio.sleep(2.0)
                 
                 except Exception as e:
                     logger.error(f"Failed to process article {article.id}: {str(e)}")
@@ -65,8 +65,11 @@ class AISimplifier:
     async def _simplify_article(self, db: Session, article: Article) -> bool:
         """Simplify a single article using Groq"""
         
+        # Get article content
+        content = article.raw_content or article.meta_description or ""
+        
         # Build comprehensive prompt
-        prompt = self._build_prompt(article)
+        prompt = self._build_prompt(article, content)  # <-- FIXED: Added content parameter
         
         try:
             # Call Groq API
@@ -144,54 +147,41 @@ class AISimplifier:
             logger.error(f"Groq API error: {str(e)}")
             return False
     
-    def _build_prompt(self, article: Article) -> str:
-        """Build comprehensive prompt for Groq"""
+    def _build_prompt(self, article, content):
+        """Build precise prompt for Groq AI to simplify cybersecurity articles."""
         
-        content = article.raw_content or article.title
-        
-        return f"""You are a cybersecurity expert communicating with non-technical small business owners in Kenya and East Africa.
+        return f"""You are 'Marliz', a sophisticated Cyber Threat Intelligence Analyst.
 
-ARTICLE INFORMATION:
+ARTICLE TO ANALYZE:
 Title: {article.title}
-Source: {article.source_name}
-Content: {content[:3000]}
+Source: {article.source_name or 'Intelligence feed'}
+Content excerpt: {content[:2800]}
 
-YOUR TASK:
-Transform this technical cybersecurity news into clear, actionable information for small business owners who have NO IT background. If the article mentions specific regions (Kenya, Africa, M-Pesa, mobile money), emphasize the local relevance.
+YOUR MISSION:
+Analyze this threat data and explain the TECHNICAL MECHANISM. Do not give generic advice.
+We need to know: HOW did they get in? WHAT tech was exploited? WHAT is the specific consequence?
 
-RESPOND WITH VALID JSON ONLY (no markdown, no comments):
+RESPOND WITH VALID JSON ONLY:
 {{
-  "summary": "3-4 sentences explaining what happened in simple terms (NO jargon)",
-  "impact": "2-3 sentences explaining SPECIFICALLY how this threatens small businesses",
-  "actions": ["Action 1", "Action 2", "Action 3"],
-  "threat_level": "low|medium|high|critical"
+  "summary": "THE MECHANISM: 3 sentences explaining the specific attack vector. Example: 'Attackers hijacked the session using a stolen OAuth token via a phishing link.' NOT: 'Bad guys stole data.'",
+  "impact": "THE CONSEQUENCE: Specific technical and business impact. Example: 'Unencrypted PII was exfiltrated to a C2 server.'",
+  "actions": ["Patch CVE-2024-XXXX immediately", "Disable NTLMv1", "Block IP range 192.168.x.x"],
+  "threat_level": "low|medium|high|critical",
+  "keywords": ["keyword1", "keyword2", "keyword3"]
 }}
 
-CRITICAL RULES:
-1. NEVER use terms: exploit, vulnerability, CVE, threat actor, zero-day, vector
-2. INSTEAD use: security gap, hackers, attack method, cybercriminals, new risk
-3. Write at 8th-grade reading level
-4. Each action step must be SPECIFIC and DOABLE TODAY (e.g., "Enable 2-factor authentication on your email account")
-5. Focus on WHAT TO DO, not how the attack works technically
-6. Be conversational but professional
-7. If the article mentions Kenya/Africa/M-Pesa, highlight local relevance in the impact section
+WRITING RULES:
+1. NO REGIONAL BIAS: Do not mention specific countries (Kenya, USA, etc.) unless the attack is EXCLUSIVELY targeting that nation. Write for a borderless, global audience.
+2. NO FLUFF: Do not say 'Stay safe' or 'In the digital age'. Start directly with the threat.
+3. NO NONSENSE: If the article is vague, state 'Technical details are limited' rather than inventing them.
+4. NO EMOJIS: Do not use emojis in the summary, impact, or actions. Use only professional technical language.
+5. THREAT LEVELS:
+   - CRITICAL: Active Zero-Day or Wormable RCE.
+   - HIGH: Active Exploitation.
+   - MEDIUM: POC available or Patch required.
+   - LOW: General news.
 
-THREAT LEVEL GUIDE:
-- LOW: Theoretical risk, no immediate action needed
-- MEDIUM: Real risk, action recommended this week
-- HIGH: Active attacks, action needed within 48 hours
-- CRITICAL: Widespread attacks, immediate action required
-
-Example good summary (Kenyan context):
-"Hackers are targeting M-Pesa users with fake customer service calls. They pretend to be from Safaricom and ask for your PIN to 'verify your account.' Once they have your PIN, they drain your M-Pesa balance within minutes."
-
-Example good summary (global):
-"Hackers are sending fake Microsoft emails that look exactly like real password reset requests. When employees click the link and enter their password, the hackers steal it and access the company's systems."
-
-Example bad summary (TOO TECHNICAL):
-"A sophisticated phishing campaign leveraging OAuth token exploitation has been observed targeting Microsoft 365 tenants."
-
-RETURN ONLY THE JSON, NO OTHER TEXT."""
+RETURN ONLY THE JSON OBJECT."""
     
     def _parse_response(self, response_text: str) -> dict:
         """Parse Groq's JSON response"""
@@ -233,35 +223,32 @@ RETURN ONLY THE JSON, NO OTHER TEXT."""
         """Extract SEO keywords from simplified content"""
         text = f"{result['summary']} {result['impact']}"
         
-        # Common cybersecurity terms for small businesses
+        # Base keywords
         keywords = [
-            "small business cybersecurity",
-            "business data protection",
-            "email security",
-            "ransomware protection",
-            "phishing prevention",
-            "cyber threats",
-            "business security"
+            "cybersecurity",
+            "threat intelligence",
+            "data breach",
+            "infosec",
+            "malware analysis"
         ]
         
-        # Add Kenyan/African specific terms if mentioned
-        african_terms = ["kenya", "m-pesa", "safaricom", "mpesa", "mobile money", "africa"]
-        if any(term in text.lower() for term in african_terms):
-            keywords.extend([
-                "Kenya cybersecurity",
-                "M-Pesa security",
-                "mobile money fraud Kenya",
-                "African business security"
-            ])
-        
         # Add specific terms from content
-        threat_terms = ["ransomware", "phishing", "malware", "breach", "hack", "fraud"]
+        threat_terms = ["ransomware", "phishing", "malware", "breach", "hack", "fraud", "exploit", "vulnerability", "patch"]
         found_terms = [term for term in threat_terms if term in text.lower()]
         
         if found_terms:
-            keywords.extend([f"{term} small business" for term in found_terms])
+            keywords.extend(found_terms)
         
-        return ", ".join(keywords[:10])
+        # Extract technical terms if present (simple regex for CVEs or capitalized tools)
+        tech_terms = re.findall(r'\b[A-Z][A-Za-z0-9]+\b', text)
+        if tech_terms:
+             # Filter out common words
+            common = ["The", "A", "An", "In", "On", "It", "We", "They", "This"]
+            keywords.extend([t for t in tech_terms if t not in common and len(t) > 2])
+        
+        # Deduplicate and limit
+        unique_keywords = list(set(keywords))
+        return ", ".join(unique_keywords[:10])
 
 # Global instance
 ai_simplifier = AISimplifier()

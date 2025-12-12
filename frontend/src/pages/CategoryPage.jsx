@@ -7,35 +7,54 @@ import { Helmet } from 'react-helmet-async';
 export default function CategoryPage() {
   const { slug } = useParams();
 
-  const { data: category } = useQuery({
+  const { data: category, isLoading: categoryLoading } = useQuery({
     queryKey: ['category', slug],
     queryFn: () => getCategory(slug)
   });
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading: articlesLoading } = useQuery({
     queryKey: ['articles', { category: slug, limit: 12 }],
     queryFn: () => getArticles({ category: slug, limit: 12 })
   });
 
+  if (categoryLoading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      </div>
+    );
+  }
+
+  if (!category) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-slate-800">Category Not Found</h1>
+          <p className="text-slate-600 mt-2">The category you are looking for does not exist.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <Helmet>
-        <title>{category?.name} Security News | Marliz Sec</title>
-        <meta name="description" content={category?.description} />
+        <title>{category.name} Security News | Marliz Sec</title>
+        <meta name="description" content={category.description} />
       </Helmet>
 
-      <div className="bg-slate-50 min-h-screen">
+      <div className="bg-slate-950 min-h-screen">
         {/* Header */}
-        <div className="bg-white border-b border-slate-200">
-          <div className="container-custom py-12">
+        <div className="bg-slate-900 border-b border-slate-800">
+          <div className="max-w-7xl mx-auto px-4 py-12">
             <div className="flex items-center mb-4">
-              <span className="text-5xl mr-4">{category?.icon}</span>
+              <span className="text-5xl mr-4">{category.icon}</span>
               <div>
-                <h1 className="text-4xl font-bold text-slate-900">
-                  {category?.name}
+                <h1 className="text-4xl font-bold text-white">
+                  {category.name}
                 </h1>
-                <p className="text-lg text-slate-600 mt-2">
-                  {category?.description}
+                <p className="text-lg text-slate-400 mt-2">
+                  {category.description}
                 </p>
               </div>
             </div>
@@ -43,8 +62,8 @@ export default function CategoryPage() {
         </div>
 
         {/* Articles */}
-        <div className="container-custom py-12">
-          {isLoading ? (
+        <div className="max-w-7xl mx-auto px-4 py-12">
+          {articlesLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div key={i} className="card animate-pulse">

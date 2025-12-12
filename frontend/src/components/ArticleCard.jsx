@@ -1,33 +1,33 @@
 import { Link } from 'react-router-dom';
-import { Clock, TrendingUp, AlertCircle } from 'lucide-react';
+import { Clock, TrendingUp, AlertCircle, Shield, AlertTriangle, CheckCircle, Info } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function ArticleCard({ article }) {
   const threatLevelConfig = {
     low: {
       badge: 'threat-badge-low',
-      icon: '🟢',
+      icon: <CheckCircle className="w-3 h-3 mr-1" />,
       text: 'LOW RISK'
     },
     medium: {
       badge: 'threat-badge-medium',
-      icon: '🟡',
+      icon: <Info className="w-3 h-3 mr-1" />,
       text: 'MEDIUM RISK'
     },
     high: {
       badge: 'threat-badge-high',
-      icon: '🔴',
+      icon: <AlertTriangle className="w-3 h-3 mr-1" />,
       text: 'HIGH RISK'
     },
     critical: {
       badge: 'threat-badge-critical',
-      icon: '🚨',
+      icon: <Shield className="w-3 h-3 mr-1" />,
       text: 'CRITICAL'
     }
   };
 
   const config = threatLevelConfig[article.simplified?.threat_level || 'medium'];
-  const timeAgo = article.published_at 
+  const timeAgo = article.published_at
     ? formatDistanceToNow(new Date(article.published_at), { addSuffix: true })
     : 'Recently';
 
@@ -35,8 +35,8 @@ export default function ArticleCard({ article }) {
     <article className="card group">
       {article.image_url && (
         <div className="aspect-video overflow-hidden">
-          <img 
-            src={article.image_url} 
+          <img
+            src={article.image_url}
             alt={article.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             loading="lazy"
@@ -49,7 +49,7 @@ export default function ArticleCard({ article }) {
           <span className={config.badge}>
             {config.icon} {config.text}
           </span>
-          
+
           {article.category && (
             <span className="text-xs font-medium text-slate-500">
               {article.category.icon} {article.category.name}
@@ -58,26 +58,26 @@ export default function ArticleCard({ article }) {
         </div>
 
         <Link to={`/article/${article.slug}`}>
-          <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-primary-600 transition-colors line-clamp-2">
+          <h3 className="text-lg md:text-xl font-bold text-slate-100 mb-3 group-hover:text-blue-400 transition-colors line-clamp-2">
             {article.title}
           </h3>
         </Link>
 
         {article.simplified?.friendly_summary && (
-          <p className="text-slate-600 mb-4 line-clamp-3 leading-relaxed">
+          <p className="text-slate-400 mb-4 line-clamp-3 leading-relaxed">
             {article.simplified.friendly_summary}
           </p>
         )}
 
         {article.simplified?.business_impact && (
-          <div className="bg-primary-50 border-l-4 border-primary-500 p-4 mb-4">
+          <div className="bg-blue-900/20 border-l-4 border-blue-500 p-4 mb-4 rounded-r-lg">
             <div className="flex items-start">
-              <AlertCircle className="w-5 h-5 text-primary-600 mr-2 flex-shrink-0 mt-0.5" />
+              <AlertCircle className="w-5 h-5 text-blue-400 mr-2 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-sm font-semibold text-primary-900 mb-1">
-                  What This Means for You
+                <p className="text-sm font-bold text-blue-200 mb-1 uppercase tracking-wide">
+                  Why This Matters
                 </p>
-                <p className="text-sm text-primary-800 line-clamp-2">
+                <p className="text-sm text-slate-300 line-clamp-2">
                   {article.simplified.business_impact}
                 </p>
               </div>
@@ -90,8 +90,8 @@ export default function ArticleCard({ article }) {
             <Clock className="w-4 h-4 mr-1" />
             {timeAgo}
           </div>
-          
-          <Link 
+
+          <Link
             to={`/article/${article.slug}`}
             className="text-primary-600 hover:text-primary-700 font-semibold text-sm flex items-center group"
           >

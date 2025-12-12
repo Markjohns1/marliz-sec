@@ -31,7 +31,7 @@ export default function Subscribe() {
       </Helmet>
 
       <div className="bg-gradient-to-br from-primary-600 to-primary-800 min-h-screen flex items-center">
-        <div className="container-custom py-16">
+        <div className="max-w-7xl mx-auto px-4 py-16">
           <div className="max-w-2xl mx-auto">
             {!success ? (
               <div className="bg-white rounded-2xl shadow-2xl p-8 md:p-12">
@@ -124,7 +124,7 @@ export default function Subscribe() {
                 <p className="text-lg text-slate-600 mb-6">
                   Check your inbox for a confirmation email. Your first alert arrives tomorrow morning.
                 </p>
-                <a 
+                <a
                   href="/"
                   className="btn-primary inline-flex items-center"
                 >

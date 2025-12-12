@@ -10,11 +10,15 @@ import './App.css';
 
 import Header from './components/Header';
 import Footer from './components/Footer';
+import BottomNav from './components/BottomNav';
+import ScrollToTop from './components/ScrollToTop';
 import Home from './pages/Home';
 import ArticleDetail from './pages/ArticleDetail';
 import CategoryPage from './pages/CategoryPage';
 import Subscribe from './pages/Subscribe';
 import About from './pages/About';
+import AllThreats from './pages/AllThreats';
+import SearchResults from './pages/SearchResults';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -35,9 +39,11 @@ function AppContent() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header categories={categories} />
-      <main className="flex-grow">
+      <main className="flex-grow pt-16">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/all-threats" element={<AllThreats />} />
+          <Route path="/search" element={<SearchResults />} />
           <Route path="/article/:slug" element={<ArticleDetail />} />
           <Route path="/category/:slug" element={<CategoryPage />} />
           <Route path="/subscribe" element={<Subscribe />} />
@@ -45,6 +51,7 @@ function AppContent() {
         </Routes>
       </main>
       <Footer categories={categories} />
+      <BottomNav />
     </div>
   );
 }
@@ -54,6 +61,7 @@ export default function App() {
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
+          <ScrollToTop />
           <AppContent />
         </BrowserRouter>
       </QueryClientProvider>

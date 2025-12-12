@@ -44,6 +44,12 @@ export default {
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
       },
+      boxShadow: {
+        'glow-primary': '0 0 15px rgba(37, 99, 235, 0.3)',
+        'glow-primary-hover': '0 0 25px rgba(37, 99, 235, 0.5)',
+        'glow-card': '0 0 20px rgba(0, 0, 0, 0.5)',
+        'glow-critical': '0 0 10px rgba(239, 68, 68, 0.2)',
+      },
     },
   },
   plugins: [],

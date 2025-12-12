@@ -13,13 +13,13 @@ export default function About() {
       <div className="bg-slate-50">
         {/* Hero */}
         <section className="bg-gradient-to-br from-primary-600 to-primary-800 text-white py-20">
-          <div className="container-custom">
+          <div className="max-w-7xl mx-auto px-4">
             <div className="max-w-3xl">
               <h1 className="text-5xl font-bold mb-6">
-                Protecting Small Businesses, One Alert at a Time
+                Protecting You. Protecting Everyone.
               </h1>
               <p className="text-xl text-primary-100">
-                We believe every business owner deserves to understand cybersecurity threats without needing a computer science degree.
+                We believe everyone—from grandmothers to CEOs—deserves to be safe online without needing a computer science degree.
               </p>
             </div>
           </div>
@@ -27,18 +27,18 @@ export default function About() {
 
         {/* Mission */}
         <section className="py-16 bg-white">
-          <div className="container-custom">
+          <div className="max-w-7xl mx-auto px-4">
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div>
                 <h2 className="text-3xl font-bold text-slate-900 mb-6">Our Mission</h2>
                 <p className="text-lg text-slate-700 mb-4">
-                  <strong className="text-primary-600">46% of cyberattacks</strong> target small businesses, yet most cybersecurity news is written for IT professionals.
+                  <strong className="text-primary-600">Cybersecurity is broken.</strong> It's full of confusing words, scare tactics, and expensive tools that regular people don't understand.
                 </p>
                 <p className="text-lg text-slate-700 mb-4">
-                  We use AI to translate complex technical threats into plain English, giving you clear action steps to protect your business.
+                  We use AI to translate the "geek speak" into plain English. We tell you exactly what is happening, why it matters to YOU, and what button to click to stay safe.
                 </p>
                 <p className="text-lg text-slate-700">
-                  No jargon. No overwhelm. Just what you need to know and do.
+                  No jargon. No gatekeeping. Just the truth.
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-6">
@@ -65,7 +65,7 @@ export default function About() {
 
         {/* How It Works */}
         <section className="py-16">
-          <div className="container-custom">
+          <div className="max-w-7xl mx-auto px-4">
             <h2 className="text-3xl font-bold text-slate-900 text-center mb-12">
               How We Keep You Protected
             </h2>
@@ -106,7 +106,7 @@ export default function About() {
 
         {/* CTA */}
         <section className="bg-primary-600 text-white py-16">
-          <div className="container-custom text-center">
+          <div className="max-w-7xl mx-auto px-4 text-center">
             <h2 className="text-3xl font-bold mb-4">Ready to Stay Protected?</h2>
             <p className="text-xl text-primary-100 mb-8 max-w-2xl mx-auto">
               Join thousands of business owners who trust us to keep them informed about cybersecurity threats.

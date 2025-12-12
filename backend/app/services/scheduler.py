@@ -38,17 +38,17 @@ async def cleanup_job():
     from app.models import Article
     from datetime import datetime, timedelta
     
-    logger.info("🧹 Starting cleanup job...")
+    logger.info("🧹 Starting daily retention cleanup...")
     try:
         with get_db_context() as db:
-            # Delete articles older than 90 days with status RAW (failed to process)
-            cutoff_date = datetime.now() - timedelta(days=90)
+            # Delete ALL articles older than 30 days to keep content fresh
+            cutoff_date = datetime.now() - timedelta(days=30)
             deleted = db.query(Article).filter(
-                Article.status == "raw",
-                Article.created_at < cutoff_date
+                Article.published_at < cutoff_date
             ).delete()
             db.commit()
-            logger.info(f"✓ Cleanup completed: {deleted} old articles removed")
+            if deleted > 0:
+                logger.info(f"✓ Retention Policy: Removed {deleted} expired articles (>30 days)")
     except Exception as e:
         logger.error(f"✗ Cleanup failed: {str(e)}")
 
@@ -67,14 +67,14 @@ def start_scheduler():
     )
     
     # Simplify articles every 30 minutes - DISABLED
-    if os.getenv("SIMPLIFY_ARTICLES", "false") == "true":
-        scheduler.add_job(
-         simplify_articles_job,
-         trigger=IntervalTrigger(minutes=30),
-         id="simplify_articles",
-         name="Simplify articles with AI",
-         replace_existing=True
-         )
+    # Simplify articles every 30 minutes
+    scheduler.add_job(
+        simplify_articles_job,
+        trigger=IntervalTrigger(minutes=30),
+        id="simplify_articles",
+        name="Simplify articles with AI",
+        replace_existing=True
+    )
     
     # Cleanup every 24 hours at 3 AM
     scheduler.add_job(
@@ -98,10 +98,15 @@ def start_scheduler():
          id="startup_simplify",
          name="Initial simplification"
      )
+    scheduler.add_job(
+        cleanup_job,
+        id="startup_cleanup",
+        name="Initial cleanup"
+    )
     
     scheduler.start()
     logger.info(f"✓ Scheduler started: News fetch every {fetch_interval} hours")
-    logger.info("✓ Jobs: fetch_news, cleanup")  # Removed simplify_articles from log
+    logger.info("✓ Jobs: fetch_news, cleanup, simplify_articles")
 
 def stop_scheduler():
     """Stop scheduler gracefully"""
