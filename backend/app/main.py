@@ -47,8 +47,9 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",
-        "http://localhost:5173",  # Vite default
-        "https://yourdomain.com"  # Add your production domain
+        "http://localhost:5173",
+        "https://marlizintel.146.190.146.121.nip.io",
+        "https://marlizintel.tymirahealth.com"
     ],
     allow_credentials=True,
     allow_methods=["*"],
