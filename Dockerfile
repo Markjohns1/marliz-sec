@@ -8,9 +8,9 @@ RUN npm run build
 
 # Stage 2: Backend & Runtime
 FROM python:3.11-slim
-WORKDIR /app
+WORKDIR /app/backend
 
-# Install system dependencies (if any)
+# Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     && rm -rf /var/lib/apt/lists/*
@@ -19,19 +19,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy Backend Code
-COPY backend/ ./backend
+# Copy Backend Code (now directly into WORKDIR)
+COPY backend/ .
 
-# Copy Built Frontend from Stage 1
-COPY --from=frontend-build /app/frontend/dist ./frontend/dist
+# Copy Built Frontend (one level up, at /app/frontend/dist)
+COPY --from=frontend-build /app/frontend/dist /app/frontend/dist
 
-# Set ENV for production
-# Set ENV for production
-ENV PYTHONPATH=/app/backend
+# Port
 ENV PORT=3000
-
-# Expose port
 EXPOSE 3000
 
-# Run Command
-CMD cd backend && uvicorn app.main:app --host 0.0.0.0 --port 3000
+# Run uvicorn from /app/backend (current WORKDIR)
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "3000"]

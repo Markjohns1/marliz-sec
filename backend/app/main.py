@@ -120,8 +120,9 @@ from fastapi.responses import FileResponse
 import os
 
 # Mount assets folder (CSS, JS, Images)
-if os.path.exists("frontend/dist"):
-    app.mount("/assets", StaticFiles(directory="frontend/dist/assets"), name="assets")
+FRONTEND_DIST = "../frontend/dist"
+if os.path.exists(FRONTEND_DIST):
+    app.mount("/assets", StaticFiles(directory=f"{FRONTEND_DIST}/assets"), name="assets")
 
     # Catch-all route for React Router (SPA)
     @app.get("/{full_path:path}")
@@ -131,18 +132,18 @@ if os.path.exists("frontend/dist"):
             raise HTTPException(status_code=404, detail="Not Found")
 
         # 1. Serve specific file if it exists (favicon.ico, robots.txt)
-        file_path = os.path.join("frontend/dist", full_path)
+        file_path = os.path.join(FRONTEND_DIST, full_path)
         if os.path.exists(file_path) and os.path.isfile(file_path):
             return FileResponse(file_path)
         
         # 2. Otherwise serve index.html (Client-side routing)
-        return FileResponse("frontend/dist/index.html")
+        return FileResponse(f"{FRONTEND_DIST}/index.html")
 
 # Root path handler
 @app.get("/")
 async def root():
-    if os.path.exists("frontend/dist/index.html"):
-         return FileResponse("frontend/dist/index.html")
+    if os.path.exists(f"{FRONTEND_DIST}/index.html"):
+         return FileResponse(f"{FRONTEND_DIST}/index.html")
     return {"status": "Marliz Sec API Running (Frontend not built)"}
 
 
