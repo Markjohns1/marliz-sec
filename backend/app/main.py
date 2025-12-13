@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 import logging
 
 from app.database import init_db
+from app import models  # Import models before init_db to register tables
 from app.routes import articles, categories, subscribers, seo
 from app.services.scheduler import start_scheduler, stop_scheduler
 
