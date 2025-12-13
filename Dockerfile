@@ -26,11 +26,12 @@ COPY backend/ ./backend
 COPY --from=frontend-build /app/frontend/dist ./frontend/dist
 
 # Set ENV for production
-ENV PYTHONPATH=/app:/app/backend
+# Set ENV for production
+ENV PYTHONPATH=/app/backend
 ENV PORT=3000
 
 # Expose port
 EXPOSE 3000
 
 # Run Command
-CMD ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "3000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "3000"]
