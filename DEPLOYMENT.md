@@ -1,50 +1,52 @@
-# Marliz Intel - Deployment Notes
+# Deploying to DigitalOcean Droplet (Ubuntu)
 
-**Date:** December 13, 2025  
-**Domain:** https://marlizintel.tymirahealth.com  
-**Platform:** DigitalOcean App Platform
+## 1. Prerequisites
+- **SSH Access:** You must be able to log in to your Droplet: `ssh root@<DROPLET_IP>`
+- **Docker Installed:** Run `docker -v` to check. If not, run `snap install docker`.
 
----
+## 2. Server Setup (First Time Only)
+On your local machine, tell the Droplet to pull your code:
 
-## Issues Fixed During Deployment
+```bash
+# SSH into your server
+ssh root@146.190.146.121
 
-### 1. ModuleNotFoundError: No module named 'app'
-- **Cause:** Dockerfile WORKDIR was `/app`, but Python code expected `/app/backend`
-- **Fix:** Set `WORKDIR /app/backend` in Dockerfile
-
-### 2. PYTHONPATH Conflict
-- **Cause:** DigitalOcean dashboard had `PYTHONPATH=/app` overriding Dockerfile
-- **Fix:** Removed PYTHONPATH from environment variables
-
-### 3. Missing `__init__.py`
-- **Cause:** Python didn't recognize `app/` as a package
-- **Fix:** Created `backend/app/__init__.py`
-
-### 4. Missing email-validator
-- **Cause:** Pydantic's EmailStr requires email-validator
-- **Fix:** Added `email-validator==2.1.0` to requirements.txt
-
-### 5. Database Tables Not Created
-- **Cause:** `models` not imported before `init_db()` ran
-- **Fix:** Added `from app import models` in main.py
-
----
-
-## Environment Variables (Required in DigitalOcean)
-
+# Clone the repository (if not already there)
+git clone https://github.com/Markjohns1/marliz-sec.git
+cd marliz-sec
 ```
-NEWSDATA_IO_KEY=<your-key>
-GROQ_API_KEY=<your-key>
+
+## 3. Configure Environment
+Create the `.env` file on the server:
+```bash
+nano .env
+```
+Paste your secrets (get them from your local `.env` or App Platform settings):
+```ini
+NEWSDATA_IO_KEY=pub_...
+GROQ_API_KEY=gsk_...
+ADMIN_SECRET=...
 FETCH_INTERVAL_HOURS=4
-ADMIN_SECRET=<your-secret>
+```
+Save with `Ctrl+O`, `Enter`, then `Ctrl+X`.
+
+## 4. Run the App
+Start the application with Docker Compose:
+
+```bash
+# Pull latest changes
+git pull origin main
+
+# Start the container (detached mode)
+docker compose up -d --build
 ```
 
-**Do NOT add:** `PYTHONPATH` or `DATABASE_URL`
+## 5. Check Status
+- **View Logs:** `docker compose logs -f`
+- **Check Container:** `docker ps`
+- **Visit Site:** `http://146.190.146.121:3000`
 
----
-
-## DNS
-
-**CNAME Record:**
-- Hostname: `marlizintel`
-- Value: `<your-app>.ondigitalocean.app`
+## 6. DNS Update
+Go to your DNS provider (DigitalOcean Networking) and update the **A Record**:
+- **Hostname:** `marlizintel`
+- **Will Direct To:** `146.190.146.121` (Select your Droplet)
