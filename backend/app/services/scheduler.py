@@ -18,6 +18,11 @@ async def fetch_news_job():
     try:
         result = await news_fetcher.fetch_news()
         logger.info(f"✓ News fetch completed: {result['total_new']} new articles")
+        
+        # Trigger simplification immediately after fetch if new articles found
+        if result['total_new'] > 0:
+            await simplify_articles_job()
+            
     except Exception as e:
         logger.error(f"✗ News fetch failed: {str(e)}")
 
@@ -93,11 +98,11 @@ def start_scheduler():
         id="startup_fetch",
         name="Initial news fetch"
     )
-    scheduler.add_job(
-         simplify_articles_job,
-         id="startup_simplify",
-         name="Initial simplification"
-     )
+    # scheduler.add_job(
+    #      simplify_articles_job,
+    #      id="startup_simplify",
+    #      name="Initial simplification"
+    #  )
     scheduler.add_job(
         cleanup_job,
         id="startup_cleanup",
