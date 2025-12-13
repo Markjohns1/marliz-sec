@@ -34,4 +34,4 @@ ENV PORT=3000
 EXPOSE 3000
 
 # Run Command
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "3000"]
+CMD cd backend && uvicorn app.main:app --host 0.0.0.0 --port 3000
