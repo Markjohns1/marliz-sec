@@ -72,7 +72,7 @@ export default function Subscribe() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="Enter your business email"
-                        className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+                        className="w-full pl-10 pr-4 py-3 text-slate-900 placeholder-slate-400 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
                         required
                       />
                     </div>
