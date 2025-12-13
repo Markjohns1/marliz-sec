@@ -6,7 +6,7 @@ services:
     container_name: marliz-sec-news
     restart: always
     ports:
-      - "3000:3000"
+      - "3005:3000"
     volumes:
       - ./backend/cybersec_news.db:/app/backend/cybersec_news.db
     env_file:
