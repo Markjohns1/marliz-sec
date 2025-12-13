@@ -70,15 +70,6 @@ app.include_router(categories.router)
 app.include_router(subscribers.router)
 app.include_router(seo.router)
 
-@app.get("/")
-def root():
-    """API health check"""
-    return {
-        "status": "healthy",
-        "service": "Marliz Sec News API",
-        "version": "1.0.0"
-    }
-
 @app.get("/api/health")
 def health_check():
     """Detailed health check"""
@@ -120,6 +111,40 @@ async def manual_simplify(admin_secret: str):
     from app.services.ai_simplifier import ai_simplifier
     result = await ai_simplifier.process_pending_articles()
     return result
+
+# ==========================================
+# SERVE STATIC FILES (React Frontend)
+# ==========================================
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+import os
+
+# Mount assets folder (CSS, JS, Images)
+if os.path.exists("frontend/dist"):
+    app.mount("/assets", StaticFiles(directory="frontend/dist/assets"), name="assets")
+
+    # Catch-all route for React Router (SPA)
+    @app.get("/{full_path:path}")
+    async def serve_react_app(full_path: str):
+        # Explicitly ignore API paths so they don't get swallowed
+        if full_path.startswith("api"):
+            raise HTTPException(status_code=404, detail="Not Found")
+
+        # 1. Serve specific file if it exists (favicon.ico, robots.txt)
+        file_path = os.path.join("frontend/dist", full_path)
+        if os.path.exists(file_path) and os.path.isfile(file_path):
+            return FileResponse(file_path)
+        
+        # 2. Otherwise serve index.html (Client-side routing)
+        return FileResponse("frontend/dist/index.html")
+
+# Root path handler
+@app.get("/")
+async def root():
+    if os.path.exists("frontend/dist/index.html"):
+         return FileResponse("frontend/dist/index.html")
+    return {"status": "Marliz Sec API Running (Frontend not built)"}
+
 
 if __name__ == "__main__":
     import uvicorn

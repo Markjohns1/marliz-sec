@@ -198,6 +198,14 @@ export default function Home() {
 
                 {/* Remaining Articles Grid */}
                 <div className="mt-16">
+                  {/* MOBILE AD SLOT (Visible only on small screens) */}
+                  <div className="lg:hidden mb-12">
+                    <div className="bg-slate-900/50 rounded-xl p-6 text-center border border-slate-800 border-dashed flex flex-col items-center justify-center min-h-[250px]">
+                      <span className="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-slate-500 uppercase tracking-wider mb-2">Advertisement</span>
+                      <p className="text-slate-600 text-sm">Your Mobile Ad Here</p>
+                    </div>
+                  </div>
+
                   <h3 className="text-2xl font-bold text-white mb-8 flex items-center">
                     <div className="w-1 h-8 bg-blue-500 mr-4 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.5)]"></div>
                     Latest Intelligence
