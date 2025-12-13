@@ -26,7 +26,7 @@ COPY backend/ ./backend
 COPY --from=frontend-build /app/frontend/dist ./frontend/dist
 
 # Set ENV for production
-ENV PYTHONPATH=/app
+ENV PYTHONPATH=/app:/app/backend
 ENV PORT=3000
 
 # Expose port
