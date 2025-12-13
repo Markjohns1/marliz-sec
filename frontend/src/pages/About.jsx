@@ -32,13 +32,13 @@ export default function About() {
               <div>
                 <h2 className="text-3xl font-bold text-slate-900 mb-6">Our Mission</h2>
                 <p className="text-lg text-slate-700 mb-4">
-                  <strong className="text-primary-600">Cybersecurity is broken.</strong> It's full of confusing words, scare tactics, and expensive tools that regular people don't understand.
+                  <strong className="text-primary-600">Cybersecurity is broken.</strong> It's full of confusing words and scare tactics.
                 </p>
                 <p className="text-lg text-slate-700 mb-4">
-                  We use AI to translate the "geek speak" into plain English. We tell you exactly what is happening, why it matters to YOU, and what button to click to stay safe.
+                  We provide direct, verified intelligence as it happens. No filters, no hidden agendas. We report the facts, tell you why it matters, and show you exactly how to stay safe.
                 </p>
                 <p className="text-lg text-slate-700">
-                  No jargon. No gatekeeping. Just the truth.
+                  Transparency is our core value. Information should be free and accessible to everyone.
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-6">
@@ -48,7 +48,7 @@ export default function About() {
                 </div>
                 <div className="bg-success-50 p-6 rounded-xl">
                   <div className="text-4xl font-bold text-success-600 mb-2">Daily</div>
-                  <div className="text-slate-600">Threat Updates</div>
+                  <div className="text-slate-600">Threat Alerts</div>
                 </div>
                 <div className="bg-warning-50 p-6 rounded-xl">
                   <div className="text-4xl font-bold text-warning-600 mb-2">3 min</div>
@@ -73,23 +73,23 @@ export default function About() {
               {[
                 {
                   icon: Zap,
-                  title: 'Auto-Fetch',
-                  description: 'Our system scans cybersecurity news every 4 hours from trusted sources.'
+                  title: '24/7 Monitoring',
+                  description: 'Our system scans for new threats every 4 hours, ensuring you never miss a critical alert.'
                 },
                 {
                   icon: Shield,
-                  title: 'AI Translation',
-                  description: 'Claude AI converts technical jargon into simple, business-friendly language.'
+                  title: 'Simplified Analysis',
+                  description: 'We convert technical jargon into simple, business-friendly language you can actually use.'
                 },
                 {
                   icon: Target,
                   title: 'Action Steps',
-                  description: 'Every alert includes specific steps you can take to protect your business.'
+                  description: 'Every alert includes specific steps you can take to protect your business immediately.'
                 },
                 {
                   icon: Users,
-                  title: 'Stay Informed',
-                  description: 'Get alerts via email, or browse our site anytime for the latest threats.'
+                  title: 'Direct Sources',
+                  description: 'We aggregate intelligence from verified open-source security feeds globally.'
                 }
               ].map((step, index) => (
                 <div key={index} className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">

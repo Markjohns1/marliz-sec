@@ -54,6 +54,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Caching Middleware
+@app.middleware("http")
+async def add_cache_headers(request, call_next):
+    response = await call_next(request)
+    if request.method == "GET" and response.status_code == 200:
+        # Cache successfully (1 hour for general content)
+        # Note: Browsers will cache this.
+        response.headers["Cache-Control"] = "public, max-age=3600" 
+    return response
+
 # Include routers
 app.include_router(articles.router)
 app.include_router(categories.router)

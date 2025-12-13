@@ -124,6 +124,7 @@ class AISimplifier:
             simplified = SimplifiedContent(
                 article_id=article.id,
                 friendly_summary=result["summary"],
+                attack_vector=result["attack_vector"],
                 business_impact=result["impact"],
                 action_steps=json.dumps(result["actions"]),
                 threat_level=ThreatLevel[result["threat_level"].upper()],
@@ -163,7 +164,8 @@ We need to know: HOW did they get in? WHAT tech was exploited? WHAT is the speci
 
 RESPOND WITH VALID JSON ONLY:
 {{
-  "summary": "THE MECHANISM: 3 sentences explaining the specific attack vector. Example: 'Attackers hijacked the session using a stolen OAuth token via a phishing link.' NOT: 'Bad guys stole data.'",
+  "summary": "THE NEWS: 3 sentences summarizing WHAT happened. Focus on the event itself.",
+  "attack_vector": "THE MECHANISM: Exactly HOW the attack occurred. Technical details. Example: 'Attackers used a zero-day in the V8 engine to execute code via a malicious PDF.'",
   "impact": "THE CONSEQUENCE: Specific technical and business impact. Example: 'Unencrypted PII was exfiltrated to a C2 server.'",
   "actions": ["Patch CVE-2024-XXXX immediately", "Disable NTLMv1", "Block IP range 192.168.x.x"],
   "threat_level": "low|medium|high|critical",
@@ -195,7 +197,7 @@ RETURN ONLY THE JSON OBJECT."""
             result = json.loads(cleaned)
             
             # Validate structure
-            required = ["summary", "impact", "actions", "threat_level"]
+            required = ["summary", "attack_vector", "impact", "actions", "threat_level"]
             if not all(key in result for key in required):
                 return None
             

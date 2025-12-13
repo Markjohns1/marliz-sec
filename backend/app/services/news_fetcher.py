@@ -72,11 +72,19 @@ class NewsFetcher:
         }
         
         try:
+            print(f"[DEBUG] Requesting URL: {self.base_url}?q={keyword}&apikey=***")
             response = await client.get(self.base_url, params=params)
             response.raise_for_status()
             data = response.json()
+            if "results" not in data:
+                print(f"[ERROR] No 'results' in response. Keys: {data.keys()}")
+                if "status" in data and data["status"] == "error":
+                     print(f"[API ERROR] {data.get('results', data)}")
+            else:
+                 print(f"[DEBUG] Keyword '{keyword}' returned {len(data['results'])} raw items.")
         except Exception as e:
             logger.error(f"API request failed: {str(e)}")
+            print(f"[EXCEPTION] {str(e)}")
             return {"fetched": 0, "new": 0}
         
         articles = data.get("results", [])
@@ -123,9 +131,10 @@ class NewsFetcher:
         return {"fetched": len(articles), "new": new_count}
     
     def _should_skip(self, article_data: dict) -> bool:
-        """Filter out irrelevant articles"""
+        """Filter out irrelevant articles (e.g., medical 'virus/attack' news)"""
         title = article_data.get("title", "").lower()
         description = article_data.get("description", "").lower()
+        full_text = f"{title} {description}"
         
         # Skip if no title or too short
         if not title or len(title) < 20:
@@ -136,14 +145,44 @@ class NewsFetcher:
         min_length = int(os.getenv("MIN_ARTICLE_LENGTH", 200))
         if content_length < min_length:
             return True
+
+        # --- Enhanced Context Aware Filtering ---
+        # Strong terms: These almost always guarantee it's cyber-related
+        strong_terms = [
+            "cyber", "ransomware", "malware", "phishing", "hacker", "hacking", 
+            "vulnerability", "exploit", "ddos", "spyware", "trojan", "keylogger",
+            "dark web", "infosec", "zero-day", "backdoor", "cve-"
+        ]
         
-        # Skip non-security related (basic filter)
-        security_terms = ["hack", "breach", "attack", "threat", "security", 
-                         "ransomware", "phishing", "malware", "cyber"]
-        if not any(term in title or term in description for term in security_terms):
+        # Weak terms: Could be medical, physical, or political (require context)
+        weak_terms = ["attack", "breach", "threat", "security", "virus", "infection", "worm", "defense"]
+        
+        # Context terms: Must allow one of these if only a weak term is present
+        context_terms = [
+            "data", "digital", "network", "server", "computer", "software", "internet", 
+            "online", "web", "password", "credential", "cloud", "system", "device", 
+            "app ", "application", "code", "file", "database"
+        ]
+
+        # 1. Check exclusions (Medical/Sports)
+        excluded_terms = ["cancer", "tumor", "pancreatic", "surgery", "football", "soccer", "cricket", "nba "]
+        if any(term in full_text for term in excluded_terms):
+            logger.info(f"Skipping article (Excluded Term): {title[:50]}...")
             return True
+
+        # 2. Check Strong Terms (Auto-Pass)
+        if any(term in full_text for term in strong_terms):
+            return False
+            
+        # 3. Check Weak Terms + Context (Conditional Pass)
+        has_weak = any(term in full_text for term in weak_terms)
+        has_context = any(term in full_text for term in context_terms)
         
-        return False
+        if has_weak and has_context:
+            return False
+            
+        logger.info(f"Skipping article (No Context): {title[:50]}...")
+        return True
     
     def _categorize(self, article_data: dict, keyword: str) -> int:
         """Determine category based on content and keyword"""

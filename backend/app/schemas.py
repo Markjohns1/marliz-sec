@@ -21,6 +21,7 @@ class Category(CategoryBase):
 # Simplified Content Schemas
 class SimplifiedContentBase(BaseModel):
     friendly_summary: str
+    attack_vector: Optional[str] = None
     business_impact: str
     action_steps: str  # JSON string
     threat_level: ThreatLevel
@@ -48,6 +49,7 @@ class ArticleCreate(ArticleBase):
 class ArticleUpdate(BaseModel):
     title: Optional[str] = None
     friendly_summary: Optional[str] = None
+    attack_vector: Optional[str] = None
     business_impact: Optional[str] = None
     action_steps: Optional[str] = None
     threat_level: Optional[ThreatLevel] = None

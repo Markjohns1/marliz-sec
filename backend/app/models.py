@@ -69,6 +69,7 @@ class SimplifiedContent(Base):
     
     # AI-generated friendly content
     friendly_summary = Column(Text, nullable=False)  # 3-4 sentences max
+    attack_vector = Column(Text, default="")  # "HOW it happened"
     business_impact = Column(Text, nullable=False)  # "What this means for YOU"
     action_steps = Column(Text, nullable=False)  # JSON array of steps
     

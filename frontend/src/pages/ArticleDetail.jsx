@@ -159,9 +159,11 @@ export default function ArticleDetail() {
                 {publishedDate} ({timeAgo})
               </div>
 
-              <div className="flex items-center">
-                <Shield className="w-4 h-4 mr-2" />
-                {article.source_name || 'Marliz Sec Staff'}
+              <div className="flex items-center bg-blue-950/40 px-3 py-1 rounded-full border border-blue-500/20 shadow-[0_0_10px_rgba(59,130,246,0.1)]">
+                <Shield className="w-3.5 h-3.5 mr-2 text-blue-400" />
+                <span className="font-semibold text-blue-100">{article.source_name || 'Marliz Sec Staff'}</span>
+                <CheckCircle2 className="w-4 h-4 ml-1.5 text-blue-500" fill="currentColor" />
+                <span className="hidden sm:inline text-[10px] text-blue-400/80 ml-2 border-l border-blue-500/20 pl-2 uppercase tracking-widest font-bold">Trusted Source</span>
               </div>
 
               {article.simplified?.reading_time_minutes && (
@@ -224,6 +226,19 @@ export default function ArticleDetail() {
                 </p>
               </section>
 
+              {/* Technical Details - Attack Vector */}
+              {article.simplified?.attack_vector && (
+                <section className="bg-red-900/10 border-l-4 border-red-500 rounded-r-xl p-8 mb-8">
+                  <h2 className="text-2xl font-bold text-red-100 mb-4 flex items-center">
+                    <Shield className="w-6 h-6 mr-2 text-red-500" />
+                    Technically: How The Attack Happened
+                  </h2>
+                  <p className="text-lg text-red-100/90 leading-relaxed font-mono text-sm md:text-base">
+                    {article.simplified.attack_vector}
+                  </p>
+                </section>
+              )}
+
               {/* Business Impact */}
               <section className="bg-blue-900/10 border-l-4 border-blue-500 rounded-r-xl p-8 mb-8">
                 <h2 className="text-2xl font-bold text-blue-100 mb-4">
@@ -252,37 +267,44 @@ export default function ArticleDetail() {
                 </div>
               </section>
 
-              {/* Original Source */}
+              {/* Original Source CTA */}
               {article.original_url && (
-                <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 mb-8">
-                  <p className="text-sm text-slate-400 mb-2">
-                    Want more technical details?
-                  </p>
+                <div className="mt-8 mb-12 flex flex-col sm:flex-row items-center justify-between gap-4 p-6 bg-slate-800/50 rounded-xl border border-slate-700/50">
+                  <div>
+                    <h3 className="text-white font-bold mb-1">Need the raw technical report?</h3>
+                    <p className="text-slate-400 text-sm">
+                      Read the full original documentation at the source.
+                    </p>
+                  </div>
                   <a
                     href={article.original_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center text-blue-400 hover:text-blue-300 font-medium"
+                    className="shrink-0 inline-flex items-center px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-medium rounded-lg transition-colors border border-slate-600 group"
                   >
-                    Read the original report
-                    <ExternalLink className="w-4 h-4 ml-2" />
+                    Open Original Source
+                    <ExternalLink className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                   </a>
                 </div>
               )}
             </div>
 
-            {/* CTA */}
-            <div className="bg-gradient-to-r from-blue-700 to-blue-900 rounded-xl p-8 text-white mt-12 shadow-glow-primary">
-              <h3 className="text-2xl font-bold mb-3">Stay Protected</h3>
-              <p className="text-blue-100 mb-6">
-                Get alerts like this delivered to your inbox every morning. Free, no spam.
-              </p>
-              <Link
-                to="/subscribe"
-                className="bg-white text-blue-900 px-6 py-3 rounded-lg font-bold hover:bg-blue-50 transition-colors inline-block"
-              >
-                Subscribe to Daily Alerts
-              </Link>
+            {/* CTA - Minimal & Non-Intrusive */}
+            <div className="mt-12 pt-8 border-t border-slate-800">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-6 bg-slate-900/30 rounded-xl p-6 border border-slate-800/50">
+                <div>
+                  <h3 className="text-lg font-bold text-slate-200 mb-1">Found this useful?</h3>
+                  <p className="text-slate-400 text-sm">
+                    Join 2,500+ professionals getting daily threat briefings.
+                  </p>
+                </div>
+                <Link
+                  to="/subscribe"
+                  className="shrink-0 px-5 py-2.5 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 font-medium rounded-lg border border-blue-500/20 transition-all text-sm"
+                >
+                  Get Daily Alerts
+                </Link>
+              </div>
             </div>
           </div>
         </article>

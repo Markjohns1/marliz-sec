@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { getArticles } from '../services/api';
 import ArticleCard from '../components/ArticleCard';
 import ThreatDashboard from '../components/ThreatDashboard';
@@ -9,17 +9,30 @@ import { Helmet } from 'react-helmet-async';
 import CategorySection from '../components/CategorySection';
 
 export default function Home() {
-  const [page, setPage] = useState(1);
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['articles', { page, limit: 12 }],
-    queryFn: () => getArticles({ page, limit: 12 }),
-    keepPreviousData: true
+  // const [page, setPage] = useState(1); // MIGRATED TO INFINITE QUERY
+  const {
+    data,
+    isLoading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage
+  } = useInfiniteQuery({
+    queryKey: ['articles', 'infinite'], // Unique key to force fresh fetch
+    queryFn: ({ pageParam = 1 }) => getArticles({ page: pageParam, limit: 12 }),
+    getNextPageParam: (lastPage) => {
+      // Assuming API returns { page: 1, pages: 10 }
+      return lastPage.page < lastPage.pages ? lastPage.page + 1 : undefined;
+    }
   });
+
+  // Flatten all pages into one list of articles
+  const allArticles = data?.pages.flatMap(page => page.articles) || [];
 
   // Calculate dynamic threat level from recent articles
   const currentThreatLevel = (() => {
-    if (!data?.articles?.length) return 'medium';
-    const levels = data.articles.map(a => a.simplified?.threat_level?.toLowerCase() || 'low');
+    if (!allArticles.length) return 'medium';
+    const levels = allArticles.slice(0, 10).map(a => a.simplified?.threat_level?.toLowerCase() || 'low');
     if (levels.includes('critical')) return 'critical';
     if (levels.includes('high')) return 'high';
     return 'medium';
@@ -27,7 +40,7 @@ export default function Home() {
 
   if (error) {
     return (
-      <div className="w-full py-12 text-center px-4"> {/* Changed to w-full and px-4 */}
+      <div className="w-full py-12 text-center px-4">
         <p className="text-red-600">Failed to load articles. Please try again later.</p>
       </div>
     );
@@ -82,6 +95,155 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Latest Articles - DARK MODE */}
+      <section id="latest" className="py-16 bg-slate-950 w-full">
+        <div className="w-full px-4">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-3xl font-bold text-white mb-2">Latest Threats</h2>
+                <p className="text-slate-400">Updated every 4 hours with actionable insights</p>
+              </div>
+            </div>
+
+            {isLoading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <div key={i} className="card animate-pulse bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                    <div className="bg-slate-800 aspect-video"></div>
+                    <div className="p-6 space-y-4">
+                      <div className="h-4 bg-slate-800 rounded w-1/4"></div>
+                      <div className="h-6 bg-slate-800 rounded w-3/4"></div>
+                      <div className="h-4 bg-slate-800 rounded"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : allArticles.length > 0 ? (
+              <>
+                {/* BENTO GRID LAYOUT */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+                  {/* Featured Hero Article (Span 8) */}
+                  <div className="lg:col-span-8">
+                    <div className="mb-4 flex items-center space-x-2">
+                      <span className="h-2 w-2 bg-red-500 rounded-full animate-pulse"></span>
+                      <h3 className="text-red-400 font-bold tracking-widest text-xs uppercase">Breaking Headline</h3>
+                    </div>
+                    {/* Render first article as Hero */}
+                    <div className="relative group cursor-pointer overflow-hidden rounded-2xl border border-slate-800 bg-slate-900">
+                      <Link to={`/article/${allArticles[0].slug}`}>
+                        <div className="aspect-video w-full overflow-hidden">
+                          <img
+                            src={allArticles[0].image_url}
+                            alt={allArticles[0].title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            loading="lazy"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/60 to-transparent"></div>
+                        </div>
+                        <div className="absolute bottom-0 p-8 w-full">
+                          <span className="inline-block px-3 py-1 mb-4 text-xs font-bold text-blue-400 bg-blue-900/30 border border-blue-500/30 rounded-full backdrop-blur-md">
+                            {allArticles[0].category?.name || 'FEATURED'}
+                          </span>
+                          <h2 className="text-2xl md:text-5xl font-bold text-white mb-4 leading-tight group-hover:text-blue-400 transition-colors">
+                            {allArticles[0].title}
+                          </h2>
+                          <p className="text-slate-300 text-lg line-clamp-2 max-w-3xl">
+                            {allArticles[0]?.simplified?.friendly_summary}
+                          </p>
+                        </div>
+                      </Link>
+                    </div>
+                  </div>
+
+                  {/* Trending Sidebar (Span 4) - STICKY ENABLED for Ads */}
+                  {/* HIDDEN ON MOBILE/TABLET - Visible only on LG screens */}
+                  <div className="hidden lg:block lg:col-span-4 relative">
+                    <div className="sticky top-24 space-y-6">
+
+                      {/* Ad Slot - Premium Placement */}
+                      <div className="bg-slate-900/50 rounded-xl p-6 text-center border border-slate-800 border-dashed hover:border-blue-500/30 transition-colors flex flex-col items-center justify-center min-h-[250px]">
+                        <span className="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-slate-500 uppercase tracking-wider mb-2">Advertisement</span>
+                        <p className="text-slate-600 text-sm">Your Ad Here</p>
+                      </div>
+
+                      <div>
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="text-slate-400 font-bold tracking-widest text-xs uppercase flex items-center">
+                            <TrendingUp className="w-4 h-4 mr-2" />
+                            Trending Now
+                          </h3>
+                        </div>
+
+                        <div className="space-y-4">
+                          {/* List next 3 articles */}
+                          {allArticles.slice(1, 4).map(article => (
+                            <Link key={article.id} to={`/article/${article.slug}`} className="block group bg-slate-900 p-4 rounded-xl border border-slate-800 hover:border-slate-600 transition-all shadow-sm hover:shadow-md">
+                              <h4 className="font-bold text-slate-200 group-hover:text-blue-400 transition-colors line-clamp-2 mb-2 text-sm">
+                                {article.title}
+                              </h4>
+                              <div className="flex items-center text-xs text-slate-500">
+                                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mr-2"></span>
+                                {article.category?.name}
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+
+                {/* Remaining Articles Grid */}
+                <div className="mt-16">
+                  <h3 className="text-2xl font-bold text-white mb-8 flex items-center">
+                    <div className="w-1 h-8 bg-blue-500 mr-4 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.5)]"></div>
+                    Latest Intelligence
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {allArticles.slice(4).map((article) => (
+                      <ArticleCard key={article.id} article={article} />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Load More Button */}
+                <div className="flex justify-center mt-16 pb-12">
+                  {hasNextPage ? (
+                    <button
+                      onClick={() => fetchNextPage()}
+                      disabled={isFetchingNextPage}
+                      className="px-8 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-medium transition-all shadow-lg hover:shadow-xl disabled:opacity-50 flex items-center"
+                    >
+                      {isFetchingNextPage ? (
+                        <>
+                          <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin mr-2"></span>
+                          Loading more...
+                        </>
+                      ) : (
+                        'Load More Articles'
+                      )}
+                    </button>
+                  ) : (
+                    <div className="text-slate-500 text-sm">
+                      You've reached the end of the feed.
+                    </div>
+                  )}
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-12">
+                <div className="text-slate-600 mb-4 text-6xl">📭</div>
+                <h3 className="text-xl font-bold text-white mb-2">No Intelligence Feed Available</h3>
+                <p className="text-slate-500">The system is currently fetching fresh data. Please check back in a few minutes.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
       {/* Stats Section - DARK MODE */}
       <section className="bg-slate-900 border-b border-slate-800 w-full">
         <div className="w-full py-12 px-4">
@@ -124,159 +286,29 @@ export default function Home() {
         color="text-orange-400"
       />
 
-      {/* Latest Articles - DARK MODE */}
-      <section id="latest" className="py-16 bg-slate-950 w-full">
-        <div className="w-full px-4">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex items-center justify-between mb-8">
+      {/* Newsletter CTA - Compact */}
+      <section className="bg-slate-900 border-t border-slate-800 py-8 w-full">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-6 bg-gradient-to-r from-blue-900/20 to-slate-900 rounded-2xl border border-blue-500/20">
+            <div className="flex items-center gap-4 text-center md:text-left">
+              <div className="p-3 bg-blue-500/10 rounded-lg text-blue-400 hidden md:block">
+                <Bell className="w-6 h-6" />
+              </div>
               <div>
-                <h2 className="text-3xl font-bold text-white mb-2">Latest Threats</h2>
-                <p className="text-slate-400">Updated every 4 hours with actionable insights</p>
+                <h2 className="text-lg font-bold text-white">
+                  Stay ahead of threats
+                </h2>
+                <p className="text-slate-400 text-sm">
+                  Get critical alerts delivered daily.
+                </p>
               </div>
             </div>
-
-            {isLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <div key={i} className="card animate-pulse bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
-                    <div className="bg-slate-800 aspect-video"></div>
-                    <div className="p-6 space-y-4">
-                      <div className="h-4 bg-slate-800 rounded w-1/4"></div>
-                      <div className="h-6 bg-slate-800 rounded w-3/4"></div>
-                      <div className="h-4 bg-slate-800 rounded"></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : data?.articles?.length > 0 ? (
-              <>
-                {/* BENTO GRID LAYOUT */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-
-                  {/* Featured Hero Article (Span 8) */}
-                  <div className="lg:col-span-8">
-                    <div className="mb-4 flex items-center space-x-2">
-                      <span className="h-2 w-2 bg-red-500 rounded-full animate-pulse"></span>
-                      <h3 className="text-red-400 font-bold tracking-widest text-xs uppercase">Breaking Headline</h3>
-                    </div>
-                    {/* Render first article as Hero */}
-                    <div className="relative group cursor-pointer overflow-hidden rounded-2xl border border-slate-800 bg-slate-900">
-                      <Link to={`/article/${data.articles[0].slug}`}>
-                        <div className="aspect-video w-full overflow-hidden">
-                          <img
-                            src={data.articles[0].image_url}
-                            alt={data.articles[0].title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/60 to-transparent"></div>
-                        </div>
-                        <div className="absolute bottom-0 p-8 w-full">
-                          <span className="inline-block px-3 py-1 mb-4 text-xs font-bold text-blue-400 bg-blue-900/30 border border-blue-500/30 rounded-full backdrop-blur-md">
-                            {data.articles[0].category?.name || 'FEATURED'}
-                          </span>
-                          <h2 className="text-2xl md:text-5xl font-bold text-white mb-4 leading-tight group-hover:text-blue-400 transition-colors">
-                            {data.articles[0].title}
-                          </h2>
-                          <p className="text-slate-300 text-lg line-clamp-2 max-w-3xl">
-                            {data.articles[0].simplified?.friendly_summary}
-                          </p>
-                        </div>
-                      </Link>
-                    </div>
-                  </div>
-
-                  {/* Trending Sidebar (Span 4) */}
-                  <div className="lg:col-span-4 space-y-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-slate-400 font-bold tracking-widest text-xs uppercase">Trending Now</h3>
-                    </div>
-                    {/* Ad Slot Placeholder */}
-                    <div className="bg-slate-900 rounded-xl p-6 text-center border border-slate-800 border-dashed">
-                      <p className="text-xs text-slate-500 uppercase tracking-widest">Sponsored</p>
-                      <div className="h-32 flex items-center justify-center text-slate-600 font-mono text-xs">
-                        AD PLACEMENT SLOT
-                      </div>
-                    </div>
-
-                    {/* List next 3 articles */}
-                    {data.articles.slice(1, 4).map(article => (
-                      <Link key={article.id} to={`/article/${article.slug}`} className="block group bg-slate-900 p-4 rounded-xl border border-slate-800 hover:border-slate-600 transition-all">
-                        <h4 className="font-bold text-slate-200 group-hover:text-blue-400 transition-colors line-clamp-2 mb-2">
-                          {article.title}
-                        </h4>
-                        <div className="flex items-center text-xs text-slate-500">
-                          <TrendingUp className="w-3 h-3 mr-1" />
-                          {article.category?.name} • {Math.ceil(article.simplified?.reading_time_minutes || 5)} min read
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Remaining Articles Grid */}
-                <div className="mt-16">
-                  <h3 className="text-2xl font-bold text-white mb-8 flex items-center">
-                    <div className="w-1 h-8 bg-blue-500 mr-4 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.5)]"></div>
-                    Latest Intelligence
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {data.articles.slice(4).map((article) => (
-                      <ArticleCard key={article.id} article={article} />
-                    ))}
-                  </div>
-                </div>
-
-                {/* Pagination Controls */}
-                <div className="flex justify-center items-center space-x-4 mt-20 pb-12">
-                  <button
-                    onClick={() => setPage(p => Math.max(1, p - 1))}
-                    disabled={page === 1}
-                    className="px-6 py-3 border border-slate-800 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white disabled:opacity-50 transition-all font-medium"
-                  >
-                    Previous
-                  </button>
-
-                  <span className="text-slate-500 font-mono">
-                    Page <span className="text-white font-bold">{page}</span> of {data.pages}
-                  </span>
-
-                  <button
-                    onClick={() => setPage(p => Math.min(data.pages, p + 1))}
-                    disabled={page === data.pages}
-                    className="px-6 py-3 border border-slate-800 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white disabled:opacity-50 transition-all font-medium"
-                  >
-                    Next
-                  </button>
-                </div>
-              </>
-            ) : (
-              <div className="text-center py-12">
-                <div className="text-slate-600 mb-4 text-6xl">📭</div>
-                <h3 className="text-xl font-bold text-white mb-2">No Intelligence Feed Available</h3>
-                <p className="text-slate-500">The system is currently fetching fresh data. Please check back in a few minutes.</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* Newsletter CTA - NOW FULL WIDTH */}
-      <section className="bg-primary-600 text-white py-16 w-full">
-        <div className="w-full px-4 text-center"> {/* Removed container-custom */}
-          <div className="max-w-7xl mx-auto"> {/* Added max-w-7xl for content */}
-            <Bell className="w-16 h-16 mx-auto mb-6 opacity-90" />
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Never Miss a Critical Threat
-            </h2>
-            <p className="text-xl text-primary-100 mb-8 max-w-2xl mx-auto">
-              Get simplified security alerts delivered to your inbox. Join 2,500+ smart business owners staying protected.
-            </p>
             <Link
               to="/subscribe"
-              className="bg-white text-primary-700 px-8 py-4 rounded-lg font-semibold hover:bg-primary-50 transition-colors shadow-lg inline-flex items-center"
+              className="w-full md:w-auto px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-lg transition-colors text-sm text-center flex items-center justify-center"
             >
               Start Free Alerts
-              <ChevronRight className="w-5 h-5 ml-2" />
+              <ChevronRight className="w-4 h-4 ml-1.5" />
             </Link>
           </div>
         </div>
