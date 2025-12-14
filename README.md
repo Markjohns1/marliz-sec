@@ -2,7 +2,20 @@
 
 SEO-optimized news aggregator that translates technical cybersecurity threats into actionable advice for non-technical individuals and businesses.
 
+## Table of Contents
+- [The Problem We Solve](#the-problem-we-solve)
+- [Our Solution](#our-solution)
+- [System Architecture](#system-architecture)
+- [Project Structure](#project-structure)
+- [Quick Start](#quick-start)
+- [Key Features](#key-features)
+- [Content Strategy](#content-strategy)
+- [Deployment](#deployment)
+- [Success Metrics](#success-metrics)
+- [Current Project Status](#current-project-status)
+
 ## The Problem We Solve
+
 
 - **Cybersecurity news is often too technical** for the average person to understand.
 - **Complexity creates vulnerability**: People need to understand threats to protect themselves, but jargon gets in the way.
