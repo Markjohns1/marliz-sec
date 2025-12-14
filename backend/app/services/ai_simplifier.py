@@ -134,9 +134,10 @@ class AISimplifier:
             # CHECK RELEVANCE
             if not result.get("is_relevant", True):
                 logger.info(f"Article {article.id} rejected by AI as irrelevant.")
-                # We can mark it as 'REJECTED' or just delete it. 
-                # For now let's mark it as a new status or just delete to save space?
-                # Let's delete strictly irrelevant ones to keep DB clean.
+                # Delete any existing simplified content first (foreign key constraint)
+                existing_simplified = db.query(SimplifiedContent).filter_by(article_id=article.id).first()
+                if existing_simplified:
+                    db.delete(existing_simplified)
                 db.delete(article)
                 db.commit()
                 return True # Handled successfully (by rejection)
