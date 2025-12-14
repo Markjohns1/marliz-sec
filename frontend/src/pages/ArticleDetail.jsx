@@ -249,6 +249,12 @@ export default function ArticleDetail() {
                 </p>
               </section>
 
+              {/* MID-ARTICLE AD PLACEMENT */}
+              <div className="my-12 bg-slate-900/50 rounded-xl p-8 text-center border border-slate-800 border-dashed flex flex-col items-center justify-center min-h-[250px]">
+                <span className="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-slate-500 uppercase tracking-wider mb-2">Advertisement</span>
+                <p className="text-slate-500 font-bold text-lg tracking-widest">AD DISPLAY</p>
+              </div>
+
               {/* Action Steps */}
               <section className="bg-slate-900/50 rounded-xl p-8 border border-slate-800 mb-8">
                 <h2 className="text-2xl font-bold text-white mb-6">

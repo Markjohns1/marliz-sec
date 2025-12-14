@@ -165,7 +165,7 @@ export default function Home() {
                       {/* Ad Slot - Premium Placement */}
                       <div className="bg-slate-900/50 rounded-xl p-6 text-center border border-slate-800 border-dashed hover:border-blue-500/30 transition-colors flex flex-col items-center justify-center min-h-[250px]">
                         <span className="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-slate-500 uppercase tracking-wider mb-2">Advertisement</span>
-                        <p className="text-slate-600 text-sm">Your Ad Here</p>
+                        <p className="text-slate-500 font-bold text-lg tracking-widest">AD DISPLAY</p>
                       </div>
 
                       <div>
@@ -202,7 +202,7 @@ export default function Home() {
                   <div className="lg:hidden mb-12">
                     <div className="bg-slate-900/50 rounded-xl p-6 text-center border border-slate-800 border-dashed flex flex-col items-center justify-center min-h-[250px]">
                       <span className="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-slate-500 uppercase tracking-wider mb-2">Advertisement</span>
-                      <p className="text-slate-600 text-sm">Your Mobile Ad Here</p>
+                      <p className="text-slate-500 font-bold text-lg tracking-widest">AD DISPLAY</p>
                     </div>
                   </div>
 

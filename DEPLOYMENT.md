@@ -4,47 +4,35 @@
 - **SSH Access:** You must be able to log in to your Droplet: `ssh root@<DROPLET_IP>`
 - **Docker Installed:** Run `docker -v` to check. If not, run `snap install docker`.
 
-## 2. Server Setup (First Time Only)
-On your local machine, tell the Droplet to pull your code:
+## 2. Server Setup
+**User:** `devops`
+**Server IP:** `146.190.146.121`
+
+### C. Enable Clean URL (Nginx Proxy)
+Run this once to configure the server to forward traffic to your app:
 
 ```bash
-# SSH into your server
-ssh root@146.190.146.121
+sudo bash -c 'cat > /etc/nginx/sites-available/marlizintel <<EOF
+server {
+    server_name marlizintel.tymirahealth.com;
+    location / {
+        proxy_pass http://localhost:3005;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+EOF'
 
-# Clone the repository (if not already there)
-git clone https://github.com/Markjohns1/marliz-sec.git
-cd marliz-sec
-```
-
-## 3. Configure Environment
-Create the `.env` file on the server:
-```bash
-nano .env
-```
-Paste your secrets (get them from your local `.env` or App Platform settings):
-```ini
-NEWSDATA_IO_KEY=pub_...
-GROQ_API_KEY=gsk_...
-ADMIN_SECRET=...
-FETCH_INTERVAL_HOURS=4
-```
-Save with `Ctrl+O`, `Enter`, then `Ctrl+X`.
-
-## 4. Run the App
-Start the application with Docker Compose:
-
-```bash
-# Pull latest changes
-git pull origin main
-
-# Start the container (detached mode)
-docker compose up -d --build
+sudo ln -s /etc/nginx/sites-available/marlizintel /etc/nginx/sites-enabled/
+sudo nginx -t && sudo systemctl reload nginx
+sudo certbot --nginx -d marlizintel.tymirahealth.com
 ```
 
 ## 5. Check Status
-- **View Logs:** `docker compose logs -f`
-- **Check Container:** `docker ps`
-- **Visit Site:** `http://146.190.146.121:3000`
+- **Visit Site (Production):** `https://marlizintel.tymirahealth.com`
+- **Check Logs:** `sudo docker compose logs -f web`
 
 ## 6. DNS Update
 Go to your DNS provider (DigitalOcean Networking) and update the **A Record**:

@@ -124,6 +124,7 @@ class NewsFetcher:
                 )
                 
                 db.add(new_article)
+                db.flush()  # Ensure slug is reserved for next iteration
                 new_count += 1
             
             db.commit()
