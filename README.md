@@ -112,7 +112,7 @@ Frontend:
 | `run.py` | Script to run the application |
 
 
-Quick Start
+## Quick Start
 1. Backend Setup
 bash
 
@@ -200,7 +200,7 @@ Tables:
 
     subscribers - Email newsletter subscribers
 
-Key Features:
+## Key Features
 
     Automatic slug generation (SEO-friendly URLs)
 
@@ -212,7 +212,7 @@ Key Features:
 
     Full-text search ready
 
-Content Strategy
+## Content Strategy
 Categories:
 
     Ransomware - Encryption attacks
@@ -312,7 +312,7 @@ Target Keywords:
 
     Phishing prevention business (720 searches/month)
 
-Deployment
+## Deployment
 Development:
 bash
 
@@ -350,7 +350,7 @@ DATABASE_URL=postgresql://user:pass@host/db
 python init_db.py
 
 Cost estimate: $15-20/month for 10K users
-Success Metrics
+## Success Metrics
 Technical:
 
     API response time: <200ms
