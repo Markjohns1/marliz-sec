@@ -8,6 +8,27 @@
 **User:** `devops`
 **Server IP:** `146.190.146.121`
 
+## 3. How to Update (Deploy New Changes)
+Whenever you push code to GitHub, run these commands on the server:
+
+```bash
+# 1. Login
+ssh devops@146.190.146.121
+
+# 2. Go to project folder
+cd ~/cybersecurity-news   # (Adjust path if different)
+
+# 3. Pull latest code
+git pull origin main
+
+# 4. Rebuild and restart services
+# (Required when Python/React code changes)
+docker compose up -d --build
+
+# 5. Check logs to confirm it started
+docker compose logs -f web
+```
+
 ### C. Enable Clean URL (Nginx Proxy)
 Run this once to configure the server to forward traffic to your app:
 
