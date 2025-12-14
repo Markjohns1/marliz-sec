@@ -123,9 +123,12 @@ export default function Header({ categories }) {
                   Categories
                 </div>
 
+                <Link to="/category/ransomware" onClick={() => setMobileMenuOpen(false)} className="py-2 px-3 text-slate-300 hover:text-white hover:bg-slate-800 rounded-md block">Ransomware</Link>
+                <Link to="/category/phishing" onClick={() => setMobileMenuOpen(false)} className="py-2 px-3 text-slate-300 hover:text-white hover:bg-slate-800 rounded-md block">Phishing & Email</Link>
                 <Link to="/category/data-breach" onClick={() => setMobileMenuOpen(false)} className="py-2 px-3 text-slate-300 hover:text-white hover:bg-slate-800 rounded-md block">Data Breaches</Link>
                 <Link to="/category/malware" onClick={() => setMobileMenuOpen(false)} className="py-2 px-3 text-slate-300 hover:text-white hover:bg-slate-800 rounded-md block">Malware & Viruses</Link>
-                <Link to="/category/phishing" onClick={() => setMobileMenuOpen(false)} className="py-2 px-3 text-slate-300 hover:text-white hover:bg-slate-800 rounded-md block">Phishing Alerts</Link>
+                <Link to="/category/vulnerability" onClick={() => setMobileMenuOpen(false)} className="py-2 px-3 text-slate-300 hover:text-white hover:bg-slate-800 rounded-md block">Vulnerabilities</Link>
+                <Link to="/category/general" onClick={() => setMobileMenuOpen(false)} className="py-2 px-3 text-slate-300 hover:text-white hover:bg-slate-800 rounded-md block">General Security</Link>
 
                 <Link
                   to="/about"

@@ -276,6 +276,18 @@ export default function Home() {
 
       {/* Category Sections */}
       <CategorySection
+        title="Ransomware Attacks"
+        slug="ransomware"
+        icon={Shield}
+        color="text-red-500"
+      />
+      <CategorySection
+        title="Phishing Alerts"
+        slug="phishing"
+        icon={Mail}
+        color="text-orange-400"
+      />
+      <CategorySection
         title="Data Breaches"
         slug="data-breach"
         icon={Database}
@@ -285,13 +297,13 @@ export default function Home() {
         title="Malware & Viruses"
         slug="malware"
         icon={FileWarning}
-        color="text-red-400"
+        color="text-purple-400"
       />
       <CategorySection
-        title="Phishing Alerts"
-        slug="phishing"
-        icon={Mail}
-        color="text-orange-400"
+        title="Vulnerabilities"
+        slug="vulnerability"
+        icon={Shield}
+        color="text-yellow-400"
       />
 
       {/* Newsletter CTA - Compact */}
