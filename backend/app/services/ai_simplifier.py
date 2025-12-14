@@ -18,6 +18,17 @@ class AISimplifier:
         # Changed to faster model with higher rate limits
         self.model = "llama-3.1-8b-instant"  # 30k tokens/min vs 12k
         self.base_url = "https://api.groq.com/openai/v1/chat/completions"
+        
+        # Category mapping (slug -> database ID)
+        # Must match categories in database
+        self.category_map = {
+            "ransomware": 1,
+            "phishing": 2,
+            "data-breach": 3,
+            "malware": 4,
+            "vulnerability": 5,
+            "general": 6
+        }
     
     async def process_pending_articles(self) -> dict:
         """Process all RAW articles through AI simplification"""
@@ -150,6 +161,12 @@ class AISimplifier:
             article.status = ArticleStatus.READY
             article.keywords = self._extract_keywords(result)
             
+            # Update category based on AI classification
+            ai_category = result.get("category", "general").lower().replace(" ", "-")
+            if ai_category in self.category_map:
+                article.category_id = self.category_map[ai_category]
+                logger.info(f"Article {article.id} classified as: {ai_category}")
+            
             db.commit()
             return True
             
@@ -179,6 +196,7 @@ We need to know: HOW did they get in? WHAT tech was exploited? WHAT is the speci
 RESPOND WITH VALID JSON ONLY:
 {{
   "is_relevant": true,
+  "category": "ransomware|phishing|data-breach|malware|vulnerability|general",
   "summary": "THE NEWS: 3 sentences summarizing WHAT happened. Focus on the event itself.",
   "attack_vector": "THE MECHANISM: Exactly HOW the attack occurred. Technical details. Example: 'Attackers used a zero-day in the V8 engine to execute code via a malicious PDF.'",
   "impact": "THE CONSEQUENCE: Specific technical and business impact. Example: 'Unencrypted PII was exfiltrated to a C2 server.'",
@@ -186,6 +204,14 @@ RESPOND WITH VALID JSON ONLY:
   "threat_level": "low|medium|high|critical",
   "keywords": ["keyword1", "keyword2", "keyword3"]
 }}
+
+CATEGORY DEFINITIONS:
+- ransomware: Encryption attacks, file locking, ransom demands.
+- phishing: Email scams, credential harvesting, social engineering.
+- data-breach: Customer data theft, database leaks, exposed records.
+- malware: Viruses, trojans, spyware, keyloggers.
+- vulnerability: CVEs, zero-days, software flaws, patches needed.
+- general: Best practices, security news, industry trends.
 
 WRITING RULES:
 1. RELEVANCE CHECK: If the article is NOT about a specific cybersecurity threat, vulnerability, or attack (e.g. if it is about lifestyle, politics, general tech, finance), return "is_relevant": false and empty strings for other fields.
