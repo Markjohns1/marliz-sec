@@ -25,12 +25,25 @@ An automated system that:
     Provides specific action steps for each threat
 
 ## System Architecture
-text
-
-NewsData.io API → FastAPI Backend → Groq AI → SQLite/PostgreSQL → React Frontend
-     ↓                  ↓              ↓            ↓                  ↓
-  Raw news        Processing     Simplification  Storage          User-friendly
-                                    (Llama 3.3)                  mobile-first UI
+```mermaid
+graph TD
+    User([End User]) <-->|View News| Frontend[React + Vite Frontend]
+    Frontend <-->|REST API| Backend[FastAPI Backend]
+    
+    subgraph Data_Pipeline [Automated Data Pipeline]
+        Scheduler[APScheduler] -->|Trigger Every 4h| Fetcher[News Fetcher Service]
+        Fetcher -->|1. Fetch Raw News| NewsAPI[NewsData.io API]
+        NewsAPI -->|2. Return Articles| Fetcher
+        Fetcher -->|3. Store Raw Data| DB[(Database)]
+        
+        DB -->|4. Detect New Articles| Simplifier[AI Simplifier Service]
+        Simplifier -->|5. Send Text| Groq[Groq AI (Llama 3.3)]
+        Groq -->|6. Return Simplified Text| Simplifier
+        Simplifier -->|7. Store Processed Content| DB
+    end
+    
+    Backend <-->|Query Content| DB
+```
 
 Technology Stack
 
