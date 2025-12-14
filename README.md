@@ -50,7 +50,7 @@ graph TD
         Fetcher -->|3. Store Raw Data| DB[(Database)]
         
         DB -->|4. Detect New Articles| Simplifier[AI Simplifier Service]
-        Simplifier -->|5. Send Text| Groq[Groq AI (Llama 3.3)]
+        Simplifier -->|5. Send Text| Groq["Groq AI (Llama 3.3)"]
         Groq -->|6. Return Simplified Text| Simplifier
         Simplifier -->|7. Store Processed Content| DB
     end
