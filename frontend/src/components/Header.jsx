@@ -109,17 +109,32 @@ export default function Header({ categories }) {
                   Live Feed
                 </Link>
 
-                {categories?.map((cat) => (
-                  <Link
-                    key={cat.slug}
-                    to={`/category/${cat.slug}`}
-                    className={`py-3 px-3 rounded-md font-medium transition-colors text-left ${isActive(`/category/${cat.slug}`) ? 'text-white bg-slate-800' : 'text-slate-300 hover:text-white hover:bg-slate-800'
-                      }`}
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    {cat.name}
-                  </Link>
-                ))}
+                <Link
+                  to="/all-threats"
+                  className={`py-3 px-3 rounded-md font-medium transition-colors text-left flex items-center ${isActive('/all-threats') ? 'text-white bg-slate-800' : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                    }`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Shield className="w-4 h-4 mr-3 text-blue-500" />
+                  All Threats
+                </Link>
+
+                <div className="pt-2 pb-1 text-xs font-bold text-slate-500 uppercase tracking-widest px-3">
+                  Categories
+                </div>
+
+                <Link to="/category/data-breach" onClick={() => setMobileMenuOpen(false)} className="py-2 px-3 text-slate-300 hover:text-white hover:bg-slate-800 rounded-md block">Data Breaches</Link>
+                <Link to="/category/malware" onClick={() => setMobileMenuOpen(false)} className="py-2 px-3 text-slate-300 hover:text-white hover:bg-slate-800 rounded-md block">Malware & Viruses</Link>
+                <Link to="/category/phishing" onClick={() => setMobileMenuOpen(false)} className="py-2 px-3 text-slate-300 hover:text-white hover:bg-slate-800 rounded-md block">Phishing Alerts</Link>
+
+                <Link
+                  to="/about"
+                  className={`mt-2 py-3 px-3 rounded-md font-medium transition-colors text-left flex items-center ${isActive('/about') ? 'text-white bg-slate-800' : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                    }`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  About Us
+                </Link>
 
                 <div className="pt-4 mt-2 border-t border-slate-800">
                   <Link

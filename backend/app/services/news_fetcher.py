@@ -152,7 +152,7 @@ class NewsFetcher:
         strong_terms = [
             "cyber", "ransomware", "malware", "phishing", "hacker", "hacking", 
             "vulnerability", "exploit", "ddos", "spyware", "trojan", "keylogger",
-            "dark web", "infosec", "zero-day", "backdoor", "cve-"
+            "dark web", "infosec", "zero-day", "backdoor", "cve-", "forensics"
         ]
         
         # Weak terms: Could be medical, physical, or political (require context)
@@ -162,11 +162,14 @@ class NewsFetcher:
         context_terms = [
             "data", "digital", "network", "server", "computer", "software", "internet", 
             "online", "web", "password", "credential", "cloud", "system", "device", 
-            "app ", "application", "code", "file", "database"
+            "app ", "application", "code", "file", "database", "linux", "windows"
         ]
 
-        # 1. Check exclusions (Medical/Sports)
-        excluded_terms = ["cancer", "tumor", "pancreatic", "surgery", "football", "soccer", "cricket", "nba "]
+        # 1. Check exclusions (Medical/Sports/Finance/General)
+        excluded_terms = [
+            "cancer", "tumor", "pancreatic", "surgery", "football", "soccer", "cricket", "nba ",
+            "financial advice", "stock market", "investment", "family sharing", "dating", "relationship"
+        ]
         if any(term in full_text for term in excluded_terms):
             logger.info(f"Skipping article (Excluded Term): {title[:50]}...")
             return True
