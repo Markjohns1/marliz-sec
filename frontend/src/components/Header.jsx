@@ -97,7 +97,7 @@ export default function Header({ categories }) {
 
         {
           mobileMenuOpen && (
-            <div className="md:hidden py-4 border-t border-slate-800 animate-fadeIn bg-slate-900 w-full absolute left-0 shadow-xl">
+            <div className="md:hidden py-4 border-t border-slate-800 animate-fadeIn bg-slate-900 w-full absolute left-0 shadow-xl max-h-[calc(100vh-4rem)] overflow-y-auto pb-24">
               <div className="flex flex-col space-y-2 px-4">
                 <Link
                   to="/"
