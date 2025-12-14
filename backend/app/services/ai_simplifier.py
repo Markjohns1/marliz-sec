@@ -43,9 +43,13 @@ class AISimplifier:
                         processed += 1
                         logger.info(f"✓ Processed: {article.title[:50]}...")
                     else:
-                        failed += 1
-                        article.status = ArticleStatus.RAW  # Reset for retry
-                        db.commit()
+                        # Mark as RAW for retry if it failed (but not if it was just irrelevant)
+                        # The _simplify_article method should handle status for irrelevant items.
+                        # If it returned False but didn't change status, we assume it failed.
+                        if article.status == ArticleStatus.PROCESSING:
+                             failed += 1
+                             article.status = ArticleStatus.RAW
+                             db.commit()
                     
                     # Add delay to avoid rate limits (500ms between requests)
                     await asyncio.sleep(2.0)
@@ -116,6 +120,16 @@ class AISimplifier:
                 logger.error(f"Failed to parse response for article {article.id}")
                 return False
             
+            # CHECK RELEVANCE
+            if not result.get("is_relevant", True):
+                logger.info(f"Article {article.id} rejected by AI as irrelevant.")
+                # We can mark it as 'REJECTED' or just delete it. 
+                # For now let's mark it as a new status or just delete to save space?
+                # Let's delete strictly irrelevant ones to keep DB clean.
+                db.delete(article)
+                db.commit()
+                return True # Handled successfully (by rejection)
+            
             # Calculate reading time (200 words per minute)
             word_count = len(result["summary"].split()) + len(result["impact"].split())
             reading_time = max(2, (word_count // 200) + 1)
@@ -164,6 +178,7 @@ We need to know: HOW did they get in? WHAT tech was exploited? WHAT is the speci
 
 RESPOND WITH VALID JSON ONLY:
 {{
+  "is_relevant": true,
   "summary": "THE NEWS: 3 sentences summarizing WHAT happened. Focus on the event itself.",
   "attack_vector": "THE MECHANISM: Exactly HOW the attack occurred. Technical details. Example: 'Attackers used a zero-day in the V8 engine to execute code via a malicious PDF.'",
   "impact": "THE CONSEQUENCE: Specific technical and business impact. Example: 'Unencrypted PII was exfiltrated to a C2 server.'",
@@ -173,10 +188,11 @@ RESPOND WITH VALID JSON ONLY:
 }}
 
 WRITING RULES:
-1. NO REGIONAL BIAS: Do not mention specific countries (Kenya, USA, etc.) unless the attack is EXCLUSIVELY targeting that nation. Write for a borderless, global audience.
-2. NO FLUFF: Do not say 'Stay safe' or 'In the digital age'. Start directly with the threat.
-3. NO NONSENSE: If the article is vague, state 'Technical details are limited' rather than inventing them.
-4. NO EMOJIS: Do not use emojis in the summary, impact, or actions. Use only professional technical language.
+1. RELEVANCE CHECK: If the article is NOT about a specific cybersecurity threat, vulnerability, or attack (e.g. if it is about lifestyle, politics, general tech, finance), return "is_relevant": false and empty strings for other fields.
+2. NO REGIONAL BIAS: Do not mention specific countries (Kenya, USA, etc.) unless the attack is EXCLUSIVELY targeting that nation. Write for a borderless, global audience.
+3. NO FLUFF: Do not say 'Stay safe' or 'In the digital age'. Start directly with the threat.
+4. NO NONSENSE: If the article is vague, state 'Technical details are limited' rather than inventing them.
+5. NO EMOJIS: Do not use emojis in the summary, impact, or actions. Use only professional technical language.
 5. THREAT LEVELS:
    - CRITICAL: Active Zero-Day or Wormable RCE.
    - HIGH: Active Exploitation.
@@ -197,6 +213,12 @@ RETURN ONLY THE JSON OBJECT."""
             result = json.loads(cleaned)
             
             # Validate structure
+            # is_relevant is optional, default to True if missing (legacy support) but usually strictly required by prompt
+            is_relevant = result.get("is_relevant", True)
+            
+            if not is_relevant:
+                 return {"is_relevant": False}
+
             required = ["summary", "attack_vector", "impact", "actions", "threat_level"]
             if not all(key in result for key in required):
                 return None
