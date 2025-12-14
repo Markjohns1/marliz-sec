@@ -209,6 +209,7 @@ export default function ArticleDetail() {
                   src={article.image_url}
                   alt={article.title}
                   className="w-full"
+                  loading="lazy"
                 />
               </div>
             )}
@@ -333,6 +334,7 @@ export default function ArticleDetail() {
                           src={article.image_url}
                           alt={article.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                          loading="lazy"
                         />
                       </div>
                     )}
