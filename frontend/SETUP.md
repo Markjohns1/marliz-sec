@@ -153,8 +153,8 @@ npm run build
 
 ## Next Steps
 
-✅ Frontend complete
-✅ Backend complete
+- Frontend complete
+- Backend complete
 🎯 Add your API keys
 🚀 Deploy to production
 📈 Start marketing!
