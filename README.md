@@ -1,15 +1,14 @@
-# **Marliz Sec News** - AI-Powered Cybersecurity News for Small Businesses
+# **Marliz Sec News** - AI-Powered Cybersecurity News for Everyone
 
-SEO-optimized news aggregator that translates technical cybersecurity threats into actionable advice for non-technical business owners.
-The Problem We Solve
+SEO-optimized news aggregator that translates technical cybersecurity threats into actionable advice for non-technical individuals and businesses.
 
-    46% of cyberattacks target small businesses
+## The Problem We Solve
 
-    60% of attacked small businesses close within 6 months
+- **Cybersecurity news is often too technical** for the average person to understand.
+- **Complexity creates vulnerability**: People need to understand threats to protect themselves, but jargon gets in the way.
+- **Everyone needs protection**: From individuals to small businesses, everyone needs simple, actionable security advice.
+- **Critical information is often buried** in complicated reports.
 
-    Existing cybersecurity news is too technical for non-IT business owners
-
-    Small businesses need simple, actionable security advice
 
 ## **Our Solution**
 
