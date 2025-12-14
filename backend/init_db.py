@@ -16,14 +16,14 @@ def seed_categories():
         {
             "name": "Ransomware",
             "slug": "ransomware",
-            "description": "Ransomware attacks and protection strategies for small businesses",
+            "description": "Ransomware attacks and protection strategies",
             "icon": "",
             "priority": 100
         },
         {
             "name": "Phishing & Email Security",
             "slug": "phishing",
-            "description": "Email scams, phishing attacks, and how to protect your business",
+            "description": "Email scams, phishing attacks, and social engineering",
             "icon": "",
             "priority": 90
         },
@@ -42,11 +42,11 @@ def seed_categories():
             "priority": 70
         },
         {
-            "name": "Password Security",
-            "slug": "passwords",
-            "description": "Password management and authentication security",
+            "name": "Vulnerabilities",
+            "slug": "vulnerability",
+            "description": "CVEs, zero-days, software flaws, and patches",
             "icon": "",
-            "priority": 60
+            "priority": 65
         },
         {
             "name": "General Security",

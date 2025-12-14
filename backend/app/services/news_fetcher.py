@@ -28,13 +28,13 @@ class NewsFetcher:
             "cybersecurity"
         ]
         
-        # Category mapping
+        # Category mapping (must match init_db.py)
         self.category_map = {
             "ransomware": 1,
             "phishing": 2,
             "data breach": 3,
             "malware": 4,
-            "email security": 5,
+            "vulnerability": 5,
             "general": 6
         }
     
@@ -197,14 +197,14 @@ class NewsFetcher:
         
         if "ransomware" in text:
             return self.category_map["ransomware"]
-        elif "phishing" in text or "email" in text:
+        elif "phishing" in text or "scam" in text:
             return self.category_map["phishing"]
         elif "breach" in text or "data leak" in text:
             return self.category_map["data breach"]
-        elif "malware" in text or "virus" in text:
+        elif "malware" in text or "virus" in text or "trojan" in text:
             return self.category_map["malware"]
-        elif "email" in text:
-            return self.category_map["email security"]
+        elif "cve" in text or "vulnerability" in text or "zero-day" in text or "patch" in text:
+            return self.category_map["vulnerability"]
         else:
             return self.category_map["general"]
     
