@@ -145,17 +145,30 @@ class AISimplifier:
             word_count = len(result["summary"].split()) + len(result["impact"].split())
             reading_time = max(2, (word_count // 200) + 1)
             
-            # Save simplified content
-            simplified = SimplifiedContent(
-                article_id=article.id,
-                friendly_summary=result["summary"],
-                attack_vector=result["attack_vector"],
-                business_impact=result["impact"],
-                action_steps=json.dumps(result["actions"]),
-                threat_level=ThreatLevel[result["threat_level"].upper()],
-                reading_time_minutes=reading_time
-            )
-            db.add(simplified)
+            # Check if simplified content already exists (for re-processing)
+            existing_simplified = db.query(SimplifiedContent).filter_by(article_id=article.id).first()
+            
+            if existing_simplified:
+                # Update existing record
+                existing_simplified.friendly_summary = result["summary"]
+                existing_simplified.attack_vector = result["attack_vector"]
+                existing_simplified.business_impact = result["impact"]
+                existing_simplified.action_steps = json.dumps(result["actions"])
+                existing_simplified.threat_level = ThreatLevel[result["threat_level"].upper()]
+                existing_simplified.reading_time_minutes = reading_time
+                logger.info(f"Updated existing simplified content for article {article.id}")
+            else:
+                # Create new record
+                simplified = SimplifiedContent(
+                    article_id=article.id,
+                    friendly_summary=result["summary"],
+                    attack_vector=result["attack_vector"],
+                    business_impact=result["impact"],
+                    action_steps=json.dumps(result["actions"]),
+                    threat_level=ThreatLevel[result["threat_level"].upper()],
+                    reading_time_minutes=reading_time
+                )
+                db.add(simplified)
             
             # Update article status
             article.status = ArticleStatus.READY
