@@ -38,25 +38,59 @@ An automated system that:
 
 ## System Architecture
 
-```mermaid
-graph TD
-    User([End User]) <-->|View News| Frontend[React + Vite Frontend]
-    Frontend <-->|REST API| Backend[FastAPI Backend]
-    
-    subgraph Data_Pipeline[Automated Data Pipeline]
-        Scheduler[APScheduler] -->|Trigger Every 4h| Fetcher[News Fetcher Service]
-        Fetcher -->|1. Fetch Raw News| NewsAPI[NewsData.io API]
-        NewsAPI -->|2. Return Articles| Fetcher
-        Fetcher -->|3. Store Raw Data| DB[(Database)]
-        
-        DB -->|4. Detect New Articles| Simplifier[AI Simplifier Service]
-        Simplifier -->|5. Send Text| Groq["Groq AI - Llama 3.3"]
-        Groq -->|6. Return Simplified Text| Simplifier
-        Simplifier -->|7. Store Processed Content| DB
-    end
-    
-    Backend <-->|Query Content| DB
+### Overview
+
+The system consists of three main layers: **Frontend**, **Backend API**, and **Automated Data Pipeline**.
+
+### Components
+
+| Component | Technology | Responsibility |
+|-----------|------------|----------------|
+| Frontend | React + Vite | User interface for browsing news |
+| Backend API | FastAPI | REST API serving articles to frontend |
+| Database | SQLite (dev) / PostgreSQL (prod) | Stores articles and simplified content |
+| News Fetcher | Python service | Fetches raw news from NewsData.io |
+| AI Simplifier | Python service | Sends articles to Groq AI for simplification |
+| Scheduler | APScheduler | Triggers automated jobs every 4 hours |
+
+### Data Flow
+
 ```
+1. FETCH (Every 4 hours)
+   Scheduler triggers → News Fetcher → NewsData.io API
+                                            ↓
+                                    Raw articles returned
+                                            ↓
+                        Articles stored in database (status: RAW)
+
+2. SIMPLIFY (After fetch)
+   Scheduler triggers → AI Simplifier → Reads RAW articles
+                                            ↓
+                        Sends content to Groq AI (Llama 3.3)
+                                            ↓
+                        AI returns: summary, impact, actions, threat_level
+                                            ↓
+                        Simplified content stored (status: READY)
+
+3. SERVE (On user request)
+   User opens website → React Frontend → Calls /api/articles
+                                            ↓
+                        FastAPI queries database for READY articles
+                                            ↓
+                        JSON response with simplified content
+                                            ↓
+                        Frontend renders news cards with threat levels
+```
+
+### API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/articles/` | GET | List all published articles |
+| `/api/articles/{slug}` | GET | Get single article by slug |
+| `/api/categories/` | GET | List all categories |
+| `/api/admin/fetch-news` | POST | Manually trigger news fetch |
+| `/api/admin/simplify` | POST | Manually trigger AI processing |
 
 ## Technology Stack
 
