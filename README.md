@@ -434,7 +434,7 @@ Support
 
     Database Issues: rm cybersec_news.db && python init_db.py
 
-    Scheduler Issues: Check logs for "Scheduler started"You're right, my apologies. Here's your **actual current project status** in markdown format:
+    Scheduler Issues: Check logs for "Scheduler started"
 
 # Current Project Status
 
@@ -579,4 +579,3 @@ npm run dev
 # Backend: Look for "News fetch completed"
 # Frontend: Check browser console for errors
 ```
-
