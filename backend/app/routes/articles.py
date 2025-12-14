@@ -41,13 +41,17 @@ def get_articles(
     if threat_level:
         query = query.filter(models.SimplifiedContent.threat_level == threat_level)
     
-    # Search in title and summary
+    # Search in multiple fields for better results
     if search:
         search_term = f"%{search}%"
         query = query.filter(
             or_(
                 models.Article.title.ilike(search_term),
-                models.SimplifiedContent.friendly_summary.ilike(search_term)
+                models.Article.original_content.ilike(search_term),
+                models.Article.keywords.ilike(search_term),
+                models.SimplifiedContent.friendly_summary.ilike(search_term),
+                models.SimplifiedContent.attack_vector.ilike(search_term),
+                models.SimplifiedContent.business_impact.ilike(search_term)
             )
         )
     
