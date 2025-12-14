@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Clock, TrendingUp, AlertCircle, Shield, AlertTriangle, CheckCircle, Info } from 'lucide-react';
+import { Clock, TrendingUp, AlertCircle, Shield, AlertTriangle, CheckCircle, Info, Eye, Users } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function ArticleCard({ article }) {
@@ -35,6 +35,10 @@ export default function ArticleCard({ article }) {
     ? formatDistanceToNow(new Date(article.published_at), { addSuffix: true })
     : 'Recently';
 
+  // View count (show at least 1 for social proof)
+  const viewCount = Math.max(article.views || 0, 1);
+  const viewText = viewCount === 1 ? '1 view' : `${viewCount.toLocaleString()} views`;
+
   return (
     <article className="card group flex flex-col h-full bg-slate-900 border border-slate-800 hover:border-slate-700 transition-all duration-300">
       <div className="aspect-video overflow-hidden relative overflow-hidden group-hover:shadow-2xl transition-all duration-300">
@@ -66,17 +70,17 @@ export default function ArticleCard({ article }) {
         )}
       </div>
 
-      <div className="p-6">
+      <div className="p-6 flex-1 flex flex-col">
         <div className="flex items-center justify-between mb-3">
           <span className={config.badge}>
             {config.icon} {config.text}
           </span>
 
-          {article.category && (
-            <span className="text-xs font-medium text-slate-500">
-              {article.category.icon} {article.category.name}
-            </span>
-          )}
+          {/* View Count - Social Proof */}
+          <span className="flex items-center text-xs text-slate-400">
+            <Eye className="w-3 h-3 mr-1" />
+            {viewText}
+          </span>
         </div>
 
         <Link to={`/article/${article.slug}`}>
@@ -86,14 +90,22 @@ export default function ArticleCard({ article }) {
         </Link>
 
         {article.simplified?.friendly_summary && (
-          <p className="text-slate-400 mb-4 line-clamp-2 leading-relaxed text-sm">
+          <p className="text-slate-400 mb-4 line-clamp-2 leading-relaxed text-sm flex-1">
             {article.simplified.friendly_summary}
           </p>
         )}
 
+        {/* Impact & Who's at Risk */}
+        {article.simplified?.business_impact && (
+          <div className="mb-4 p-3 bg-slate-800/50 rounded-lg border border-slate-700/50">
+            <div className="flex items-start text-xs text-slate-300">
+              <Users className="w-3 h-3 mr-2 mt-0.5 text-orange-400 flex-shrink-0" />
+              <span className="line-clamp-2">{article.simplified.business_impact}</span>
+            </div>
+          </div>
+        )}
 
-
-        <div className="flex items-center justify-between pt-4 border-t border-slate-200">
+        <div className="flex items-center justify-between pt-4 border-t border-slate-700 mt-auto">
           <div className="flex items-center text-sm text-slate-500">
             <Clock className="w-4 h-4 mr-1" />
             {timeAgo}
@@ -107,12 +119,6 @@ export default function ArticleCard({ article }) {
             <TrendingUp className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
-
-        {article.views > 0 && (
-          <div className="mt-2 text-xs text-slate-400">
-            {article.views.toLocaleString()} views
-          </div>
-        )}
       </div>
     </article>
   );
