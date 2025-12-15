@@ -48,5 +48,5 @@ def get_robots():
     content = """User-agent: *
 Allow: /
 
-Sitemap: http://localhost:8000/sitemap.xml"""
+Sitemap: https://marlizintel.tymirahealth.com/sitemap.xml"""
     return Response(content=content, media_type="text/plain")
