@@ -11,7 +11,8 @@ def get_sitemap(db: Session = Depends(get_db)):
     articles = db.query(Article).filter(Article.status == ArticleStatus.READY).all()
     
     # Base URL for your frontend
-    base_url = "http://localhost:3000" # In production, change this to your actual domain
+    # Base URL for your frontend
+    base_url = "https://marlizintel.tymirahealth.com" # In production, change this to your actual domain
     
     xml_content = ['<?xml version="1.0" encoding="UTF-8"?>']
     xml_content.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')

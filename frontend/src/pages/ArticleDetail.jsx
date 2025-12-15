@@ -80,6 +80,7 @@ export default function ArticleDetail() {
         <meta property="og:description" content={article.simplified?.friendly_summary} />
         {article.image_url && <meta property="og:image" content={article.image_url} />}
         <meta property="og:type" content="article" />
+        <link rel="canonical" href={`https://marlizintel.tymirahealth.com/article/${article.slug}`} />
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",

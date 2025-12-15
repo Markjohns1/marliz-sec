@@ -55,6 +55,7 @@ export default function Home() {
           content="Real-time threat intelligence for East African businesses. Monitor, Detect, and Prevent cyber attacks with Marliz Sec."
         />
         <meta name="keywords" content="Kenya cybersecurity, M-Pesa fraud, business threat intel, ransomware alerts" />
+        <link rel="canonical" href="https://marlizintel.tymirahealth.com/" />
       </Helmet>
 
       {/* Live Threat Dashboard */}
