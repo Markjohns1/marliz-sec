@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { formatDistanceToNow, format } from 'date-fns';
 import { Helmet } from 'react-helmet-async';
+import AdUnit from '../components/AdUnit';
 
 export default function ArticleDetail() {
   const { slug } = useParams();
@@ -130,8 +131,15 @@ export default function ArticleDetail() {
           </div>
         </div>
 
-        <article className="max-w-7xl mx-auto px-4 py-12">
-          <div className="max-w-4xl mx-auto">
+        <div className="max-w-[1600px] mx-auto px-4 py-8 lg:py-12 flex flex-col lg:flex-row gap-8 relative items-start">
+
+          {/* LEFT SIDEBAR AD (Desktop Only) */}
+          <div className="hidden xl:block w-[160px] shrink-0 sticky top-24 pt-4">
+            <AdUnit format="vertical" />
+          </div>
+
+          {/* MAIN CONTENT */}
+          <article className="flex-1 min-w-0 max-w-4xl mx-auto w-full">
             {/* Back Button */}
             <Link
               to="/"
@@ -247,6 +255,11 @@ export default function ArticleDetail() {
                 );
               })()}
 
+              {/* MOBILE AD PLACEMENT (Visible only on mobile/tablet) */}
+              <div className="xl:hidden">
+                <AdUnit format="rectangle" />
+              </div>
+
               {/* Business Impact */}
               <section className="bg-blue-900/10 border-l-4 border-blue-500 rounded-r-xl p-8 mb-8">
                 <h2 className="text-2xl font-bold text-blue-100 mb-4">
@@ -256,12 +269,6 @@ export default function ArticleDetail() {
                   {article.simplified?.business_impact}
                 </p>
               </section>
-
-              {/* MID-ARTICLE AD PLACEMENT */}
-              <div className="my-12 bg-slate-900/50 rounded-xl p-8 text-center border border-slate-800 border-dashed flex flex-col items-center justify-center min-h-[250px]">
-                <span className="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-slate-500 uppercase tracking-wider mb-2">Advertisement</span>
-                <p className="text-slate-500 font-bold text-lg tracking-widest">AD DISPLAY</p>
-              </div>
 
               {/* Action Steps */}
               <section className="bg-slate-900/50 rounded-xl p-8 border border-slate-800 mb-8">
@@ -280,6 +287,11 @@ export default function ArticleDetail() {
                   ))}
                 </div>
               </section>
+
+              {/* SECONDARY MOBILE AD */}
+              <div className="xl:hidden">
+                <AdUnit format="fluid" />
+              </div>
 
               {/* Original Source CTA */}
               {article.original_url && (
@@ -320,8 +332,13 @@ export default function ArticleDetail() {
                 </Link>
               </div>
             </div>
+          </article>
+
+          {/* RIGHT SIDEBAR AD (Desktop Only) */}
+          <div className="hidden xl:block w-[160px] shrink-0 sticky top-24 pt-4">
+            <AdUnit format="vertical" />
           </div>
-        </article>
+        </div>
 
         {/* Related Articles */}
         {related && related.length > 0 && (

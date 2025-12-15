@@ -7,6 +7,7 @@ import { Shield, TrendingUp, Bell, ChevronRight, Database, FileWarning, Mail } f
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import CategorySection from '../components/CategorySection';
+import AdUnit from '../components/AdUnit';
 
 export default function Home() {
   // const [page, setPage] = useState(1); // MIGRATED TO INFINITE QUERY
@@ -164,10 +165,7 @@ export default function Home() {
                     <div className="sticky top-24 space-y-6">
 
                       {/* Ad Slot - Premium Placement */}
-                      <div className="bg-slate-900/50 rounded-xl p-6 text-center border border-slate-800 border-dashed hover:border-blue-500/30 transition-colors flex flex-col items-center justify-center min-h-[250px]">
-                        <span className="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-slate-500 uppercase tracking-wider mb-2">Advertisement</span>
-                        <p className="text-slate-500 font-bold text-lg tracking-widest">AD DISPLAY</p>
-                      </div>
+                      <AdUnit format="rectangle" className="mb-6" />
 
                       <div>
                         <div className="flex items-center justify-between mb-4">
@@ -201,10 +199,7 @@ export default function Home() {
                 <div className="mt-16">
                   {/* MOBILE AD SLOT (Visible only on small screens) */}
                   <div className="lg:hidden mb-12">
-                    <div className="bg-slate-900/50 rounded-xl p-6 text-center border border-slate-800 border-dashed flex flex-col items-center justify-center min-h-[250px]">
-                      <span className="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-slate-500 uppercase tracking-wider mb-2">Advertisement</span>
-                      <p className="text-slate-500 font-bold text-lg tracking-widest">AD DISPLAY</p>
-                    </div>
+                    <AdUnit format="rectangle" />
                   </div>
 
                   <h3 className="text-2xl font-bold text-white mb-8 flex items-center">
