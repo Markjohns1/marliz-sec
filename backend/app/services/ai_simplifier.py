@@ -239,7 +239,19 @@ WRITING RULES:
    - MEDIUM: POC available or Patch required.
    - LOW: General news.
 
-RETURN ONLY THE JSON OBJECT."""
+RETURN ONLY THE JSON OBJECT.
+
+SPECIAL INSTRUCTION FOR 'ATTACK_VECTOR' FIELD:
+Start this field with a dynamic header followed by '|||'.
+- If it's an attack: "Technically: How The Attack Happened|||..."
+- If it's a vulnerability: "Technically: The Vulnerability Details|||..."
+- If it's a new tool/feature: "Technically: How It Works|||..."
+- If it's an update/policy: "Technically: What Changed|||..."
+
+SPECIAL INSTRUCTION FOR EDUCATIONAL CONTENT:
+When using technical terms (like CVE, CVSS, Zero-day, Buffer Overflow, RCE), you MUST provide a simple 3-5 word explanation in parentheses immediately after.
+Example: "The attacker used a Zero-day (a secret flaw with no fix yet) to bypass auth."
+This is CRITICAL. The content must be understandable by a non-technical business owner while remaining accurate."""
     
     def _parse_response(self, response_text: str) -> dict:
         """Parse Groq's JSON response"""
