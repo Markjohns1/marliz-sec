@@ -1,12 +1,13 @@
-﻿from fastapi import FastAPI, HTTPException
+﻿from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import logging
 
 from app.database import init_db
-from app import models  # Import models before init_db to register tables
+from app import models, auth  # Updated
 from app.routes import articles, categories, subscribers, seo
 from app.services.scheduler import start_scheduler, stop_scheduler
+from app.auth import verify_api_key
 
 logging.basicConfig(
     level=logging.INFO,
@@ -56,14 +57,31 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Caching Middleware
+# Security Headers Middleware
 @app.middleware("http")
-async def add_cache_headers(request, call_next):
+async def add_security_headers(request, call_next):
     response = await call_next(request)
+    
+    # HSTS (Strict-Transport-Security) - Force HTTPS for 1 year
+    # Only suitable if site is fully HTTPS.
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    
+    # Prevent clickjacking
+    response.headers["X-Frame-Options"] = "DENY"
+    
+    # Prevent MIME type sniffing
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    
+    # Basic Content Security Policy (Allow everything for now to prevent breaking, but block mixed content)
+    response.headers["Content-Security-Policy"] = "upgrade-insecure-requests; frame-ancestors 'none';"
+    
+    # Referrer Policy
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+
+    # Caching (Keep existing logic mixed in or separate)
     if request.method == "GET" and response.status_code == 200:
-        # Cache successfully (1 hour for general content)
-        # Note: Browsers will cache this.
         response.headers["Cache-Control"] = "public, max-age=3600" 
+        
     return response
 
 # Include routers
@@ -92,26 +110,25 @@ def health_check():
     }
 
 # Manual trigger endpoints (for testing)
+# Manual trigger endpoints (Protected)
 @app.post("/api/admin/fetch-news")
-async def manual_fetch_news(admin_secret: str):
-    """Manually trigger news fetch"""
-    import os
-    if admin_secret != os.getenv("ADMIN_SECRET"):
-        return {"error": "Unauthorized"}
-    
+async def manual_fetch_news(
+    api_key_obj = Depends(verify_api_key)
+):
+    """Manually trigger news fetch (Protected)"""
     from app.services.news_fetcher import news_fetcher
     result = await news_fetcher.fetch_news()
+    logger.info(f"Manual news fetch triggered by {api_key_obj.name}")
     return result
 
 @app.post("/api/admin/simplify")
-async def manual_simplify(admin_secret: str):
-    """Manually trigger AI simplification"""
-    import os
-    if admin_secret != os.getenv("ADMIN_SECRET"):
-        return {"error": "Unauthorized"}
-    
+async def manual_simplify(
+    api_key_obj = Depends(verify_api_key)
+):
+    """Manually trigger AI simplification (Protected)"""
     from app.services.ai_simplifier import ai_simplifier
     result = await ai_simplifier.process_pending_articles()
+    logger.info(f"Manual simplification triggered by {api_key_obj.name}")
     return result
 
 # ==========================================

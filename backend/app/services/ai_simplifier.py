@@ -3,8 +3,9 @@ import json
 import requests
 import asyncio
 from datetime import datetime
-from sqlalchemy.orm import Session
-from app.models import Article, SimplifiedContent, ArticleStatus, ThreatLevel
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+from app.models import Article, SimplifiedContent, ArticleStatus, ThreatLevel, Category
 from app.database import get_db_context
 import logging
 import re
@@ -20,32 +21,40 @@ class AISimplifier:
         self.base_url = "https://api.groq.com/openai/v1/chat/completions"
         
         # Category mapping (slug -> database ID)
-        # Must match categories in database
-        self.category_map = {
-            "ransomware": 1,
-            "phishing": 2,
-            "data-breach": 3,
-            "malware": 4,
-            "vulnerability": 5,
-            "general": 6
-        }
+        self.category_map = {} # Loaded dynamically
     
+    async def _load_categories(self, db: AsyncSession):
+        """Load categories from database into memory"""
+        stmt = select(Category)
+        result = await db.execute(stmt)
+        categories = result.scalars().all()
+        # Map regular slug AND spaced versions just in case
+        self.category_map = {c.slug: c.id for c in categories}
+        for c in categories:
+             self.category_map[c.slug.replace("-", " ")] = c.id
+
     async def process_pending_articles(self) -> dict:
         """Process all RAW articles through AI simplification"""
         processed = 0
         failed = 0
         
-        with get_db_context() as db:
-            # Get all RAW articles
-            articles = db.query(Article).filter_by(status=ArticleStatus.RAW).all()
-            
-            logger.info(f"Found {len(articles)} articles to process")
-            
-            for article in articles:
-                try:
-                    # Mark as processing
-                    article.status = ArticleStatus.PROCESSING
-                    db.commit()
+        with get_db_context() as db_ctx:
+            # Manually handle the context since it returns an async generator
+            async with db_ctx as db:
+                await self._load_categories(db)
+                
+                # Get all RAW articles
+                stmt = select(Article).filter_by(status=ArticleStatus.RAW)
+                result = await db.execute(stmt)
+                articles = result.scalars().all()
+                
+                logger.info(f"Found {len(articles)} articles to process")
+                
+                for article in articles:
+                    try:
+                        # Mark as processing
+                        article.status = ArticleStatus.PROCESSING
+                        await db.commit()
                     
                     # Simplify with Groq
                     result = await self._simplify_article(db, article)
@@ -60,7 +69,7 @@ class AISimplifier:
                         if article.status == ArticleStatus.PROCESSING:
                              failed += 1
                              article.status = ArticleStatus.RAW
-                             db.commit()
+                             await db.commit()
                     
                     # Add delay to avoid rate limits (500ms between requests)
                     await asyncio.sleep(2.0)
@@ -68,7 +77,7 @@ class AISimplifier:
                 except Exception as e:
                     logger.error(f"Failed to process article {article.id}: {str(e)}")
                     article.status = ArticleStatus.RAW
-                    db.commit()
+                    await db.commit()
                     failed += 1
         
         return {
@@ -77,7 +86,7 @@ class AISimplifier:
             "timestamp": datetime.now().isoformat()
         }
     
-    async def _simplify_article(self, db: Session, article: Article) -> bool:
+    async def _simplify_article(self, db: AsyncSession, article: Article) -> bool:
         """Simplify a single article using Groq"""
         
         # Get article content
@@ -135,11 +144,13 @@ class AISimplifier:
             if not result.get("is_relevant", True):
                 logger.info(f"Article {article.id} rejected by AI as irrelevant.")
                 # Delete any existing simplified content first (foreign key constraint)
-                existing_simplified = db.query(SimplifiedContent).filter_by(article_id=article.id).first()
+                stmt = select(SimplifiedContent).filter_by(article_id=article.id)
+                existing = await db.execute(stmt)
+                existing_simplified = existing.scalars().first()
                 if existing_simplified:
-                    db.delete(existing_simplified)
-                db.delete(article)
-                db.commit()
+                    await db.delete(existing_simplified)
+                await db.delete(article)
+                await db.commit()
                 return True # Handled successfully (by rejection)
             
             # Calculate reading time (200 words per minute)
@@ -147,7 +158,9 @@ class AISimplifier:
             reading_time = max(2, (word_count // 200) + 1)
             
             # Check if simplified content already exists (for re-processing)
-            existing_simplified = db.query(SimplifiedContent).filter_by(article_id=article.id).first()
+            stmt = select(SimplifiedContent).filter_by(article_id=article.id)
+            existing = await db.execute(stmt)
+            existing_simplified = existing.scalars().first()
             
             if existing_simplified:
                 # Update existing record
@@ -181,7 +194,7 @@ class AISimplifier:
                 article.category_id = self.category_map[ai_category]
                 logger.info(f"Article {article.id} classified as: {ai_category}")
             
-            db.commit()
+            await db.commit()
             return True
             
         except requests.exceptions.RequestException as e:

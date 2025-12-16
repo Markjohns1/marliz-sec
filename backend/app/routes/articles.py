@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.orm import Session
-from sqlalchemy import desc, or_
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, desc, or_, func
+from sqlalchemy.orm import selectinload
 from app.database import get_db
 from app import models, schemas
+from app.auth import verify_api_key
 from app.models import ArticleStatus
 from typing import List, Optional
 import json
@@ -12,26 +14,25 @@ from slugify import slugify
 router = APIRouter(prefix="/api/articles", tags=["articles"])
 
 @router.get("/", response_model=schemas.ArticleList)
-def get_articles(
+async def get_articles(
     page: int = Query(1, ge=1),
     limit: int = Query(12, ge=1, le=50),
     category: Optional[str] = None,
     threat_level: Optional[str] = None,
+    sort_by: Optional[str] = "date",
     search: Optional[str] = None,
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """
-    Get paginated list of published articles
-    - SEO-friendly with filters
-    - Returns only READY articles with simplified content
+    Get paginated list of published articles (Async)
     """
     
-    # Base query: only published articles with simplified content
-    query = db.query(models.Article).join(
+    # Base query
+    query = select(models.Article).join(
         models.SimplifiedContent
     ).filter(
         models.Article.status.in_([ArticleStatus.READY, ArticleStatus.EDITED, ArticleStatus.PUBLISHED])
-    )
+    ).options(selectinload(models.Article.simplified), selectinload(models.Article.category))
     
     # Filter by category slug
     if category:
@@ -41,13 +42,13 @@ def get_articles(
     if threat_level:
         query = query.filter(models.SimplifiedContent.threat_level == threat_level)
     
-    # Search in multiple fields for better results
+    # Search
     if search:
         search_term = f"%{search}%"
         query = query.filter(
             or_(
                 models.Article.title.ilike(search_term),
-                models.Article.original_content.ilike(search_term),
+                models.Article.raw_content.ilike(search_term),
                 models.Article.keywords.ilike(search_term),
                 models.SimplifiedContent.friendly_summary.ilike(search_term),
                 models.SimplifiedContent.attack_vector.ilike(search_term),
@@ -55,13 +56,34 @@ def get_articles(
             )
         )
     
-    # Get total count
-    total = query.count()
+    # Sort results
+    if sort_by == "severity":
+        from sqlalchemy import case
+        severity_order = case(
+            {
+                models.ThreatLevel.CRITICAL: 4,
+                models.ThreatLevel.HIGH: 3,
+                models.ThreatLevel.MEDIUM: 2,
+                models.ThreatLevel.LOW: 1,
+            },
+            value=models.SimplifiedContent.threat_level,
+        )
+        query = query.order_by(desc(severity_order), desc(models.Article.published_at))
+    else:
+        query = query.order_by(desc(models.Article.published_at))
     
-    # Paginate and sort by date
-    articles = query.order_by(desc(models.Article.published_at)).offset(
-        (page - 1) * limit
-    ).limit(limit).all()
+    # Execute count
+    # Note: For strict total count in filtering, a separate query is cleanest
+    # We clone the query but select count()
+    count_query = select(func.count()).select_from(query.subquery())
+    total_result = await db.execute(count_query)
+    total = total_result.scalar_one()
+
+    # Paginate
+    query = query.offset((page - 1) * limit).limit(limit)
+    
+    result = await db.execute(query)
+    articles = result.scalars().all()
     
     # Calculate pages
     pages = (total + limit - 1) // limit
@@ -74,71 +96,70 @@ def get_articles(
     }
 
 @router.get("/{slug}", response_model=schemas.ArticleWithContent)
-def get_article(slug: str, db: Session = Depends(get_db)):
-    """
-    Get single article by slug
-    - Increments view count
-    - Returns full content with SEO meta
-    """
+async def get_article(slug: str, db: AsyncSession = Depends(get_db)):
+    """Get single article by slug (Async)"""
     
-    article = db.query(models.Article).filter(
+    stmt = select(models.Article).filter(
         models.Article.slug == slug,
         models.Article.status.in_([ArticleStatus.READY, ArticleStatus.EDITED, ArticleStatus.PUBLISHED])
-    ).first()
+    ).options(selectinload(models.Article.simplified), selectinload(models.Article.category))
+    
+    result = await db.execute(stmt)
+    article = result.scalars().first()
     
     if not article:
         raise HTTPException(status_code=404, detail="Article not found")
     
     # Increment views
     article.views += 1
-    db.commit()
+    await db.commit()
     
     return article
 
 @router.get("/related/{article_id}", response_model=List[schemas.Article])
-def get_related_articles(
+async def get_related_articles(
     article_id: int,
     limit: int = Query(3, ge=1, le=10),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
-    """Get related articles from same category"""
+    """Get related articles"""
     
-    article = db.query(models.Article).filter_by(id=article_id).first()
+    result = await db.execute(select(models.Article).filter_by(id=article_id))
+    article = result.scalars().first()
+    
     if not article:
         raise HTTPException(status_code=404, detail="Article not found")
     
-    related = db.query(models.Article).filter(
+    stmt = select(models.Article).filter(
         models.Article.category_id == article.category_id,
         models.Article.id != article_id,
         models.Article.status.in_([ArticleStatus.READY, ArticleStatus.EDITED])
-    ).order_by(desc(models.Article.published_at)).limit(limit).all()
+    ).order_by(desc(models.Article.published_at)).limit(limit).options(selectinload(models.Article.category))
+    
+    result = await db.execute(stmt)
+    related = result.scalars().all()
     
     return related
 
 @router.post("/manual", response_model=schemas.Article)
-def create_manual_article(
+async def create_manual_article(
     article_data: schemas.ManualArticleCreate,
-    db: Session = Depends(get_db)
+    api_key = Depends(verify_api_key),
+    db: AsyncSession = Depends(get_db)
 ):
-    """
-    Create article manually (admin only)
-    - For posting custom content
-    - Bypasses AI processing
-    """
+    """Create article manually (Protected)"""
     
-    import os
-    if article_data.admin_secret != os.getenv("ADMIN_SECRET"):
-        raise HTTPException(status_code=403, detail="Invalid admin secret")
-    
-    # Generate slug
     base_slug = slugify(article_data.title)
     slug = base_slug
     counter = 1
-    while db.query(models.Article).filter_by(slug=slug).first():
+    
+    while True:
+        res = await db.execute(select(models.Article).filter_by(slug=slug))
+        if not res.scalars().first():
+            break
         slug = f"{base_slug}-{counter}"
         counter += 1
     
-    # Create article
     article = models.Article(
         title=article_data.title,
         slug=slug,
@@ -153,9 +174,8 @@ def create_manual_article(
         edited_at=datetime.now()
     )
     db.add(article)
-    db.flush()  # Get article.id
+    await db.flush()
     
-    # Create simplified content
     simplified = models.SimplifiedContent(
         article_id=article.id,
         friendly_summary=article_data.friendly_summary,
@@ -164,86 +184,86 @@ def create_manual_article(
         threat_level=article_data.threat_level
     )
     db.add(simplified)
-    db.commit()
-    db.refresh(article)
+    await db.commit()
+    await db.refresh(article)
     
-    return article
+    # Eager load for validation
+    stmt = select(models.Article).filter_by(id=article.id).options(selectinload(models.Article.category))
+    res = await db.execute(stmt)
+    return res.scalars().first()
 
 @router.put("/{article_id}", response_model=schemas.Article)
-def update_article(
+async def update_article(
     article_id: int,
     updates: schemas.ArticleUpdate,
-    db: Session = Depends(get_db)
+    api_key_obj = Depends(verify_api_key),
+    db: AsyncSession = Depends(get_db)
 ):
-    """
-    Edit article content
-    - Updates simplified content
-    - Marks as edited with timestamp
-    """
+    """Edit article content (Protected)"""
     
-    import os
-    # Simple auth check - in production use proper JWT
-    from fastapi import Header
+    stmt = select(models.Article).filter_by(id=article_id)
+    result = await db.execute(stmt)
+    article = result.scalars().first()
     
-    article = db.query(models.Article).filter_by(id=article_id).first()
     if not article:
         raise HTTPException(status_code=404, detail="Article not found")
     
-    simplified = db.query(models.SimplifiedContent).filter_by(
-        article_id=article_id
-    ).first()
+    stmt_simp = select(models.SimplifiedContent).filter_by(article_id=article_id)
+    res_simp = await db.execute(stmt_simp)
+    simplified = res_simp.scalars().first()
+    
     if not simplified:
         raise HTTPException(status_code=404, detail="Simplified content not found")
     
     # Update fields
     if updates.title:
         article.title = updates.title
-        # Regenerate slug
         article.slug = slugify(updates.title)
     
-    if updates.friendly_summary:
-        simplified.friendly_summary = updates.friendly_summary
+    if updates.friendly_summary: simplified.friendly_summary = updates.friendly_summary
+    if updates.business_impact: simplified.business_impact = updates.business_impact
+    if updates.action_steps: simplified.action_steps = updates.action_steps
+    if updates.threat_level: simplified.threat_level = updates.threat_level
+    if updates.category_id: article.category_id = updates.category_id
     
-    if updates.business_impact:
-        simplified.business_impact = updates.business_impact
-    
-    if updates.action_steps:
-        simplified.action_steps = updates.action_steps
-    
-    if updates.threat_level:
-        simplified.threat_level = updates.threat_level
-    
-    if updates.category_id:
-        article.category_id = updates.category_id
-    
-    # Mark as edited
     article.is_edited = True
     article.edited_by = updates.edited_by
     article.edited_at = datetime.now()
     article.status = ArticleStatus.EDITED
     
-    db.commit()
-    db.refresh(article)
+    await db.commit()
     
-    return article
+    # Reload with relationships
+    stmt = select(models.Article).filter_by(id=article.id).options(selectinload(models.Article.category))
+    res = await db.execute(stmt)
+    return res.scalars().first()
 
 @router.get("/stats/dashboard")
-def get_dashboard_stats(db: Session = Depends(get_db)):
-    """Get stats for admin dashboard"""
+async def get_dashboard_stats(
+    api_key = Depends(verify_api_key),
+    db: AsyncSession = Depends(get_db)
+):
+    """Get stats for admin dashboard (Async)"""
     
-    total_articles = db.query(models.Article).count()
-    published = db.query(models.Article).filter(
+    # Execute counts (efficiently)
+    q_total = select(func.count()).select_from(models.Article)
+    total_articles = (await db.execute(q_total)).scalar_one()
+
+    q_pub = select(func.count()).select_from(models.Article).filter(
         models.Article.status.in_([ArticleStatus.READY, ArticleStatus.EDITED, ArticleStatus.PUBLISHED])
-    ).count()
-    pending = db.query(models.Article).filter_by(status=ArticleStatus.RAW).count()
-    total_views = db.query(models.Article).with_entities(
-        db.func.sum(models.Article.views)
-    ).scalar() or 0
+    )
+    published = (await db.execute(q_pub)).scalar_one()
+
+    q_pend = select(func.count()).select_from(models.Article).filter_by(status=ArticleStatus.RAW)
+    pending = (await db.execute(q_pend)).scalar_one()
+
+    q_views = select(func.sum(models.Article.views))
+    total_views = (await db.execute(q_views)).scalar_one() or 0
     
-    # Top articles by views
-    top_articles = db.query(models.Article).order_by(
-        desc(models.Article.views)
-    ).limit(5).all()
+    # Top articles
+    stmt = select(models.Article).order_by(desc(models.Article.views)).limit(5)
+    top_articles_res = await db.execute(stmt)
+    top_articles = top_articles_res.scalars().all()
     
     return {
         "total_articles": total_articles,

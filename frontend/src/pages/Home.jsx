@@ -3,7 +3,8 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { getArticles } from '../services/api';
 import ArticleCard from '../components/ArticleCard';
 import ThreatDashboard from '../components/ThreatDashboard';
-import { Shield, TrendingUp, Bell, ChevronRight, Database, FileWarning, Mail } from 'lucide-react';
+import { Shield, TrendingUp, Bell, ChevronRight, Database, FileWarning, Mail, Filter, ArrowDownWideNarrow } from 'lucide-react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import CategorySection from '../components/CategorySection';
@@ -11,6 +12,9 @@ import AdUnit from '../components/AdUnit';
 
 export default function Home() {
   // const [page, setPage] = useState(1); // MIGRATED TO INFINITE QUERY
+  const [filterLevel, setFilterLevel] = useState(''); // '' = All, 'critical', 'high', 'medium', 'low'
+  const [sortBy, setSortBy] = useState('date'); // 'date' or 'severity'
+
   const {
     data,
     isLoading,
@@ -19,8 +23,13 @@ export default function Home() {
     hasNextPage,
     isFetchingNextPage
   } = useInfiniteQuery({
-    queryKey: ['articles', 'infinite'], // Unique key to force fresh fetch
-    queryFn: ({ pageParam = 1 }) => getArticles({ page: pageParam, limit: 12 }),
+    queryKey: ['articles', 'infinite', filterLevel, sortBy], // Unique key to force fresh fetch
+    queryFn: ({ pageParam = 1 }) => getArticles({
+      page: pageParam,
+      limit: 12,
+      threat_level: filterLevel,
+      sort_by: sortBy
+    }),
     getNextPageParam: (lastPage) => {
       // Assuming API returns { page: 1, pages: 10 }
       return lastPage.page < lastPage.pages ? lastPage.page + 1 : undefined;
@@ -202,10 +211,42 @@ export default function Home() {
                     <AdUnit format="rectangle" />
                   </div>
 
-                  <h3 className="text-2xl font-bold text-white mb-8 flex items-center">
-                    <div className="w-1 h-8 bg-blue-500 mr-4 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.5)]"></div>
-                    Latest Intelligence
-                  </h3>
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                    <h3 className="text-2xl font-bold text-white flex items-center">
+                      <div className="w-1 h-8 bg-blue-500 mr-4 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.5)]"></div>
+                      Latest Intelligence
+                    </h3>
+
+                    <div className="flex flex-wrap items-center gap-3">
+                      {/* Filter Tabs */}
+                      <div className="flex bg-slate-900 p-1 rounded-lg border border-slate-800">
+                        {['', 'critical', 'high', 'medium', 'low'].map((level) => (
+                          <button
+                            key={level || 'all'}
+                            onClick={() => setFilterLevel(level)}
+                            className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${filterLevel === level
+                                ? 'bg-slate-800 text-white shadow-sm'
+                                : 'text-slate-400 hover:text-slate-200'
+                              }`}
+                          >
+                            {level ? level.charAt(0).toUpperCase() + level.slice(1) : 'All'}
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Sort Toggle */}
+                      <button
+                        onClick={() => setSortBy(sortBy === 'date' ? 'severity' : 'date')}
+                        className={`flex items-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all ${sortBy === 'severity'
+                            ? 'bg-red-900/20 border-red-500/30 text-red-400'
+                            : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
+                          }`}
+                      >
+                        <ArrowDownWideNarrow className="w-3.5 h-3.5 mr-1.5" />
+                        {sortBy === 'severity' ? 'Highest Severity' : 'Newest First'}
+                      </button>
+                    </div>
+                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {allArticles.slice(4).map((article) => (
                       <ArticleCard key={article.id} article={article} />

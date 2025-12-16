@@ -1,7 +1,8 @@
 import httpx
 import os
 from datetime import datetime
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from app.models import Article, Category, ArticleStatus
 from app.database import get_db_context
 from slugify import slugify
@@ -28,22 +29,31 @@ class NewsFetcher:
             "cybersecurity"
         ]
         
-        # Category mapping (must match init_db.py)
-        self.category_map = {
-            "ransomware": 1,
-            "phishing": 2,
-            "data breach": 3,
-            "malware": 4,
-            "vulnerability": 5,
-            "general": 6
-        }
+        # Category mapping (slug -> id)
+        self.category_map = {}  # Loaded dynamically
     
+    async def _load_categories(self, db: AsyncSession):
+        """Load categories from database into memory"""
+        stmt = select(Category)
+        result = await db.execute(stmt)
+        categories = result.scalars().all()
+        
+        self.category_map = {c.slug.replace("-", " "): c.id for c in categories}
+        # Ensure we have common mappings
+        if "data-breach" not in self.category_map and "data breach" in self.category_map:
+             self.category_map["data-breach"] = self.category_map["data breach"]
+
     async def fetch_news(self) -> dict:
         """Main method to fetch news from all keywords"""
         total_fetched = 0
         total_new = 0
         
         async with httpx.AsyncClient(timeout=30.0) as client:
+            # Pre-load categories
+            with get_db_context() as db_ctx:
+                async with db_ctx as db:
+                    await self._load_categories(db)
+            
             for keyword in self.keywords:
                 try:
                     result = await self._fetch_keyword(client, keyword)
@@ -96,9 +106,9 @@ class NewsFetcher:
                     continue
                 
                 # Check if exists
-                existing = db.query(Article).filter_by(
-                    original_url=article_data["link"]
-                ).first()
+                stmt = select(Article).filter_by(original_url=article_data["link"])
+                result = await db.execute(stmt)
+                existing = result.scalars().first()
                 
                 if existing:
                     continue
@@ -110,9 +120,12 @@ class NewsFetcher:
                 raw_content = self._extract_content(article_data)
                 
                 # Create article
+                # Note: We need to pass the session to _generate_unique_slug now
+                slug = await self._generate_unique_slug(db, article_data["title"])
+                
                 new_article = Article(
                     title=article_data["title"][:500],
-                    slug=self._generate_unique_slug(db, article_data["title"]),
+                    slug=slug,
                     original_url=article_data["link"],
                     source_name=article_data.get("source_id", "Unknown"),
                     published_at=self._parse_date(article_data.get("pubDate")),
@@ -124,10 +137,10 @@ class NewsFetcher:
                 )
                 
                 db.add(new_article)
-                db.flush()  # Ensure slug is reserved for next iteration
+                await db.flush()  # Ensure slug is reserved for next iteration
                 new_count += 1
             
-            db.commit()
+            await db.commit()
         
         return {"fetched": len(articles), "new": new_count}
     
@@ -196,17 +209,17 @@ class NewsFetcher:
                 article_data.get("description", "")).lower()
         
         if "ransomware" in text:
-            return self.category_map["ransomware"]
+            return self.category_map.get("ransomware", 1)
         elif "phishing" in text or "scam" in text:
-            return self.category_map["phishing"]
+            return self.category_map.get("phishing", 2)
         elif "breach" in text or "data leak" in text:
-            return self.category_map["data breach"]
+            return self.category_map.get("data breach", 3)
         elif "malware" in text or "virus" in text or "trojan" in text:
-            return self.category_map["malware"]
+            return self.category_map.get("malware", 4)
         elif "cve" in text or "vulnerability" in text or "zero-day" in text or "patch" in text:
-            return self.category_map["vulnerability"]
+            return self.category_map.get("vulnerability", 5)
         else:
-            return self.category_map["general"]
+            return self.category_map.get("general", 6)
     
     def _extract_content(self, article_data: dict) -> str:
         """Extract and clean article content"""
@@ -223,13 +236,16 @@ class NewsFetcher:
         
         return full_text[:5000]  # Limit to 5000 chars
     
-    def _generate_unique_slug(self, db: Session, title: str) -> str:
+    async def _generate_unique_slug(self, db: AsyncSession, title: str) -> str:
         """Generate unique slug for article"""
         base_slug = slugify(title)[:100]
         slug = base_slug
         counter = 1
         
-        while db.query(Article).filter_by(slug=slug).first():
+        while True:
+            result = await db.execute(select(Article).filter_by(slug=slug))
+            if not result.scalars().first():
+                break
             slug = f"{base_slug}-{counter}"
             counter += 1
         

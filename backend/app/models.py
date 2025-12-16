@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey, Enum as SQLEnum
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
+from datetime import datetime
 from app.database import Base
 import enum
 
@@ -28,6 +29,17 @@ class Category(Base):
     priority = Column(Integer, default=0)  # for ordering
     
     articles = relationship("Article", back_populates="category")
+
+class APIKey(Base):
+    __tablename__ = "api_keys"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True)  # e.g. "Admin", "MobileApp"
+    key_prefix = Column(String, index=True)  # First 8 chars for identification
+    key_hash = Column(String, index=True)  # Hashed key
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    last_used_at = Column(DateTime, nullable=True)
 
 class Article(Base):
     __tablename__ = "articles"

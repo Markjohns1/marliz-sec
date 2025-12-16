@@ -31,6 +31,18 @@ const queryClient = new QueryClient({
   },
 });
 
+import AdminLogin from './pages/AdminLogin';
+import AdminDashboard from './pages/AdminDashboard';
+import { Navigate } from 'react-router-dom';
+
+const ProtectedRoute = ({ children }) => {
+  const apiKey = localStorage.getItem('admin_api_key');
+  if (!apiKey) {
+    return <Navigate to="/console/login" replace />;
+  }
+  return children;
+};
+
 function AppContent() {
   const { data: categories } = useQuery({
     queryKey: ['categories'],
@@ -49,6 +61,17 @@ function AppContent() {
           <Route path="/category/:slug" element={<CategoryPage />} />
           <Route path="/subscribe" element={<Subscribe />} />
           <Route path="/about" element={<About />} />
+
+          {/* Admin Routes (Obfuscated) */}
+          <Route path="/console/login" element={<AdminLogin />} />
+          <Route
+            path="/console"
+            element={
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
 
         </Routes>
       </main>
