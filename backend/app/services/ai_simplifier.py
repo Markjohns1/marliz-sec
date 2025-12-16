@@ -216,7 +216,7 @@ class AISimplifier:
             return False
     
     def _build_prompt(self, article, content):
-        """Build precise prompt for Groq AI to simplify cybersecurity articles with SEO-optimized titles."""
+        """Build precise prompt for Groq AI with advanced SEO optimization based on Search Console data."""
         
         return f"""You are 'Marliz', a sophisticated Cyber Threat Intelligence Analyst AND SEO Expert.
 
@@ -227,83 +227,92 @@ Content excerpt: {content[:2800]}
 
 YOUR MISSION:
 1. Analyze this threat data and explain the TECHNICAL MECHANISM.
-2. Generate an SEO-OPTIMIZED, CLICKABLE TITLE that will get clicks from Google search results.
-3. Generate a compelling META DESCRIPTION for search engines.
+2. Generate an SEO-OPTIMIZED, CLICKABLE TITLE for Google search results.
+3. Generate a compelling META DESCRIPTION with long-tail keywords.
 
 RESPOND WITH VALID JSON ONLY:
 {{
   "is_relevant": true,
   "category": "ransomware|phishing|data-breach|malware|vulnerability|general",
   "seo_title": "YOUR NEW SEO TITLE - See rules below",
-  "meta_description": "150-160 char description that makes people NEED to click. Include the problem + promise of solution.",
-  "summary": "THE NEWS: 3 sentences summarizing WHAT happened. Focus on the event itself.",
-  "attack_vector": "THE MECHANISM: Exactly HOW the attack occurred. Technical details.",
-  "impact": "THE CONSEQUENCE: Specific technical and business impact.",
-  "who_is_at_risk": "Specific groups affected: e.g. 'Healthcare providers using VMware', 'Chrome users on Windows'",
-  "actions": ["Patch CVE-2024-XXXX immediately", "Disable NTLMv1", "Block IP range 192.168.x.x"],
+  "meta_description": "150-160 char description optimized for clicks",
+  "summary": "THE NEWS: 3 sentences summarizing WHAT happened.",
+  "attack_vector": "THE MECHANISM: HOW the attack occurred. Technical details.",
+  "impact": "THE CONSEQUENCE: Technical and business impact.",
+  "who_is_at_risk": "Specific groups affected (e.g., 'Chrome users on Windows', 'Healthcare providers')",
+  "actions": ["Specific action 1", "Specific action 2", "Specific action 3"],
   "threat_level": "low|medium|high|critical",
-  "keywords": ["keyword1", "keyword2", "keyword3"]
+  "keywords": ["long-tail keyword 1", "long-tail keyword 2", "long-tail keyword 3"]
 }}
 
-=== SEO TITLE RULES (CRITICAL) ===
-Your seo_title MUST follow these patterns to maximize clicks:
+=== SEO TITLE RULES (BASED ON REAL SEARCH DATA) ===
 
-FOR URGENT THREATS:
-- "BREAKING: [Specific Attack] Hits [Target] - [Consequence]"
-- "ALERT: [Number] Million Users Affected by [Attack Name]"
-- "WARNING: [Threat] Targets [Specific Group] - Here's How to Stay Safe"
+**CRITICAL: Include SPECIFIC NUMBERS whenever possible!**
+People search for:
+- "data breach that hit 500000 users"
+- "breach affected two thirds of country"
+- "hack exposed millions of records"
 
-FOR VULNERABILITIES:
-- "URGENT: Patch Now - [Software] Zero-Day Exploited in the Wild"
-- "Critical [Software] Flaw Lets Hackers [Specific Action]"
+TITLE PATTERNS THAT GET CLICKS:
 
 FOR DATA BREACHES:
-- "[Company Name] Breach Exposes [Number] Records - Check If You're Affected"
-- "MASSIVE Data Leak: [Specific Data Type] of [Number] Users Exposed"
+- "MASSIVE: [Company] Breach Exposes [X Million] Records - Are You Affected?"
+- "BREAKING: Data Breach Hits [X%/Fraction] of [Country/Industry]"
+- "[Country] Data Breach 2024: [Number] Citizens' Data Exposed"
 
-FOR GENERAL NEWS:
-- "Why [Trend] Is Keeping Security Teams Awake at Night"
-- "[Number] Ways to Protect Your Business from [Threat Type]"
+FOR VULNERABILITIES:
+- "URGENT: [Software] Flaw Affects [Number] Million Devices - Patch Now"
+- "Critical [Software] Bug Lets Hackers [Specific Action] - Fix Available"
 
-TITLE MUST:
-1. Start with an urgency word (BREAKING, ALERT, WARNING, URGENT, CRITICAL, MASSIVE) when appropriate
-2. Include specific numbers when available (e.g., "500,000 users", "3 million records")
-3. Be 50-60 characters for optimal Google display
-4. Answer "What's in it for me?" for the reader
-5. Simplify technical jargon (CVE-2024-1234 becomes "Critical Windows Flaw")
+FOR ATTACKS:
+- "ALERT: [Attack Name] Targets [Specific Group] - [Number] Affected"
+- "[Country/Company] Under Attack: [Number] Systems Compromised"
 
-TITLE MUST NOT:
-- Use ALL CAPS for the entire title (only the urgency word)
-- Be vague like "New Ransomware Attack" (specify WHICH ransomware, WHO got hit)
-- Use clickbait that doesn't match content
+TITLE OPTIMIZATION RULES:
+1. ALWAYS include a NUMBER (users, records, %, millions, dollars)
+2. Be SPECIFIC about WHO is affected (country, industry, software users)
+3. Include urgency word: BREAKING, ALERT, WARNING, URGENT, CRITICAL, MASSIVE
+4. 50-60 characters for Google
+5. Write for USA/UK/EU audience (highest value traffic)
 
-=== META DESCRIPTION ===
-150-160 characters. Must include:
-1. The PROBLEM (threat/attack)
-2. WHO is affected
-3. Promise of VALUE (how to check/protect/respond)
-Example: "A devastating ransomware attack just exposed 500K patient records. Here's how to check if YOUR data was leaked and what to do next."
+=== META DESCRIPTION (LONG-TAIL KEYWORD OPTIMIZED) ===
+
+150-160 characters. MUST include:
+1. The PROBLEM with a specific number
+2. WHO is affected (be specific)
+3. A QUESTION or CALL-TO-ACTION
+
+GOOD EXAMPLES:
+- "A massive breach exposed 9 million citizens' data. Were you affected? Here's how to check if your information was leaked and what to do next."
+- "Critical Windows flaw affects 1 billion devices. Is your PC vulnerable? Learn how to protect yourself before hackers exploit this bug."
+
+=== KEYWORDS FIELD (LONG-TAIL FOCUS) ===
+
+Generate 5-7 LONG-TAIL keywords that people actually search:
+- "data breach affected two thirds country" (not just "data breach")
+- "how to check if my data was leaked" (not just "data leak")
+- "[company name] hack what to do" (not just "hack")
+- "[country] breach 2024 affected users"
 
 CATEGORY DEFINITIONS:
-- ransomware: Encryption attacks, file locking, ransom demands.
-- phishing: Email scams, credential harvesting, social engineering.
-- data-breach: Customer data theft, database leaks, exposed records.
-- malware: Viruses, trojans, spyware, keyloggers.
-- vulnerability: CVEs, zero-days, software flaws, patches needed.
-- general: Best practices, security news, industry trends.
+- ransomware: Encryption attacks, ransom demands
+- phishing: Email scams, credential harvesting
+- data-breach: Data theft, database leaks
+- malware: Viruses, trojans, spyware
+- vulnerability: CVEs, zero-days, patches
+- general: Best practices, security news
 
 WRITING RULES:
-1. RELEVANCE CHECK: If NOT about cybersecurity threat/vulnerability/attack, return "is_relevant": false.
-2. NO REGIONAL BIAS: Write for a global audience.
-3. NO FLUFF: No "Stay safe" or "In the digital age".
-4. When using technical terms (CVE, CVSS, Zero-day), provide a 3-5 word explanation in parentheses.
+1. If NOT about cybersecurity, return "is_relevant": false
+2. Write for GLOBAL audience (USA, UK, EU primary)
+3. NO FLUFF ("Stay safe", "In today's digital age")
+4. Explain technical terms briefly in parentheses
 
 SPECIAL INSTRUCTION FOR 'ATTACK_VECTOR' FIELD:
-Start with a dynamic header followed by '|||'.
+Start with dynamic header + '|||':
 - Attack: "Technically: How The Attack Happened|||..."
 - Vulnerability: "Technically: The Vulnerability Details|||..."
 - Tool/feature: "Technically: How It Works|||..."
-- Update/policy: "Technically: What Changed|||..."
 
 RETURN ONLY THE JSON OBJECT."""
     
