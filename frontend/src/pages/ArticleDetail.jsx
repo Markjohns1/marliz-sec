@@ -2,12 +2,13 @@ import { useQuery } from '@tanstack/react-query';
 import { useParams, Link } from 'react-router-dom';
 import { getArticle, getRelatedArticles } from '../services/api';
 import {
-  Clock, Share2, CheckCircle2, AlertCircle,
+  Clock, CheckCircle2, AlertCircle,
   ExternalLink, ChevronLeft, Shield, AlertTriangle, CheckCircle, Info
 } from 'lucide-react';
 import { formatDistanceToNow, format } from 'date-fns';
 import { Helmet } from 'react-helmet-async';
 import AdUnit from '../components/AdUnit';
+import SocialShare from '../components/SocialShare';
 
 export default function ArticleDetail() {
   const { slug } = useParams();
@@ -187,28 +188,13 @@ export default function ArticleDetail() {
                 </div>
               )}
 
-              <button
-                onClick={async () => {
-                  try {
-                    if (navigator.share) {
-                      await navigator.share({
-                        title: article.title,
-                        text: article.simplified?.friendly_summary,
-                        url: window.location.href,
-                      });
-                    } else {
-                      await navigator.clipboard.writeText(window.location.href);
-                      alert('Link copied to clipboard!');
-                    }
-                  } catch (err) {
-                    console.error('Error sharing:', err);
-                  }
-                }}
-                className="ml-auto flex items-center text-blue-400 hover:text-blue-300 font-medium"
-              >
-                <Share2 className="w-4 h-4 mr-2" />
-                Share
-              </button>
+              <div className="ml-auto">
+                <SocialShare
+                  url={`https://marlizintel.tymirahealth.com/article/${article.slug}`}
+                  title={article.title}
+                  summary={article.simplified?.friendly_summary}
+                />
+              </div>
             </div>
 
             {/* Featured Image */}
