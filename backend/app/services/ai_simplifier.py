@@ -184,9 +184,18 @@ class AISimplifier:
                 )
                 db.add(simplified)
             
-            # Update article status
+            # Update article status and SEO fields
             article.status = ArticleStatus.READY
             article.keywords = self._extract_keywords(result)
+            
+            # UPDATE TITLE with SEO-optimized version from AI
+            if result.get("seo_title"):
+                article.title = result["seo_title"]
+                logger.info(f"Article {article.id} title updated: {result['seo_title'][:50]}...")
+            
+            # UPDATE META DESCRIPTION with AI version
+            if result.get("meta_description"):
+                article.meta_description = result["meta_description"]
             
             # Update category based on AI classification
             ai_category = result.get("category", "general").lower().replace(" ", "-")
@@ -207,9 +216,9 @@ class AISimplifier:
             return False
     
     def _build_prompt(self, article, content):
-        """Build precise prompt for Groq AI to simplify cybersecurity articles."""
+        """Build precise prompt for Groq AI to simplify cybersecurity articles with SEO-optimized titles."""
         
-        return f"""You are 'Marliz', a sophisticated Cyber Threat Intelligence Analyst.
+        return f"""You are 'Marliz', a sophisticated Cyber Threat Intelligence Analyst AND SEO Expert.
 
 ARTICLE TO ANALYZE:
 Title: {article.title}
@@ -217,20 +226,63 @@ Source: {article.source_name or 'Intelligence feed'}
 Content excerpt: {content[:2800]}
 
 YOUR MISSION:
-Analyze this threat data and explain the TECHNICAL MECHANISM. Do not give generic advice.
-We need to know: HOW did they get in? WHAT tech was exploited? WHAT is the specific consequence?
+1. Analyze this threat data and explain the TECHNICAL MECHANISM.
+2. Generate an SEO-OPTIMIZED, CLICKABLE TITLE that will get clicks from Google search results.
+3. Generate a compelling META DESCRIPTION for search engines.
 
 RESPOND WITH VALID JSON ONLY:
 {{
   "is_relevant": true,
   "category": "ransomware|phishing|data-breach|malware|vulnerability|general",
+  "seo_title": "YOUR NEW SEO TITLE - See rules below",
+  "meta_description": "150-160 char description that makes people NEED to click. Include the problem + promise of solution.",
   "summary": "THE NEWS: 3 sentences summarizing WHAT happened. Focus on the event itself.",
-  "attack_vector": "THE MECHANISM: Exactly HOW the attack occurred. Technical details. Example: 'Attackers used a zero-day in the V8 engine to execute code via a malicious PDF.'",
-  "impact": "THE CONSEQUENCE: Specific technical and business impact. Example: 'Unencrypted PII was exfiltrated to a C2 server.'",
+  "attack_vector": "THE MECHANISM: Exactly HOW the attack occurred. Technical details.",
+  "impact": "THE CONSEQUENCE: Specific technical and business impact.",
+  "who_is_at_risk": "Specific groups affected: e.g. 'Healthcare providers using VMware', 'Chrome users on Windows'",
   "actions": ["Patch CVE-2024-XXXX immediately", "Disable NTLMv1", "Block IP range 192.168.x.x"],
   "threat_level": "low|medium|high|critical",
   "keywords": ["keyword1", "keyword2", "keyword3"]
 }}
+
+=== SEO TITLE RULES (CRITICAL) ===
+Your seo_title MUST follow these patterns to maximize clicks:
+
+FOR URGENT THREATS:
+- "BREAKING: [Specific Attack] Hits [Target] - [Consequence]"
+- "ALERT: [Number] Million Users Affected by [Attack Name]"
+- "WARNING: [Threat] Targets [Specific Group] - Here's How to Stay Safe"
+
+FOR VULNERABILITIES:
+- "URGENT: Patch Now - [Software] Zero-Day Exploited in the Wild"
+- "Critical [Software] Flaw Lets Hackers [Specific Action]"
+
+FOR DATA BREACHES:
+- "[Company Name] Breach Exposes [Number] Records - Check If You're Affected"
+- "MASSIVE Data Leak: [Specific Data Type] of [Number] Users Exposed"
+
+FOR GENERAL NEWS:
+- "Why [Trend] Is Keeping Security Teams Awake at Night"
+- "[Number] Ways to Protect Your Business from [Threat Type]"
+
+TITLE MUST:
+1. Start with an urgency word (BREAKING, ALERT, WARNING, URGENT, CRITICAL, MASSIVE) when appropriate
+2. Include specific numbers when available (e.g., "500,000 users", "3 million records")
+3. Be 50-60 characters for optimal Google display
+4. Answer "What's in it for me?" for the reader
+5. Simplify technical jargon (CVE-2024-1234 becomes "Critical Windows Flaw")
+
+TITLE MUST NOT:
+- Use ALL CAPS for the entire title (only the urgency word)
+- Be vague like "New Ransomware Attack" (specify WHICH ransomware, WHO got hit)
+- Use clickbait that doesn't match content
+
+=== META DESCRIPTION ===
+150-160 characters. Must include:
+1. The PROBLEM (threat/attack)
+2. WHO is affected
+3. Promise of VALUE (how to check/protect/respond)
+Example: "A devastating ransomware attack just exposed 500K patient records. Here's how to check if YOUR data was leaked and what to do next."
 
 CATEGORY DEFINITIONS:
 - ransomware: Encryption attacks, file locking, ransom demands.
@@ -241,30 +293,19 @@ CATEGORY DEFINITIONS:
 - general: Best practices, security news, industry trends.
 
 WRITING RULES:
-1. RELEVANCE CHECK: If the article is NOT about a specific cybersecurity threat, vulnerability, or attack (e.g. if it is about lifestyle, politics, general tech, finance), return "is_relevant": false and empty strings for other fields.
-2. NO REGIONAL BIAS: Do not mention specific countries (Kenya, USA, etc.) unless the attack is EXCLUSIVELY targeting that nation. Write for a borderless, global audience.
-3. NO FLUFF: Do not say 'Stay safe' or 'In the digital age'. Start directly with the threat.
-4. NO NONSENSE: If the article is vague, state 'Technical details are limited' rather than inventing them.
-5. NO EMOJIS: Do not use emojis in the summary, impact, or actions. Use only professional technical language.
-5. THREAT LEVELS:
-   - CRITICAL: Active Zero-Day or Wormable RCE.
-   - HIGH: Active Exploitation.
-   - MEDIUM: POC available or Patch required.
-   - LOW: General news.
-
-RETURN ONLY THE JSON OBJECT.
+1. RELEVANCE CHECK: If NOT about cybersecurity threat/vulnerability/attack, return "is_relevant": false.
+2. NO REGIONAL BIAS: Write for a global audience.
+3. NO FLUFF: No "Stay safe" or "In the digital age".
+4. When using technical terms (CVE, CVSS, Zero-day), provide a 3-5 word explanation in parentheses.
 
 SPECIAL INSTRUCTION FOR 'ATTACK_VECTOR' FIELD:
-Start this field with a dynamic header followed by '|||'.
-- If it's an attack: "Technically: How The Attack Happened|||..."
-- If it's a vulnerability: "Technically: The Vulnerability Details|||..."
-- If it's a new tool/feature: "Technically: How It Works|||..."
-- If it's an update/policy: "Technically: What Changed|||..."
+Start with a dynamic header followed by '|||'.
+- Attack: "Technically: How The Attack Happened|||..."
+- Vulnerability: "Technically: The Vulnerability Details|||..."
+- Tool/feature: "Technically: How It Works|||..."
+- Update/policy: "Technically: What Changed|||..."
 
-SPECIAL INSTRUCTION FOR EDUCATIONAL CONTENT:
-When using technical terms (like CVE, CVSS, Zero-day, Buffer Overflow, RCE), you MUST provide a simple 3-5 word explanation in parentheses immediately after.
-Example: "The attacker used a Zero-day (a secret flaw with no fix yet) to bypass auth."
-This is CRITICAL. The content must be understandable by a non-technical business owner while remaining accurate."""
+RETURN ONLY THE JSON OBJECT."""
     
     def _parse_response(self, response_text: str) -> dict:
         """Parse Groq's JSON response"""

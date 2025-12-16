@@ -60,14 +60,24 @@ async def cleanup_job():
 def start_scheduler():
     """Start all scheduled jobs"""
     
-    fetch_interval = int(os.getenv("FETCH_INTERVAL_HOURS", 4))
-    
-    # Fetch news every X hours (default: 4)
+    # Fetch news twice daily: 7 AM and 7 PM UTC
     scheduler.add_job(
         fetch_news_job,
-        trigger=IntervalTrigger(hours=fetch_interval),
-        id="fetch_news",
-        name="Fetch cybersecurity news",
+        trigger="cron",
+        hour=7,
+        minute=0,
+        id="fetch_news_morning",
+        name="Morning news fetch (7 AM)",
+        replace_existing=True
+    )
+    
+    scheduler.add_job(
+        fetch_news_job,
+        trigger="cron",
+        hour=19,
+        minute=0,
+        id="fetch_news_evening",
+        name="Evening news fetch (7 PM)",
         replace_existing=True
     )
     
@@ -110,8 +120,8 @@ def start_scheduler():
     )
     
     scheduler.start()
-    logger.info(f"✓ Scheduler started: News fetch every {fetch_interval} hours")
-    logger.info("✓ Jobs: fetch_news, cleanup, simplify_articles")
+    logger.info("✓ Scheduler started: News fetch at 7 AM and 7 PM UTC")
+    logger.info("✓ Jobs: fetch_news_morning, fetch_news_evening, cleanup, simplify_articles")
 
 def stop_scheduler():
     """Stop scheduler gracefully"""
