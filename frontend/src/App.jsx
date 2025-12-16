@@ -20,6 +20,7 @@ import About from './pages/About';
 import AllThreats from './pages/AllThreats';
 import SearchResults from './pages/SearchResults';
 
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -48,6 +49,7 @@ function AppContent() {
           <Route path="/category/:slug" element={<CategoryPage />} />
           <Route path="/subscribe" element={<Subscribe />} />
           <Route path="/about" element={<About />} />
+
         </Routes>
       </main>
       <Footer categories={categories} />
