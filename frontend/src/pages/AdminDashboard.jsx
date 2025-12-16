@@ -13,24 +13,42 @@ import {
     Clock,
     Eye,
     TrendingUp,
-    AlertTriangle
+    Calendar,
+    BarChart3,
+    Flame,
+    FolderOpen,
+    ArrowUpRight,
+    ArrowDownRight
 } from 'lucide-react';
 
-// Stat Card Component
-const StatCard = ({ title, value, icon: Icon, color, loading }) => (
-    <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all">
-        <div className="flex items-center justify-between mb-4">
-            <div className={`p-3 rounded-xl ${color}`}>
-                <Icon className="w-6 h-6 text-white" />
+// Stat Card Component - Mobile Responsive
+const StatCard = ({ title, value, icon: Icon, color, loading, subtitle }) => (
+    <div className="bg-white p-4 sm:p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all">
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <div className={`p-2 sm:p-3 rounded-xl ${color}`}>
+                <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
             {loading && <div className="h-2 w-16 bg-slate-100 rounded animate-pulse"></div>}
         </div>
-        <h3 className="text-slate-500 text-sm font-medium mb-1">{title}</h3>
-        <p className="text-3xl font-bold text-slate-900">
-            {loading ? "..." : value?.toLocaleString()}
+        <h3 className="text-slate-500 text-xs sm:text-sm font-medium mb-1">{title}</h3>
+        <p className="text-2xl sm:text-3xl font-bold text-slate-900">
+            {loading ? "..." : typeof value === 'number' ? value.toLocaleString() : value}
         </p>
+        {subtitle && <p className="text-xs text-slate-400 mt-1">{subtitle}</p>}
     </div>
 );
+
+// Growth Indicator
+const GrowthBadge = ({ value }) => {
+    const isPositive = value >= 0;
+    return (
+        <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full ${isPositive ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
+            }`}>
+            {isPositive ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
+            {Math.abs(value)}%
+        </span>
+    );
+};
 
 export default function AdminDashboard() {
     const navigate = useNavigate();
@@ -59,7 +77,7 @@ export default function AdminDashboard() {
         try {
             const result = await actionFn();
             setMessage({ type: 'success', text: `Success: ${name} completed.` });
-            refetch(); // Refresh stats
+            refetch();
         } catch (error) {
             setMessage({ type: 'error', text: `Error: ${error.message}` });
         } finally {
@@ -74,30 +92,30 @@ export default function AdminDashboard() {
             </Helmet>
 
             {/* Top Bar */}
-            <div className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between sticky top-16 z-30">
+            <div className="bg-white border-b border-slate-200 px-4 sm:px-6 py-4 flex items-center justify-between sticky top-16 z-30">
                 <div className="flex items-center gap-2">
                     <LayoutDashboard className="w-5 h-5 text-primary-600" />
-                    <h1 className="text-lg font-bold text-slate-900">System Overview</h1>
+                    <h1 className="text-base sm:text-lg font-bold text-slate-900">Analytics Dashboard</h1>
                 </div>
                 <button
                     onClick={handleLogout}
                     className="flex items-center gap-2 text-sm text-slate-500 hover:text-red-600 transition-colors"
                 >
                     <LogOut className="w-4 h-4" />
-                    Logout
+                    <span className="hidden sm:inline">Logout</span>
                 </button>
             </div>
 
-            <div className="container mx-auto max-w-6xl px-4 py-8">
+            <div className="container mx-auto max-w-6xl px-4 py-6 sm:py-8">
 
                 {/* Welcome */}
-                <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-slate-900">Welcome back, Admin</h2>
-                    <p className="text-slate-500">Here's what's happening with your system today.</p>
+                <div className="mb-6 sm:mb-8">
+                    <h2 className="text-xl sm:text-2xl font-bold text-slate-900">Welcome back, Admin</h2>
+                    <p className="text-sm sm:text-base text-slate-500">Here's what's happening with your system.</p>
                 </div>
 
-                {/* Stats Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                {/* Primary Stats Grid */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
                     <StatCard
                         title="Total Articles"
                         value={stats?.total_articles}
@@ -128,28 +146,72 @@ export default function AdminDashboard() {
                     />
                 </div>
 
-                {/* Action Panel */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Time-Based Metrics */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
+                    <StatCard
+                        title="Today"
+                        value={stats?.articles_today}
+                        icon={Calendar}
+                        color="bg-indigo-500"
+                        loading={isLoading}
+                        subtitle="new articles"
+                    />
+                    <StatCard
+                        title="This Week"
+                        value={stats?.articles_this_week}
+                        icon={BarChart3}
+                        color="bg-cyan-500"
+                        loading={isLoading}
+                        subtitle="last 7 days"
+                    />
+                    <StatCard
+                        title="Avg Views"
+                        value={stats?.avg_views}
+                        icon={TrendingUp}
+                        color="bg-pink-500"
+                        loading={isLoading}
+                        subtitle="per article"
+                    />
+                    <div className="bg-white p-4 sm:p-6 rounded-2xl border border-slate-100 shadow-sm">
+                        <div className="flex items-center justify-between mb-3 sm:mb-4">
+                            <div className="p-2 sm:p-3 rounded-xl bg-emerald-500">
+                                <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                            </div>
+                        </div>
+                        <h3 className="text-slate-500 text-xs sm:text-sm font-medium mb-1">Weekly Growth</h3>
+                        <div className="flex items-center gap-2">
+                            {isLoading ? (
+                                <span className="text-2xl font-bold text-slate-900">...</span>
+                            ) : (
+                                <GrowthBadge value={stats?.growth_pct || 0} />
+                            )}
+                        </div>
+                        <p className="text-xs text-slate-400 mt-1">vs last week</p>
+                    </div>
+                </div>
+
+                {/* Action Panel + Insights */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 mb-6 sm:mb-8">
 
                     {/* Controls */}
-                    <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm h-fit">
+                    <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm h-fit">
                         <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
                             <Zap className="w-5 h-5 text-yellow-500" />
                             Quick Actions
                         </h3>
 
-                        <div className="space-y-4">
+                        <div className="space-y-3 sm:space-y-4">
                             <button
                                 onClick={() => handleAction(triggerNewsFetch, 'News Fetch')}
                                 disabled={actionLoading}
-                                className="w-full flex items-center justify-between p-4 rounded-xl border border-slate-200 hover:border-primary-500 hover:bg-primary-50 transition-all group"
+                                className="w-full flex items-center justify-between p-3 sm:p-4 rounded-xl border border-slate-200 hover:border-primary-500 hover:bg-primary-50 transition-all group"
                             >
                                 <div className="flex items-center gap-3">
                                     <div className="p-2 bg-slate-100 rounded-lg group-hover:bg-white transition-colors">
-                                        <RefreshCw className={`w-5 h-5 text-slate-600 ${actionLoading === 'News Fetch' ? 'animate-spin' : ''}`} />
+                                        <RefreshCw className={`w-4 h-4 sm:w-5 sm:h-5 text-slate-600 ${actionLoading === 'News Fetch' ? 'animate-spin' : ''}`} />
                                     </div>
                                     <div className="text-left">
-                                        <div className="font-semibold text-slate-900">Fetch News</div>
+                                        <div className="font-semibold text-sm sm:text-base text-slate-900">Fetch News</div>
                                         <div className="text-xs text-slate-500">Pull latest from NewsData.io</div>
                                     </div>
                                 </div>
@@ -158,14 +220,14 @@ export default function AdminDashboard() {
                             <button
                                 onClick={() => handleAction(triggerSimplify, 'AI Simplifier')}
                                 disabled={actionLoading}
-                                className="w-full flex items-center justify-between p-4 rounded-xl border border-slate-200 hover:border-purple-500 hover:bg-purple-50 transition-all group"
+                                className="w-full flex items-center justify-between p-3 sm:p-4 rounded-xl border border-slate-200 hover:border-purple-500 hover:bg-purple-50 transition-all group"
                             >
                                 <div className="flex items-center gap-3">
                                     <div className="p-2 bg-slate-100 rounded-lg group-hover:bg-white transition-colors">
-                                        <Zap className={`w-5 h-5 text-slate-600 ${actionLoading === 'AI Simplifier' ? 'animate-pulse' : ''}`} />
+                                        <Zap className={`w-4 h-4 sm:w-5 sm:h-5 text-slate-600 ${actionLoading === 'AI Simplifier' ? 'animate-pulse' : ''}`} />
                                     </div>
                                     <div className="text-left">
-                                        <div className="font-semibold text-slate-900">Run AI Processor</div>
+                                        <div className="font-semibold text-sm sm:text-base text-slate-900">Run AI Processor</div>
                                         <div className="text-xs text-slate-500">Simplify pending articles</div>
                                     </div>
                                 </div>
@@ -180,30 +242,91 @@ export default function AdminDashboard() {
                         )}
                     </div>
 
-                    {/* Top Content */}
-                    <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                    {/* Trending Now */}
+                    <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
                         <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
-                            <TrendingUp className="w-5 h-5 text-blue-500" />
-                            Top Performing Content
+                            <Flame className="w-5 h-5 text-orange-500" />
+                            Trending Now
+                            <span className="text-xs font-normal text-slate-400 ml-1">(Last 48h)</span>
                         </h3>
 
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left">
+                        <div className="space-y-3">
+                            {stats?.trending_articles?.length > 0 ? (
+                                stats.trending_articles.map((article, idx) => (
+                                    <div key={article.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 transition-colors">
+                                        <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${idx === 0 ? 'bg-orange-100 text-orange-600' :
+                                                idx === 1 ? 'bg-slate-100 text-slate-600' :
+                                                    'bg-slate-50 text-slate-400'
+                                            }`}>{idx + 1}</span>
+                                        <span className="flex-1 text-sm text-slate-700 truncate">{article.title}</span>
+                                        <span className="text-xs font-mono text-slate-500">{article.views} views</span>
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="text-sm text-slate-400 text-center py-4">No trending articles in the last 48 hours</p>
+                            )}
+                        </div>
+                    </div>
+
+                </div>
+
+                {/* Bottom Grid: Categories + Top All-Time */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+
+                    {/* Categories Breakdown */}
+                    <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
+                        <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
+                            <FolderOpen className="w-5 h-5 text-blue-500" />
+                            Categories Breakdown
+                        </h3>
+
+                        <div className="space-y-3">
+                            {stats?.categories_breakdown?.map((cat, idx) => (
+                                <div key={cat.name} className="flex items-center gap-3">
+                                    <div className="flex-1">
+                                        <div className="flex justify-between items-center mb-1">
+                                            <span className="text-sm font-medium text-slate-700">{cat.name}</span>
+                                            <span className="text-xs text-slate-500">{cat.count} articles</span>
+                                        </div>
+                                        <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                            <div
+                                                className="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full transition-all"
+                                                style={{ width: `${(cat.count / (stats.total_articles || 1)) * 100}%` }}
+                                            ></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                            {(!stats?.categories_breakdown || stats.categories_breakdown.length === 0) && (
+                                <p className="text-sm text-slate-400 text-center py-4">No category data available</p>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Top All-Time */}
+                    <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
+                        <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
+                            <TrendingUp className="w-5 h-5 text-green-500" />
+                            Top Performing (All Time)
+                        </h3>
+
+                        <div className="overflow-x-auto -mx-4 sm:mx-0">
+                            <table className="w-full text-left min-w-[300px]">
                                 <thead>
                                     <tr className="border-b border-slate-100">
-                                        <th className="pb-3 text-xs font-semibold text-slate-500 uppercase">Article Title</th>
-                                        <th className="pb-3 text-xs font-semibold text-slate-500 uppercase text-right">Views</th>
+                                        <th className="pb-3 pl-4 sm:pl-0 text-xs font-semibold text-slate-500 uppercase">Article</th>
+                                        <th className="pb-3 pr-4 sm:pr-0 text-xs font-semibold text-slate-500 uppercase text-right">Views</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-50">
                                     {stats?.top_articles?.map((article) => (
                                         <tr key={article.id} className="group hover:bg-slate-50 transition-colors">
-                                            <td className="py-3 pr-4">
-                                                <span className="font-medium text-slate-700 group-hover:text-primary-600 transition-colors line-clamp-1">
+                                            <td className="py-3 pr-4 pl-4 sm:pl-0">
+                                                <span className="font-medium text-sm text-slate-700 group-hover:text-primary-600 transition-colors line-clamp-1">
                                                     {article.title}
                                                 </span>
                                             </td>
-                                            <td className="py-3 text-right font-mono text-slate-600">
+                                            <td className="py-3 pr-4 sm:pr-0 text-right font-mono text-sm text-slate-600">
                                                 {article.views.toLocaleString()}
                                             </td>
                                         </tr>

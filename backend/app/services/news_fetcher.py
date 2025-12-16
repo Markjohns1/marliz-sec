@@ -50,9 +50,8 @@ class NewsFetcher:
         
         async with httpx.AsyncClient(timeout=30.0) as client:
             # Pre-load categories
-            with get_db_context() as db_ctx:
-                async with db_ctx as db:
-                    await self._load_categories(db)
+            async with get_db_context() as db:
+                await self._load_categories(db)
             
             for keyword in self.keywords:
                 try:

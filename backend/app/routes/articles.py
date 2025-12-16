@@ -243,9 +243,16 @@ async def get_dashboard_stats(
     api_key = Depends(verify_api_key),
     db: AsyncSession = Depends(get_db)
 ):
-    """Get stats for admin dashboard (Async)"""
+    """Get stats for admin dashboard (Async) - Advanced Analytics"""
+    from datetime import datetime, timedelta
     
-    # Execute counts (efficiently)
+    now = datetime.utcnow()
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    week_ago = now - timedelta(days=7)
+    two_weeks_ago = now - timedelta(days=14)
+    two_days_ago = now - timedelta(hours=48)
+    
+    # === BASIC COUNTS ===
     q_total = select(func.count()).select_from(models.Article)
     total_articles = (await db.execute(q_total)).scalar_one()
 
@@ -260,15 +267,80 @@ async def get_dashboard_stats(
     q_views = select(func.sum(models.Article.views))
     total_views = (await db.execute(q_views)).scalar_one() or 0
     
-    # Top articles
+    # === TIME-BASED METRICS ===
+    # Articles today
+    q_today = select(func.count()).select_from(models.Article).filter(
+        models.Article.created_at >= today_start
+    )
+    articles_today = (await db.execute(q_today)).scalar_one()
+    
+    # Articles this week
+    q_week = select(func.count()).select_from(models.Article).filter(
+        models.Article.created_at >= week_ago
+    )
+    articles_this_week = (await db.execute(q_week)).scalar_one()
+    
+    # Articles last week (for comparison)
+    q_last_week = select(func.count()).select_from(models.Article).filter(
+        models.Article.created_at >= two_weeks_ago,
+        models.Article.created_at < week_ago
+    )
+    articles_last_week = (await db.execute(q_last_week)).scalar_one()
+    
+    # Growth percentage
+    if articles_last_week > 0:
+        growth_pct = round(((articles_this_week - articles_last_week) / articles_last_week) * 100, 1)
+    else:
+        growth_pct = 100 if articles_this_week > 0 else 0
+    
+    # === CONTENT INSIGHTS ===
+    # Average views per article
+    avg_views = round(total_views / total_articles, 1) if total_articles > 0 else 0
+    
+    # Top articles (all time)
     stmt = select(models.Article).order_by(desc(models.Article.views)).limit(5)
     top_articles_res = await db.execute(stmt)
     top_articles = top_articles_res.scalars().all()
     
+    # Trending articles (last 48 hours, sorted by views)
+    q_trending = select(models.Article).filter(
+        models.Article.created_at >= two_days_ago,
+        models.Article.status.in_([ArticleStatus.READY, ArticleStatus.EDITED, ArticleStatus.PUBLISHED])
+    ).order_by(desc(models.Article.views)).limit(5)
+    trending_res = await db.execute(q_trending)
+    trending_articles = trending_res.scalars().all()
+    
+    # === CATEGORIES BREAKDOWN ===
+    q_cats = select(
+        models.Category.name,
+        func.count(models.Article.id).label("count")
+    ).join(models.Article, models.Article.category_id == models.Category.id
+    ).group_by(models.Category.name
+    ).order_by(desc("count"))
+    cats_res = await db.execute(q_cats)
+    categories_breakdown = [{"name": r[0], "count": r[1]} for r in cats_res.fetchall()]
+    
+    # Top category
+    top_category = categories_breakdown[0]["name"] if categories_breakdown else "N/A"
+    
     return {
+        # Basic
         "total_articles": total_articles,
         "published": published,
         "pending": pending,
         "total_views": total_views,
-        "top_articles": [{"id": a.id, "title": a.title, "views": a.views} for a in top_articles]
+        
+        # Time-based
+        "articles_today": articles_today,
+        "articles_this_week": articles_this_week,
+        "growth_pct": growth_pct,
+        
+        # Content
+        "avg_views": avg_views,
+        "top_category": top_category,
+        "top_articles": [{"id": a.id, "title": a.title, "views": a.views} for a in top_articles],
+        "trending_articles": [{"id": a.id, "title": a.title, "views": a.views} for a in trending_articles],
+        
+        # Categories
+        "categories_breakdown": categories_breakdown
     }
