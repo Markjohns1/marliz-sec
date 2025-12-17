@@ -122,6 +122,10 @@ async def get_article(slug: str, db: AsyncSession = Depends(get_db)):
     result = await db.execute(stmt)
     article = result.scalars().first()
     
+    # Confirm object is fresh
+    print(f"DEBUG: Refetched article {article.id}. Status: {article.status}")
+    
+    # Explicitly convert to Pydantic model to unhook from DB session
     return schemas.ArticleWithContent.model_validate(article)
 
 @router.get("/related/{article_id}", response_model=List[schemas.Article])
