@@ -36,4 +36,4 @@ Thumbs.db
 
 # Database
 *.db
-*.sqlite
+*.sqlite*.csv
