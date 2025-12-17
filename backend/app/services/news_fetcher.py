@@ -99,7 +99,7 @@ class NewsFetcher:
         articles = data.get("results", [])
         new_count = 0
         
-        with get_db_context() as db:
+        async with get_db_context() as db:
             for article_data in articles:
                 if self._should_skip(article_data):
                     continue

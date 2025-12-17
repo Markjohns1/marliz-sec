@@ -22,7 +22,7 @@ async def lifespan(app: FastAPI):
     logger.info(" Starting Marliz Sec News API...")
     
     # Initialize database
-    init_db()
+    await init_db()
     logger.info("✓ Database initialized")
     
     # Start background scheduler

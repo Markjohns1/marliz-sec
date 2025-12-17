@@ -45,7 +45,7 @@ async def cleanup_job():
     
     logger.info("🧹 Starting daily retention cleanup...")
     try:
-        with get_db_context() as db:
+        async with get_db_context() as db:
             # Delete ALL articles older than 30 days to keep content fresh
             cutoff_date = datetime.now() - timedelta(days=30)
             deleted = db.query(Article).filter(

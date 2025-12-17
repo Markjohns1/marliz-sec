@@ -3,7 +3,7 @@
     # email your-email@example.com
 }
 
-marlizintel.tymirahealth.com:8443 {
+marlizintel.tymirahealth.com {
     reverse_proxy web:3000 {
         header_up Host {upstream_hostport}
         header_up X-Real-IP {remote}
