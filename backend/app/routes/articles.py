@@ -101,7 +101,7 @@ async def get_article(slug: str, db: AsyncSession = Depends(get_db)):
     
     stmt = select(models.Article).filter(
         models.Article.slug == slug,
-        models.Article.status.in_([ArticleStatus.READY, ArticleStatus.EDITED, ArticleStatus.PUBLISHED])
+        models.Article.status.in_([s.value for s in [ArticleStatus.READY, ArticleStatus.EDITED, ArticleStatus.PUBLISHED]])
     ).options(selectinload(models.Article.simplified), selectinload(models.Article.category))
     
     result = await db.execute(stmt)
