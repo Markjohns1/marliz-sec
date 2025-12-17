@@ -113,6 +113,7 @@ async def get_article(slug: str, db: AsyncSession = Depends(get_db)):
     # Increment views
     article.views += 1
     await db.commit()
+    await db.refresh(article)
     
     return article
 
