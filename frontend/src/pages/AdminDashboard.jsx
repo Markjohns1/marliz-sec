@@ -23,7 +23,34 @@ import {
     ShieldOff
 } from 'lucide-react';
 
-// ... (StatCard and GrowthBadge components remain the same)
+
+// Helper Components
+function StatCard({ title, value, icon: Icon, color, loading, subtitle }) {
+    return (
+        <div className="bg-white p-4 sm:p-6 rounded-2xl border border-slate-100 shadow-sm">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <div className={`p-2 sm:p-3 rounded-xl ${color}`}>
+                    <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                </div>
+            </div>
+            <h3 className="text-slate-500 text-xs sm:text-sm font-medium mb-1">{title}</h3>
+            <div className="text-2xl sm:text-3xl font-bold text-slate-900">
+                {loading ? '...' : (value?.toLocaleString() || 0)}
+            </div>
+            {subtitle && <p className="text-xs text-slate-400 mt-1">{subtitle}</p>}
+        </div>
+    );
+}
+
+function GrowthBadge({ value }) {
+    const isPositive = value >= 0;
+    return (
+        <div className={`flex items-center gap-1 text-lg sm:text-2xl font-bold ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+            {isPositive ? <ArrowUpRight className="w-5 h-5" /> : <ArrowDownRight className="w-5 h-5" />}
+            {Math.abs(value).toFixed(1)}%
+        </div>
+    );
+}
 
 export default function AdminDashboard() {
     const navigate = useNavigate();
