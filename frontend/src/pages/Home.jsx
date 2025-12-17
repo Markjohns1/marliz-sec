@@ -10,6 +10,10 @@ import { Helmet } from 'react-helmet-async';
 import CategorySection from '../components/CategorySection';
 import AdUnit from '../components/AdUnit';
 
+const stripHtml = (html) => {
+  return (html || '').replace(/<[^>]+>/g, '');
+};
+
 export default function Home() {
   // const [page, setPage] = useState(1); // MIGRATED TO INFINITE QUERY
   const [filterLevel, setFilterLevel] = useState(''); // '' = All, 'critical', 'high', 'medium', 'low'
@@ -161,7 +165,7 @@ export default function Home() {
                             {allArticles[0].title}
                           </h2>
                           <p className="text-slate-300 text-lg line-clamp-2 max-w-3xl">
-                            {allArticles[0]?.simplified?.friendly_summary}
+                            {stripHtml(allArticles[0]?.simplified?.friendly_summary)}
                           </p>
                         </div>
                       </Link>
@@ -225,8 +229,8 @@ export default function Home() {
                             key={level || 'all'}
                             onClick={() => setFilterLevel(level)}
                             className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${filterLevel === level
-                                ? 'bg-slate-800 text-white shadow-sm'
-                                : 'text-slate-400 hover:text-slate-200'
+                              ? 'bg-slate-800 text-white shadow-sm'
+                              : 'text-slate-400 hover:text-slate-200'
                               }`}
                           >
                             {level ? level.charAt(0).toUpperCase() + level.slice(1) : 'All'}
@@ -238,8 +242,8 @@ export default function Home() {
                       <button
                         onClick={() => setSortBy(sortBy === 'date' ? 'severity' : 'date')}
                         className={`flex items-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all ${sortBy === 'severity'
-                            ? 'bg-red-900/20 border-red-500/30 text-red-400'
-                            : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
+                          ? 'bg-red-900/20 border-red-500/30 text-red-400'
+                          : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
                           }`}
                       >
                         <ArrowDownWideNarrow className="w-3.5 h-3.5 mr-1.5" />
