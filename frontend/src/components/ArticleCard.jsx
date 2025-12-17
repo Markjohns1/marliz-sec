@@ -2,6 +2,10 @@ import { Link } from 'react-router-dom';
 import { Clock, TrendingUp, AlertCircle, Shield, AlertTriangle, CheckCircle, Info, Eye, Users } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
+const stripHtml = (html) => {
+  return (html || '').replace(/<[^>]+>/g, '');
+};
+
 export default function ArticleCard({ article }) {
   const threatLevelConfig = {
     low: {
@@ -91,7 +95,7 @@ export default function ArticleCard({ article }) {
 
         {article.simplified?.friendly_summary && (
           <p className="text-slate-400 mb-4 line-clamp-2 leading-relaxed text-sm flex-1">
-            {article.simplified.friendly_summary}
+            {stripHtml(article.simplified.friendly_summary)}
           </p>
         )}
 
@@ -100,7 +104,7 @@ export default function ArticleCard({ article }) {
           <div className="mb-4 p-3 bg-slate-800/50 rounded-lg border border-slate-700/50">
             <div className="flex items-start text-xs text-slate-300">
               <Users className="w-3 h-3 mr-2 mt-0.5 text-orange-400 flex-shrink-0" />
-              <span className="line-clamp-2">{article.simplified.business_impact}</span>
+              <span className="line-clamp-2">{stripHtml(article.simplified.business_impact)}</span>
             </div>
           </div>
         )}

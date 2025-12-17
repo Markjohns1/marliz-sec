@@ -226,7 +226,7 @@ export default function ArticleDetail() {
               {/* Technical Details - Attack Vector */}
               {article.simplified?.attack_vector && (() => {
                 const parts = article.simplified.attack_vector.split('|||');
-                const title = parts.length > 1 ? parts[0] : "Technically: How The Attack Happened";
+                const title = parts.length > 1 ? parts[0].replace(/<[^>]+>/g, '').trim() : "Technically: How The Attack Happened";
                 const content = parts.length > 1 ? parts[1] : article.simplified.attack_vector;
 
                 return (
@@ -257,7 +257,7 @@ export default function ArticleDetail() {
                 </h2>
                 <div
                   className="text-lg text-blue-200 leading-relaxed space-y-4"
-                  dangerouslySetInnerHTML={{ __html: article.simplified?.business_impact }}
+                  dangerouslySetInnerHTML={{ __html: article.simplified?.business_impact?.replace(/\|\|\|/g, '') }}
                 />
               </section>
 
