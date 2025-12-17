@@ -38,12 +38,12 @@ class AISimplifier:
         processed = 0
         failed = 0
         
-        with get_db_context() as db_ctx:
-            # Manually handle the context since it returns an async generator
-            async with db_ctx as db:
-                await self._load_categories(db)
-                
-                # Get all RAW articles
+        
+        # Use single async context manager
+        async with get_db_context() as db:
+            await self._load_categories(db)
+            
+            # Get all RAW articles
                 stmt = select(Article).filter_by(status=ArticleStatus.RAW)
                 result = await db.execute(stmt)
                 articles = result.scalars().all()
