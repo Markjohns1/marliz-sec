@@ -6,11 +6,11 @@ from app.database import Base
 import enum
 
 class ArticleStatus(str, enum.Enum):
-    RAW = "raw"
-    PROCESSING = "processing"
-    READY = "ready"
-    EDITED = "edited"
-    PUBLISHED = "published"
+    RAW = "RAW"
+    PROCESSING = "PROCESSING"
+    READY = "READY"
+    EDITED = "EDITED"
+    PUBLISHED = "PUBLISHED"
 
 class ThreatLevel(str, enum.Enum):
     LOW = "low"
