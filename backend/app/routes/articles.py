@@ -122,10 +122,8 @@ async def get_article(slug: str, db: AsyncSession = Depends(get_db)):
     result = await db.execute(stmt)
     article = result.scalars().first()
     
-    # Confirm object is fresh
-    print(f"DEBUG: Refetched article {article.id}. Status: {article.status}")
-    
-    # Explicitly convert to Pydantic model to unhook from DB session
+    # We explicitly convert to Pydantic model here to ensure all data is eagerly loaded 
+    # before the session closes, preventing 'MissingGreenlet' errors in the response serialization.
     return schemas.ArticleWithContent.model_validate(article)
 
 @router.get("/related/{article_id}", response_model=List[schemas.Article])
