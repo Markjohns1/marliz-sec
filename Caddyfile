@@ -4,7 +4,11 @@
 }
 
 marlizintel.tymirahealth.com {
-    reverse_proxy web:3000 {
+    @not_acme {
+        not path /.well-known/*
+    }
+
+    reverse_proxy @not_acme web:3000 {
         header_up Host {upstream_hostport}
         header_up X-Real-IP {remote}
     }

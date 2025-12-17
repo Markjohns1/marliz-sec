@@ -115,7 +115,7 @@ async def get_article(slug: str, db: AsyncSession = Depends(get_db)):
     await db.commit()
     await db.refresh(article)
     
-    return article
+    return schemas.ArticleWithContent.model_validate(article)
 
 @router.get("/related/{article_id}", response_model=List[schemas.Article])
 async def get_related_articles(
