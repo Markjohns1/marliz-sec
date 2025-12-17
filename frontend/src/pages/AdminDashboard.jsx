@@ -57,11 +57,12 @@ export default function AdminDashboard() {
     const [actionLoading, setActionLoading] = useState(null);
     const [message, setMessage] = useState(null);
 
-    // Fetch Stats
+    // Fetch Stats - Auto-refresh every 15 seconds
     const { data: stats, isLoading, refetch } = useQuery({
         queryKey: ['admin-stats'],
         queryFn: getDashboardStats,
         retry: false,
+        refetchInterval: 15000, // Auto-refresh every 15 seconds
         onError: () => {
             logout();
             navigate('/console/login');
