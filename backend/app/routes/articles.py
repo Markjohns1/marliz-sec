@@ -236,6 +236,10 @@ async def update_article(
     if updates.threat_level: simplified.threat_level = updates.threat_level
     if updates.category_id: article.category_id = updates.category_id
     
+    # Tier 1 / Tier 2 Strategy Updates
+    if updates.content_type: article.content_type = updates.content_type
+    if updates.protected_from_deletion is not None: article.protected_from_deletion = updates.protected_from_deletion
+    
     article.is_edited = True
     article.edited_by = updates.edited_by
     article.edited_at = datetime.now()
@@ -348,8 +352,8 @@ async def get_dashboard_stats(
         # Content
         "avg_views": avg_views,
         "top_category": top_category,
-        "top_articles": [{"id": a.id, "title": a.title, "views": a.views} for a in top_articles],
-        "trending_articles": [{"id": a.id, "title": a.title, "views": a.views} for a in trending_articles],
+        "top_articles": [{"id": a.id, "title": a.title, "views": a.views, "protected": a.protected_from_deletion} for a in top_articles],
+        "trending_articles": [{"id": a.id, "title": a.title, "views": a.views, "protected": a.protected_from_deletion} for a in trending_articles],
         
         # Categories
         "categories_breakdown": categories_breakdown

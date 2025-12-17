@@ -55,6 +55,8 @@ class ArticleUpdate(BaseModel):
     threat_level: Optional[ThreatLevel] = None
     category_id: Optional[int] = None
     edited_by: str
+    content_type: Optional[str] = None
+    protected_from_deletion: Optional[bool] = None
 
 class Article(ArticleBase):
     model_config = ConfigDict(from_attributes=True)
@@ -66,6 +68,8 @@ class Article(ArticleBase):
     is_edited: bool
     edited_at: Optional[datetime] = None
     meta_description: Optional[str] = None
+    content_type: Optional[str] = "news"
+    protected_from_deletion: Optional[bool] = False
     
 class ArticleWithContent(Article):
     simplified: Optional[SimplifiedContent] = None

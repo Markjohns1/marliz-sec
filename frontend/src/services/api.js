@@ -39,6 +39,11 @@ export const getArticle = async (slug) => {
   return data;
 };
 
+export const updateArticle = async (id, updates) => {
+  const { data } = await api.put(`/api/articles/${id}`, updates);
+  return data;
+};
+
 export const getRelatedArticles = async (articleId) => {
   const { data } = await api.get(`/api/articles/related/${articleId}`);
   return data;
