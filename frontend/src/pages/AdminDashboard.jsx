@@ -63,6 +63,8 @@ export default function AdminDashboard() {
         queryFn: getDashboardStats,
         retry: false,
         refetchInterval: 15000, // Auto-refresh every 15 seconds
+        staleTime: 0, // Always consider data stale
+        refetchOnWindowFocus: true, // Refresh when tab gets focus
         onError: () => {
             logout();
             navigate('/console/login');
@@ -107,7 +109,7 @@ export default function AdminDashboard() {
             } else {
                 setMessage({ type: 'success', text: `✓ ${name} completed.` });
             }
-            refetch();
+            await refetch(); // Wait for fresh data
         } catch (error) {
             setMessage({ type: 'error', text: `Error: ${error.message}` });
         } finally {
