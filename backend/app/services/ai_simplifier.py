@@ -50,33 +50,33 @@ class AISimplifier:
             
             logger.info(f"Found {len(articles)} articles to process")
                 
-                for article in articles:
-                    try:
-                        # Mark as processing
-                        article.status = ArticleStatus.PROCESSING
-                        await db.commit()
+            for article in articles:
+                try:
+                    # Mark as processing
+                    article.status = ArticleStatus.PROCESSING
+                    await db.commit()
+                
+                    # Simplify with Groq
+                    result = await self._simplify_article(db, article)
                     
-                        # Simplify with Groq
-                        result = await self._simplify_article(db, article)
-                        
-                        if result:
-                            processed += 1
-                            logger.info(f"✓ Processed: {article.title[:50]}...")
-                        else:
-                            # Mark as RAW for retry if it failed (but not if it was just irrelevant)
-                            if article.status == ArticleStatus.PROCESSING:
-                                 failed += 1
-                                 article.status = ArticleStatus.RAW
-                                 await db.commit()
-                        
-                        # Add delay to avoid rate limits (500ms between requests)
-                        await asyncio.sleep(2.0)
+                    if result:
+                        processed += 1
+                        logger.info(f"✓ Processed: {article.title[:50]}...")
+                    else:
+                        # Mark as RAW for retry if it failed (but not if it was just irrelevant)
+                        if article.status == ArticleStatus.PROCESSING:
+                             failed += 1
+                             article.status = ArticleStatus.RAW
+                             await db.commit()
                     
-                    except Exception as e:
-                        logger.error(f"Failed to process article {article.id}: {str(e)}")
-                        article.status = ArticleStatus.RAW
-                        await db.commit()
-                        failed += 1
+                    # Add delay to avoid rate limits (500ms between requests)
+                    await asyncio.sleep(2.0)
+                
+                except Exception as e:
+                    logger.error(f"Failed to process article {article.id}: {str(e)}")
+                    article.status = ArticleStatus.RAW
+                    await db.commit()
+                    failed += 1
         
         return {
             "processed": processed,
