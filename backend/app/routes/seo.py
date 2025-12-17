@@ -1,18 +1,20 @@
 from fastapi import APIRouter, Response, Depends
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from app.database import get_db
 from app.models import Article, ArticleStatus
 
 router = APIRouter()
 
 @router.get("/sitemap.xml")
-def get_sitemap(db: Session = Depends(get_db)):
+async def get_sitemap(db: AsyncSession = Depends(get_db)):
     """Generate dynamic sitemap for all published articles"""
-    articles = db.query(Article).filter(Article.status == ArticleStatus.READY).all()
+    stmt = select(Article).filter(Article.status.in_([ArticleStatus.READY, ArticleStatus.EDITED, ArticleStatus.PUBLISHED]))
+    result = await db.execute(stmt)
+    articles = result.scalars().all()
     
-    # Base URL for your frontend
-    # Base URL for your frontend
-    base_url = "https://marlizintel.tymirahealth.com" # In production, change this to your actual domain
+    # Base URL - use the nip.io domain that is currently working
+    base_url = "https://marlizintel.146.190.146.121.nip.io"
     
     xml_content = ['<?xml version="1.0" encoding="UTF-8"?>']
     xml_content.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')

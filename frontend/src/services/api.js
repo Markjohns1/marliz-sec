@@ -21,11 +21,13 @@ api.interceptors.request.use((config) => {
 export const getArticles = async ({
   page = 1,
   limit = 12,
+  category = '',
   search = '',
   threat_level = '',
   sort_by = 'date'
 } = {}) => {
   const params = { page, limit };
+  if (category) params.category = category;  // CRITICAL: Pass category to API
   if (search) params.search = search;
   if (threat_level) params.threat_level = threat_level;
   if (sort_by) params.sort_by = sort_by;
