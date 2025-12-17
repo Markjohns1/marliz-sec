@@ -227,8 +227,8 @@ Content excerpt: {content[:2800]}
 
 YOUR MISSION:
 1. Analyze this threat data and explain the TECHNICAL MECHANISM.
-2. Generate an SEO-OPTIMIZED, CLICKABLE TITLE for Google search results.
-3. Generate a compelling META DESCRIPTION with long-tail keywords.
+2. Generate an SEO-OPTIMIZED, CLICKABLE TITLE following the "ENTITY + EVENT + YEAR" formula.
+3. Generate a compelling META DESCRIPTION with high-volume keywords.
 
 RESPOND WITH VALID JSON ONLY:
 {{
@@ -242,62 +242,46 @@ RESPOND WITH VALID JSON ONLY:
   "who_is_at_risk": "Specific groups affected (e.g., 'Chrome users on Windows', 'Healthcare providers')",
   "actions": ["Specific action 1", "Specific action 2", "Specific action 3"],
   "threat_level": "low|medium|high|critical",
-  "keywords": ["long-tail keyword 1", "long-tail keyword 2", "long-tail keyword 3"]
+  "keywords": ["keyword 1", "keyword 2", "keyword 3", "keyword 4", "keyword 5"]
 }}
 
-=== SEO TITLE RULES (BASED ON REAL SEARCH DATA) ===
+=== 🏆 SEO TITLE RULES (CRITICAL FOR TRAFFIC) ===
 
-**CRITICAL: Include SPECIFIC NUMBERS whenever possible!**
-People search for:
-- "data breach that hit 500000 users"
-- "breach affected two thirds of country"
-- "hack exposed millions of records"
+FORMULA: [Entity Name] [Event Type] [Year]: [Impact/Number]
+Examples of WINNING Titles:
+- "Austria Data Breach 2024: Two-Thirds of Citizens Affected" (Better than "The breach that hit...")
+- "Verizon Data Breach 2025: 63,000 Employees Exposed"
+- "European Data Breaches 2024: New Report Reveals Massive Spike"
+- "Critical Chrome Vulnerability 2024: Update Your Browser Now"
 
-TITLE PATTERNS THAT GET CLICKS:
+RULES:
+1. START with the ENTITY (Country, Company, Software Name).
+2. ALWAYS include the YEAR (2024 or 2025) if relevant to a breach/report.
+3. Use HIGH VOLUME phrases: "Data Breach", "Cyber Attack", "Hack", "Vulnerability".
+4. Include a NUMBER if available (records, money, users).
+5. 50-60 characters maximum.
 
-FOR DATA BREACHES:
-- "MASSIVE: [Company] Breach Exposes [X Million] Records - Are You Affected?"
-- "BREAKING: Data Breach Hits [X%/Fraction] of [Country/Industry]"
-- "[Country] Data Breach 2024: [Number] Citizens' Data Exposed"
-
-FOR VULNERABILITIES:
-- "URGENT: [Software] Flaw Affects [Number] Million Devices - Patch Now"
-- "Critical [Software] Bug Lets Hackers [Specific Action] - Fix Available"
-
-FOR ATTACKS:
-- "ALERT: [Attack Name] Targets [Specific Group] - [Number] Affected"
-- "[Country/Company] Under Attack: [Number] Systems Compromised"
-
-TITLE OPTIMIZATION RULES:
-1. ALWAYS include a NUMBER (users, records, %, millions, dollars)
-2. Be SPECIFIC about WHO is affected (country, industry, software users)
-3. Include urgency word: BREAKING, ALERT, WARNING, URGENT, CRITICAL, MASSIVE
-4. 50-60 characters for Google
-5. Write for USA/UK/EU audience (highest value traffic)
-
-=== META DESCRIPTION (LONG-TAIL KEYWORD OPTIMIZED) ===
+=== META DESCRIPTION (CLICK OPTIMIZED) ===
 
 150-160 characters. MUST include:
-1. The PROBLEM with a specific number
-2. WHO is affected (be specific)
-3. A QUESTION or CALL-TO-ACTION
+1. The exact phrase "Data Breach" or "Vulnerability" (if applicable).
+2. The specific ENTITY NAME (e.g., "Austria", "Microsoft").
+3. The YEAR (e.g., "2024").
+4. A call to action: "Check if you are affected."
 
-GOOD EXAMPLES:
-- "A massive breach exposed 9 million citizens' data. Were you affected? Here's how to check if your information was leaked and what to do next."
-- "Critical Windows flaw affects 1 billion devices. Is your PC vulnerable? Learn how to protect yourself before hackers exploit this bug."
+=== KEYWORDS FIELD (HIGH VOLUME FOCUS) ===
 
-=== KEYWORDS FIELD (LONG-TAIL FOCUS) ===
-
-Generate 5-7 LONG-TAIL keywords that people actually search:
-- "data breach affected two thirds country" (not just "data breach")
-- "how to check if my data was leaked" (not just "data leak")
-- "[company name] hack what to do" (not just "hack")
-- "[country] breach 2024 affected users"
+Generate 5-7 keywords focusing on SEARCH VOLUME:
+- "Austria data breach 2024"
+- "European data breaches"
+- "Major data breaches 2024"
+- "Cybersecurity news 2024"
+- "[Company Name] hack"
 
 CATEGORY DEFINITIONS:
 - ransomware: Encryption attacks, ransom demands
 - phishing: Email scams, credential harvesting
-- data-breach: Data theft, database leaks
+- data-breach: Data theft, database leaks (PRIORITIZE THIS CATEGORY)
 - malware: Viruses, trojans, spyware
 - vulnerability: CVEs, zero-days, patches
 - general: Best practices, security news
