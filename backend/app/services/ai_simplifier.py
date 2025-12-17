@@ -231,7 +231,7 @@ Content excerpt: {content[:2800]}
 
 YOUR MISSION:
 1. Analyze this threat data and explain the TECHNICAL MECHANISM.
-2. Generate an SEO-OPTIMIZED, CLICKABLE TITLE following the "ENTITY + EVENT + YEAR" formula.
+2. Generate an SEO-OPTIMIZED, CLICKABLE TITLE following the \"ENTITY + EVENT\" formula (year optional).
 3. Generate a compelling META DESCRIPTION with high-volume keywords.
 4. WRITE A LONG-FORM NEWS UPDATE (500-700 WORDS MINIMUM) formatted with HTML tags.
 
@@ -252,19 +252,20 @@ RESPOND WITH VALID JSON ONLY:
 
 === 🏆 SEO TITLE RULES (CRITICAL FOR TRAFFIC) ===
 
-FORMULA: [Entity Name] [Event Type] [Year]: [Impact/Number]
+FORMULA: [Entity Name] [Event Type] [Year - OPTIONAL]: [Impact/Number]
 Examples of WINNING Titles:
-- "Austria Data Breach 2024: Two-Thirds of Citizens Affected" (Better than "The breach that hit...")
-- "Verizon Data Breach 2025: 63,000 Employees Exposed"
-- "European Data Breaches 2024: New Report Reveals Massive Spike"
-- "Critical Chrome Vulnerability 2024: Update Your Browser Now"
+- "Austria Data Breach: Two-Thirds of Citizens Affected" (Year optional if recent)
+- "Verizon Exposes 63,000 Employee Records" (Number is more important than year)
+- "Critical Chrome Vulnerability: Update Your Browser Now" (Urgency over year)
+- "European Data Breaches {datetime.now().year}: Annual Report Analysis" (Year for reports/summaries)
 
 RULES:
 1. START with the ENTITY (Country, Company, Software Name).
-2. ALWAYS include the YEAR (2024 or 2025) if relevant to a breach/report.
-3. Use HIGH VOLUME phrases: "Data Breach", "Cyber Attack", "Hack", "Vulnerability".
-4. Include a NUMBER if available (records, money, users).
-5. 50-60 characters maximum.
+2. Include the YEAR ({datetime.now().year}) ONLY if it's a report, annual summary, or historical reference.
+3. DO NOT add the year to breaking news or ongoing incidents - it's implied they are current.
+4. Use HIGH VOLUME phrases: "Data Breach", "Cyber Attack", "Hack", "Vulnerability".
+5. Include a NUMBER if available (records, money, users).
+6. 50-60 characters maximum.
 
 === CONTENT LENGTH & FORMATTING (TIER 1 STRATEGY) ===
 - **LENGTH:** Total content (summary + attack_vector + impact) MUST be **500-700 words**.
