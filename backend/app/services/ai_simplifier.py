@@ -44,11 +44,11 @@ class AISimplifier:
             await self._load_categories(db)
             
             # Get all RAW articles
-                stmt = select(Article).filter_by(status=ArticleStatus.RAW)
-                result = await db.execute(stmt)
-                articles = result.scalars().all()
-                
-                logger.info(f"Found {len(articles)} articles to process")
+            stmt = select(Article).filter_by(status=ArticleStatus.RAW)
+            result = await db.execute(stmt)
+            articles = result.scalars().all()
+            
+            logger.info(f"Found {len(articles)} articles to process")
                 
                 for article in articles:
                     try:
