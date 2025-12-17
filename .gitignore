@@ -35,5 +35,5 @@ yarn-error.log*
 Thumbs.db
 
 # Database
-*.db
-*.sqlite*.csv
+*.sqlite
+*.csv
