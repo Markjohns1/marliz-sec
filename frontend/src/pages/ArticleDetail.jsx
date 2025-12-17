@@ -217,9 +217,10 @@ export default function ArticleDetail() {
                   <AlertCircle className="w-6 h-6 mr-2 text-blue-500" />
                   Now, Let's Talk About What Happened
                 </h2>
-                <p className="text-lg text-slate-300 leading-relaxed">
-                  {article.simplified?.friendly_summary}
-                </p>
+                <div
+                  className="text-lg text-slate-300 leading-relaxed space-y-4"
+                  dangerouslySetInnerHTML={{ __html: article.simplified?.friendly_summary }}
+                />
               </section>
 
               {/* Technical Details - Attack Vector */}
@@ -230,13 +231,16 @@ export default function ArticleDetail() {
 
                 return (
                   <section className="bg-red-900/10 border-l-4 border-red-500 rounded-r-xl p-8 mb-8">
-                    <h2 className="text-2xl font-bold text-red-100 mb-4 flex items-center">
-                      <Shield className="w-6 h-6 mr-2 text-red-500" />
-                      {title}
-                    </h2>
-                    <p className="text-lg text-red-100/90 leading-relaxed font-mono text-sm md:text-base">
-                      {content}
-                    </p>
+                    {parts.length > 1 && (
+                      <h2 className="text-2xl font-bold text-red-100 mb-4 flex items-center">
+                        <Shield className="w-6 h-6 mr-2 text-red-500" />
+                        {title}
+                      </h2>
+                    )}
+                    <div
+                      className="text-lg text-red-100/90 leading-relaxed font-mono text-sm md:text-base space-y-4"
+                      dangerouslySetInnerHTML={{ __html: content }}
+                    />
                   </section>
                 );
               })()}
@@ -251,9 +255,10 @@ export default function ArticleDetail() {
                 <h2 className="text-2xl font-bold text-blue-100 mb-4">
                   Why This Matters to You (Personal & Business)
                 </h2>
-                <p className="text-lg text-blue-200 leading-relaxed">
-                  {article.simplified?.business_impact}
-                </p>
+                <div
+                  className="text-lg text-blue-200 leading-relaxed space-y-4"
+                  dangerouslySetInnerHTML={{ __html: article.simplified?.business_impact }}
+                />
               </section>
 
               {/* Action Steps */}
