@@ -224,26 +224,22 @@ export default function ArticleDetail() {
               </section>
 
               {/* Technical Details - Attack Vector */}
-              {article.simplified?.attack_vector && (() => {
-                const parts = article.simplified.attack_vector.split('|||');
-                const title = parts.length > 1 ? parts[0].replace(/<[^>]+>/g, '').trim() : "Technically: How The Attack Happened";
-                const content = parts.length > 1 ? parts[1] : article.simplified.attack_vector;
-
-                return (
-                  <section className="bg-red-900/10 border-l-4 border-red-500 rounded-r-xl p-8 mb-8">
-                    {parts.length > 1 && (
-                      <h2 className="text-2xl font-bold text-red-100 mb-4 flex items-center">
-                        <Shield className="w-6 h-6 mr-2 text-red-500" />
-                        {title}
-                      </h2>
-                    )}
-                    <div
-                      className="text-lg text-red-100/90 leading-relaxed font-mono text-sm md:text-base space-y-4"
-                      dangerouslySetInnerHTML={{ __html: content }}
-                    />
-                  </section>
-                );
-              })()}
+              {article.simplified?.attack_vector && (
+                <section className="bg-red-900/10 border-l-4 border-red-500 rounded-r-xl p-8 mb-8">
+                  <h2 className="text-2xl font-bold text-red-100 mb-4 flex items-center">
+                    <Shield className="w-6 h-6 mr-2 text-red-500" />
+                    Technically: How It Happened
+                  </h2>
+                  <div
+                    className="text-lg text-red-100/90 leading-relaxed font-mono text-sm md:text-base space-y-4"
+                    dangerouslySetInnerHTML={{
+                      __html: article.simplified.attack_vector
+                        .replace(/\|\|\|/g, '')
+                        .replace(/<h2>.*?<\/h2>/gi, '')
+                    }}
+                  />
+                </section>
+              )}
 
               {/* MOBILE AD PLACEMENT (Visible only on mobile/tablet) */}
               <div className="xl:hidden">

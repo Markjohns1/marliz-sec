@@ -231,7 +231,7 @@ Content excerpt: {content[:2800]}
 
 YOUR MISSION:
 1. Analyze this threat data and explain the TECHNICAL MECHANISM.
-2. Generate an SEO-OPTIMIZED, CLICKABLE TITLE following the \"ENTITY + EVENT\" formula (year optional).
+2. Generate an SEO-OPTIMIZED, CLICKABLE TITLE following the "ENTITY + EVENT" formula.
 3. Generate a compelling META DESCRIPTION with high-volume keywords.
 4. WRITE A LONG-FORM NEWS UPDATE (500-700 WORDS MINIMUM) formatted with HTML tags.
 
@@ -250,22 +250,21 @@ RESPOND WITH VALID JSON ONLY:
   "keywords": ["keyword 1", "keyword 2", "keyword 3", "keyword 4", "keyword 5"]
 }}
 
-=== 🏆 SEO TITLE RULES (CRITICAL FOR TRAFFIC) ===
+=== 🏆 SEO TITLE RULES ===
 
-FORMULA: [Entity Name] [Event Type] [Year - OPTIONAL]: [Impact/Number]
-Examples of WINNING Titles:
-- "Austria Data Breach: Two-Thirds of Citizens Affected" (Year optional if recent)
-- "Verizon Exposes 63,000 Employee Records" (Number is more important than year)
-- "Critical Chrome Vulnerability: Update Your Browser Now" (Urgency over year)
-- "European Data Breaches {datetime.now().year}: Annual Report Analysis" (Year for reports/summaries)
+FORMULA: [Entity Name] [Event]: [Impact/Number]
+Examples:
+- "Austria Data Breach: Two-Thirds of Citizens Affected"
+- "Verizon Exposes 63,000 Employee Records"
+- "Chrome Vulnerability: Update Your Browser Now"
+- "Ransomware Attack Hits Major Hospital Chain"
 
 RULES:
-1. START with the ENTITY (Country, Company, Software Name).
-2. Include the YEAR ({datetime.now().year}) ONLY if it's a report, annual summary, or historical reference.
-3. DO NOT add the year to breaking news or ongoing incidents - it's implied they are current.
-4. Use HIGH VOLUME phrases: "Data Breach", "Cyber Attack", "Hack", "Vulnerability".
-5. Include a NUMBER if available (records, money, users).
-6. 50-60 characters maximum.
+1. START with the ENTITY (Company, Country, Software).
+2. DO NOT add years to titles - news is assumed current.
+3. Use action words: "Exposes", "Hits", "Attacks", "Breaches".
+4. Include a NUMBER if available.
+5. 50-60 characters maximum.
 
 === CONTENT LENGTH & FORMATTING (TIER 1 STRATEGY) ===
 - **LENGTH:** Total content (summary + attack_vector + impact) MUST be **500-700 words**.
@@ -308,10 +307,8 @@ WRITING RULES:
 4. Explain technical terms briefly in parentheses
 
 SPECIAL INSTRUCTION FOR 'ATTACK_VECTOR' FIELD:
-Start with dynamic header + '|||':
-- Attack: "Technically: How The Attack Happened|||..."
-- Vulnerability: "Technically: The Vulnerability Details|||..."
-- Tool/feature: "Technically: How It Works|||..."
+Write the technical explanation directly WITHOUT any special headers or separators.
+Just explain HOW the attack/vulnerability works in plain HTML paragraphs.
 
 RETURN ONLY THE JSON OBJECT."""
     
