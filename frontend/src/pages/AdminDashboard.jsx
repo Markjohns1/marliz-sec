@@ -79,7 +79,7 @@ export default function AdminDashboard() {
                 protected_from_deletion: !currentStatus,
                 edited_by: 'admin' // Required by schema
             });
-            refetch(); // Refresh to see changes
+            await refetch(); // Wait for data to refresh
             setMessage({ type: 'success', text: `Success: Article protection ${!currentStatus ? 'enabled' : 'disabled'}.` });
         } catch (error) {
             setMessage({ type: 'error', text: `Error: ${error.message}` });
