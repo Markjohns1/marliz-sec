@@ -43,15 +43,20 @@ async def cleanup_job():
     from app.models import Article
     from datetime import datetime, timedelta
     
+    from sqlalchemy import delete
+    
     logger.info("🧹 Starting daily retention cleanup...")
     try:
         async with get_db_context() as db:
             # Delete ALL articles older than 30 days to keep content fresh
             cutoff_date = datetime.now() - timedelta(days=30)
-            deleted = db.query(Article).filter(
-                Article.published_at < cutoff_date
-            ).delete()
-            db.commit()
+            
+            # Async delete syntax
+            stmt = delete(Article).where(Article.published_at < cutoff_date)
+            result = await db.execute(stmt)
+            deleted = result.rowcount
+            
+            await db.commit()
             if deleted > 0:
                 logger.info(f"✓ Retention Policy: Removed {deleted} expired articles (>30 days)")
     except Exception as e:
