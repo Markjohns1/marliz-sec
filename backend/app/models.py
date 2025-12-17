@@ -60,6 +60,10 @@ class Article(Base):
     meta_description = Column(String(160))
     keywords = Column(Text)  # comma-separated
     
+    # Tiered Content System
+    content_type = Column(String(20), default="news") # 'news' or 'evergreen'
+    protected_from_deletion = Column(Boolean, default=False)
+    
     # Tracking
     views = Column(Integer, default=0)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

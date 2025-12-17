@@ -51,14 +51,22 @@ async def cleanup_job():
             # Delete ALL articles older than 30 days to keep content fresh
             cutoff_date = datetime.now() - timedelta(days=30)
             
-            # Async delete syntax
-            stmt = delete(Article).where(Article.published_at < cutoff_date)
+            # Conditional Deletion:
+            # 1. content_type = 'news' (or NULL/default)
+            # 2. protected_from_deletion = FALSE
+            # 3. older than 30 days
+            
+            stmt = delete(Article).where(
+                Article.published_at < cutoff_date,
+                (Article.content_type == 'news') | (Article.content_type == None),
+                Article.protected_from_deletion == False
+            )
             result = await db.execute(stmt)
             deleted = result.rowcount
             
             await db.commit()
             if deleted > 0:
-                logger.info(f"✓ Retention Policy: Removed {deleted} expired articles (>30 days)")
+                logger.info(f"✓ Retention Policy: Removed {deleted} expired NEWS articles (>30 days)")
     except Exception as e:
         logger.error(f"✗ Cleanup failed: {str(e)}")
 

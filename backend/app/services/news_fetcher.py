@@ -48,12 +48,21 @@ class NewsFetcher:
         total_fetched = 0
         total_new = 0
         
+        # Limit per batch (User requested 10-12)
+        # We set a hard limit to avoid spamming
+        limit = 12
+        
         async with httpx.AsyncClient(timeout=30.0) as client:
             # Pre-load categories
             async with get_db_context() as db:
                 await self._load_categories(db)
             
             for keyword in self.keywords:
+                # Stop if we have enough new articles
+                if total_new >= limit:
+                    logger.info(f"Reached batch limit of {limit} articles. Stopping.")
+                    break
+                    
                 try:
                     result = await self._fetch_keyword(client, keyword)
                     total_fetched += result["fetched"]

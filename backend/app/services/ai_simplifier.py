@@ -49,7 +49,6 @@ class AISimplifier:
             articles = result.scalars().all()
             
             logger.info(f"Found {len(articles)} articles to process")
-                
             for article in articles:
                 try:
                     # Mark as processing
@@ -91,7 +90,7 @@ class AISimplifier:
         content = article.raw_content or article.meta_description or ""
         
         # Build comprehensive prompt
-        prompt = self._build_prompt(article, content)  # <-- FIXED: Added content parameter
+        prompt = self._build_prompt(article, content)
         
         try:
             # Call Groq API
@@ -109,12 +108,13 @@ class AISimplifier:
                     }
                 ],
                 "temperature": 0.7,
-                "max_completion_tokens": 2000,
+                # Increased tokens for longer articles (500-700 words + JSON overhead)
+                "max_completion_tokens": 3000, 
                 "top_p": 1,
                 "stream": False
             }
             
-            response = requests.post(self.base_url, headers=headers, json=data, timeout=30)
+            response = requests.post(self.base_url, headers=headers, json=data, timeout=45)
             
             # Handle rate limiting with exponential backoff
             if response.status_code == 429:
@@ -159,6 +159,12 @@ class AISimplifier:
             stmt = select(SimplifiedContent).filter_by(article_id=article.id)
             existing = await db.execute(stmt)
             existing_simplified = existing.scalars().first()
+            
+            # Determine content type (Default to 'news', upgrade to 'evergreen' if deep analysis)
+            # This is a basic heuristic; Admin can override later
+            content_type = "news"
+            # If word count is high or threat level critical, could be candidate for evergreen
+            # But currently user logic is manual, so default to 'news'
             
             if existing_simplified:
                 # Update existing record
@@ -216,7 +222,7 @@ class AISimplifier:
     def _build_prompt(self, article, content):
         """Build precise prompt for Groq AI with advanced SEO optimization based on Search Console data."""
         
-        return f"""You are 'Marliz', a sophisticated Cyber Threat Intelligence Analyst AND SEO Expert.
+        return f"""You are 'Marliz', a specific Cyber Threat Intelligence Analyst AND SEO Expert.
 
 ARTICLE TO ANALYZE:
 Title: {article.title}
@@ -227,6 +233,7 @@ YOUR MISSION:
 1. Analyze this threat data and explain the TECHNICAL MECHANISM.
 2. Generate an SEO-OPTIMIZED, CLICKABLE TITLE following the "ENTITY + EVENT + YEAR" formula.
 3. Generate a compelling META DESCRIPTION with high-volume keywords.
+4. WRITE A LONG-FORM NEWS UPDATE (500-700 WORDS MINIMUM) formatted with HTML tags.
 
 RESPOND WITH VALID JSON ONLY:
 {{
@@ -234,10 +241,10 @@ RESPOND WITH VALID JSON ONLY:
   "category": "ransomware|phishing|data-breach|malware|vulnerability|general",
   "seo_title": "YOUR NEW SEO TITLE - See rules below",
   "meta_description": "150-160 char description optimized for clicks",
-  "summary": "THE NEWS: 3 sentences summarizing WHAT happened.",
-  "attack_vector": "THE MECHANISM: HOW the attack occurred. Technical details.",
-  "impact": "THE CONSEQUENCE: Technical and business impact.",
-  "who_is_at_risk": "Specific groups affected (e.g., 'Chrome users on Windows', 'Healthcare providers')",
+  "summary": "<p><strong>Introduction:</strong> What happened, when, and why it matters (150 words)...</p>",
+  "attack_vector": "<h2>How The Attack Happened</h2><p>Technical details of the mechanism...</p><ul><li>Key technical fact 1</li><li>Key technical fact 2</li></ul>",
+  "impact": "<h2>Impact & Affected Parties</h2><p>Who is affected and business consequences (150 words)...</p>",
+  "who_is_at_risk": "Specific groups affected",
   "actions": ["Specific action 1", "Specific action 2", "Specific action 3"],
   "threat_level": "low|medium|high|critical",
   "keywords": ["keyword 1", "keyword 2", "keyword 3", "keyword 4", "keyword 5"]
@@ -258,6 +265,15 @@ RULES:
 3. Use HIGH VOLUME phrases: "Data Breach", "Cyber Attack", "Hack", "Vulnerability".
 4. Include a NUMBER if available (records, money, users).
 5. 50-60 characters maximum.
+
+=== CONTENT LENGTH & FORMATTING (TIER 1 STRATEGY) ===
+- **LENGTH:** Total content (summary + attack_vector + impact) MUST be **500-700 words**.
+- **FORMAT:** Use HTML tags (`<h2>`, `<p>`, `<ul>`, `<li>`, `<strong>`) for readability.
+- **TONE:** Professional, journalistic, urgent but factual.
+- **STRUCTURE:** 
+  1. Introduction (What/When/Why) - Put in "summary" field.
+  2. Technical Details (How it happened) - Put in "attack_vector" field.
+  3. Impact Analysis (Consequences) - Put in "impact" field.
 
 === META DESCRIPTION (CLICK OPTIMIZED) ===
 
