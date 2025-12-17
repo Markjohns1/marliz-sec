@@ -92,7 +92,20 @@ export default function AdminDashboard() {
         setMessage(null);
         try {
             const result = await actionFn();
-            setMessage({ type: 'success', text: `Success: ${name} completed.` });
+            // Show detailed result for AI processing
+            if (result.processed !== undefined) {
+                setMessage({
+                    type: 'success',
+                    text: `✓ Processed ${result.processed} articles. ${result.remaining || 0} remaining.`
+                });
+            } else if (result.total_new !== undefined) {
+                setMessage({
+                    type: 'success',
+                    text: `✓ Fetched ${result.total_new} new articles.`
+                });
+            } else {
+                setMessage({ type: 'success', text: `✓ ${name} completed.` });
+            }
             refetch();
         } catch (error) {
             setMessage({ type: 'error', text: `Error: ${error.message}` });

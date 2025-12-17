@@ -73,24 +73,25 @@ async def cleanup_job():
 def start_scheduler():
     """Start all scheduled jobs"""
     
-    # Fetch news twice daily: 7 AM and 7 PM UTC
+    # Fetch news twice daily: 7 AM and 7 PM EAT (East Africa Time = UTC+3)
+    # 4 AM UTC = 7 AM EAT, 4 PM UTC = 7 PM EAT
     scheduler.add_job(
         fetch_news_job,
         trigger="cron",
-        hour=7,
+        hour=4,
         minute=0,
         id="fetch_news_morning",
-        name="Morning news fetch (7 AM)",
+        name="Morning news fetch (7 AM EAT)",
         replace_existing=True
     )
     
     scheduler.add_job(
         fetch_news_job,
         trigger="cron",
-        hour=19,
+        hour=16,
         minute=0,
         id="fetch_news_evening",
-        name="Evening news fetch (7 PM)",
+        name="Evening news fetch (7 PM EAT)",
         replace_existing=True
     )
     

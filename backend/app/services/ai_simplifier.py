@@ -34,21 +34,26 @@ class AISimplifier:
              self.category_map[c.slug.replace("-", " ")] = c.id
 
     async def process_pending_articles(self) -> dict:
-        """Process all RAW articles through AI simplification"""
+        """Process up to 10 RAW articles through AI simplification"""
         processed = 0
         failed = 0
-        
+        BATCH_LIMIT = 10  # Only process 10 articles per button click
         
         # Use single async context manager
         async with get_db_context() as db:
             await self._load_categories(db)
             
-            # Get all RAW articles
-            stmt = select(Article).filter_by(status=ArticleStatus.RAW)
+            # Get all RAW articles (but only process BATCH_LIMIT)
+            stmt = select(Article).filter_by(status=ArticleStatus.RAW).limit(BATCH_LIMIT)
             result = await db.execute(stmt)
             articles = result.scalars().all()
             
-            logger.info(f"Found {len(articles)} articles to process")
+            # Count total remaining (for UI feedback)
+            count_stmt = select(Article).filter_by(status=ArticleStatus.RAW)
+            count_result = await db.execute(count_stmt)
+            total_pending = len(count_result.scalars().all())
+            
+            logger.info(f"Found {len(articles)} articles to process (batch limit: {BATCH_LIMIT})")
             for article in articles:
                 try:
                     # Mark as processing
@@ -80,6 +85,7 @@ class AISimplifier:
         return {
             "processed": processed,
             "failed": failed,
+            "remaining": total_pending - processed,
             "timestamp": datetime.now().isoformat()
         }
     
