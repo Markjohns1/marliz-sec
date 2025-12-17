@@ -113,7 +113,14 @@ async def get_article(slug: str, db: AsyncSession = Depends(get_db)):
     # Increment views
     article.views += 1
     await db.commit()
-    await db.refresh(article)
+    # Re-fetch with relationships to ensure everything is loaded for Pydantic
+    # We reuse the logic from the initial query or just execute a new simple one with options
+    stmt = select(models.Article).filter_by(id=article.id).options(
+        selectinload(models.Article.simplified), 
+        selectinload(models.Article.category)
+    )
+    result = await db.execute(stmt)
+    article = result.scalars().first()
     
     return schemas.ArticleWithContent.model_validate(article)
 

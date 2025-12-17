@@ -4,13 +4,17 @@
 }
 
 marlizintel.tymirahealth.com {
-    @not_acme {
-        not path /.well-known/*
+    # Handle ACME challenges specifically by not proxying them (Caddy handles them internally)
+    handle /.well-known/* {
+        respond 404
     }
 
-    reverse_proxy @not_acme web:3000 {
-        header_up Host {upstream_hostport}
-        header_up X-Real-IP {remote}
+    # Proxy everything else to the backend
+    handle {
+        reverse_proxy web:3000 {
+            header_up Host {upstream_hostport}
+            header_up X-Real-IP {remote}
+        }
     }
     
     # Enable gzip compression
