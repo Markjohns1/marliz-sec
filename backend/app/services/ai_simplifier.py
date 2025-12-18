@@ -256,38 +256,29 @@ RESPOND WITH VALID JSON ONLY:
   "keywords": ["keyword 1", "keyword 2", "keyword 3", "keyword 4", "keyword 5"]
 }}
 
-=== 🏆 SEO TITLE RULES ===
+=== 🏆 SEO TITLE RULES (CLICK-WORTHY & URGENT) ===
 
-FORMULA: [Entity Name] [Event]: [Impact/Number]
+FORMULA: [Entity] [Event]: [Impact/Number] – [Urgency/Action]
 Examples:
-- "Austria Data Breach: Two-Thirds of Citizens Affected"
-- "Verizon Exposes 63,000 Employee Records"
-- "Chrome Vulnerability: Update Your Browser Now"
-- "Ransomware Attack Hits Major Hospital Chain"
+- "Massive Coupang Breach Exposes 33M+ Records – Are You Affected?"
+- "Critical Chrome Vulnerability: Update NOW to Avoid Exploitation"
+- "Ransomware Hits Major Hospital: Patient Data at Risk [Alert]"
 
 RULES:
 1. START with the ENTITY (Company, Country, Software).
-2. DO NOT add years to titles - news is assumed current.
-3. Use action words: "Exposes", "Hits", "Attacks", "Breaches".
-4. Include a NUMBER if available.
-5. 50-60 characters maximum.
+2. USE POWER WORDS: "Massive", "Critical", "Exposes", "Hits", "Urgent", "Alert".
+3. INCLUDE NUMBERS whenever possible (e.g., "33M+", "Two-Thirds").
+4. ADD A HOOK/ACTION at the end if space permits (e.g., "– Check Now", "[Alert]").
+5. Keep under 60 characters to avoid truncation.
 
-=== CONTENT LENGTH & FORMATTING (TIER 1 STRATEGY) ===
-- **LENGTH:** Total content (summary + attack_vector + impact) MUST be **500-700 words**.
-- **FORMAT:** Use HTML tags (`<h2>`, `<p>`, `<ul>`, `<li>`, `<strong>`) for readability.
-- **TONE:** Professional, journalistic, urgent but factual.
-- **STRUCTURE:** 
-  1. Introduction (What/When/Why) - Put in "summary" field.
-  2. Technical Details (How it happened) - Put in "attack_vector" field.
-  3. Impact Analysis (Consequences) - Put in "impact" field.
+=== META DESCRIPTION (CLICK MAGNET) ===
 
-=== META DESCRIPTION (CLICK OPTIMIZED) ===
-
-150-160 characters. MUST include:
-1. The exact phrase "Data Breach" or "Vulnerability" (if applicable).
-2. The specific ENTITY NAME (e.g., "Austria", "Microsoft").
-3. The YEAR (e.g., "2024").
-4. A call to action: "Check if you are affected."
+150-160 characters. formula: [HOOK/SHOCKING STAT] + [KEY DETAILS] + [CALL TO ACTION].
+Rules:
+1. START with the most important fact or number.
+2. USE EMOTIONAL TRIGGERS: "At risk", "Exposed", "Critical warning".
+3. END WITH A CTA: "Check if you are affected.", "See the full list.", "Protect your data now."
+4. Include specific entity names and the current year naturally.
 
 === KEYWORDS FIELD (HIGH VOLUME FOCUS) ===
 
