@@ -18,6 +18,8 @@ import Subscribe from './pages/Subscribe';
 import About from './pages/About';
 import AllThreats from './pages/AllThreats';
 import SearchResults from './pages/SearchResults';
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
 
 
 const queryClient = new QueryClient({
@@ -62,6 +64,8 @@ function AppContent() {
           <Route path="/category/:slug" element={<CategoryPage />} />
           <Route path="/subscribe" element={<Subscribe />} />
           <Route path="/about" element={<About />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
 
           {/* Admin Routes (Obfuscated) */}
           <Route path="/console/login" element={<AdminLogin />} />

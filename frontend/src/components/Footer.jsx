@@ -102,13 +102,13 @@ export default function Footer({ categories }) {
             </p>
           </div>
           <div className="flex flex-wrap gap-4 text-sm">
-            <a href="#" className="hover:text-primary-400 transition-colors">
+            <Link to="/privacy" className="hover:text-primary-400 transition-colors">
               Privacy Policy
-            </a>
-            <a href="#" className="hover:text-primary-400 transition-colors">
+            </Link>
+            <Link to="/terms" className="hover:text-primary-400 transition-colors">
               Terms of Service
-            </a>
-            <a href="#" className="hover:text-primary-400 transition-colors">
+            </Link>
+            <a href="mailto:admin@marlizintel.tymirahealth.com" className="hover:text-primary-400 transition-colors">
               Contact
             </a>
           </div>

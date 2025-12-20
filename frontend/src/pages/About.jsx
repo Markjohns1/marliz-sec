@@ -63,6 +63,30 @@ export default function About() {
           </div>
         </section>
 
+        {/* Leadership - John Mark */}
+        <section className="py-20 bg-slate-900 text-white">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="max-w-3xl mx-auto text-center">
+              <h2 className="text-3xl font-bold mb-8">Who We Are</h2>
+              <div className="bg-slate-800/50 p-8 rounded-2xl border border-slate-700">
+                <p className="text-xl leading-relaxed text-slate-300 mb-6">
+                  "Marliz Security isn't an algorithm. It's us."
+                </p>
+                <p className="text-lg text-slate-400 mb-8">
+                  Founded and led by <strong>John Mark</strong>, we are a dedicated team of security analysts committed to bringing you the truth. We don't rely on automated summaries; we read the raw data, verify the sources, and write the reports ourselves to ensure you get the context a machine can't provide.
+                </p>
+                <div className="inline-flex items-center gap-4">
+                  <div className="w-12 h-12 bg-primary-600 rounded-full flex items-center justify-center font-bold text-xl">JM</div>
+                  <div className="text-left">
+                    <div className="font-bold text-white">John Mark</div>
+                    <div className="text-sm text-primary-400">Founder & Lead Analyst</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* How It Works */}
         <section className="py-16">
           <div className="max-w-7xl mx-auto px-4">
