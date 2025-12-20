@@ -435,12 +435,32 @@ async def get_dashboard_stats(
     for row in rows:
         cat_id, cat_name, count, cat_views, cat_impressions, avg_pos = row
         
-        # Get top article for this specific category
-        stmt_top = select(models.Article.title, models.Article.views).filter(
+        # Get top 5 articles for this specific category
+        stmt_top = select(
+            models.Article.id,
+            models.Article.title,
+            models.Article.views,
+            models.Article.slug,
+            models.Article.draft_title,
+            models.Article.draft_meta_description,
+            models.Article.draft_keywords
+        ).filter(
             models.Article.category_id == cat_id
-        ).order_by(desc(models.Article.views)).limit(1)
+        ).order_by(desc(models.Article.views)).limit(5)
         top_res = await db.execute(stmt_top)
-        top_art_row = top_res.fetchone()
+        top_art_rows = top_res.fetchall()
+        
+        top_articles_list = []
+        for art in top_art_rows:
+            top_articles_list.append({
+                "id": art[0],
+                "title": art[1],
+                "views": art[2],
+                "slug": art[3],
+                "draft_title": art[4],
+                "draft_meta_description": art[5],
+                "draft_keywords": art[6]
+            })
         
         categories_performance.append({
             "name": cat_name,
@@ -448,7 +468,7 @@ async def get_dashboard_stats(
             "total_views": cat_views or 0,
             "total_impressions": cat_impressions or 0,
             "avg_position": float(avg_pos) if avg_pos else 0.0,
-            "top_article": {"title": top_art_row[0], "views": top_art_row[1]} if top_art_row else None
+            "top_articles": top_articles_list
         })
     
     # Top category by views
