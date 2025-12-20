@@ -18,15 +18,19 @@ class NewsFetcher:
         self.base_url = "https://newsdata.io/api/1/news"
         self.max_articles = int(os.getenv("MAX_ARTICLES_PER_FETCH", 20))
         
-        # Cybersecurity keywords - broader terms
+        # High-Priority Cybersecurity Intelligence Keywords
         self.keywords = [
             "ransomware",
-            "phishing", 
-            "data breach",
-            "email security",
-            "credential theft",
-            "malware",
-            "cybersecurity"
+            "phishing scam", 
+            "data breach exposé",
+            "zero-day exploit",
+            "critical vulnerability patch",
+            "supply chain attack",
+            "apt hacking group",
+            "malware analysis",
+            "dark web leak",
+            "cisa alert",
+            "cybersecurity infrastructure"
         ]
         
         # Category mapping (slug -> id)

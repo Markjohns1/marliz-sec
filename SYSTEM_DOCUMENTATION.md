@@ -87,9 +87,36 @@ graph TD
 
 ---
 
-## 5. Directory Structure
+## 5. Intelligence Engine (The "Brain")
+The system's core value lies in its proprietary AI-driven processing pipeline, optimized for business relevance and search visibility.
 
-## 5. Directory Structure
+### 🧠 The Marliz Intelligence Persona
+The AI (Groq/Llama-3.1) is prompted to act as a **Senior Cyber Threat Intelligence Analyst**. It doesn't just summarize; it performs:
+- **Technical Mechanism Analysis:** Translating zero-days and exploits into actionable insights.
+- **Operational Impact Modeling:** Explaining *why* a threat matters to business stability.
+- **Strategic SEO Optimization:** Automatically generating click-worthy titles and meta descriptions using the `ENTITY + EVENT` formula.
+
+### 🛡️ Smart Fetching Logic
+The `NewsFetcher` uses a multi-layered filtering system:
+1.  **Context-Aware Keywords:** Targets specific high-priority intel (Ransomware, Zero-day, Supply Chain).
+2.  **Noise Reduction:** Automatically rejects lifestyle, marketing, and irrelevant medical "virus" news.
+3.  **Deduplication:** Ensures unique content is served per fetch cycle.
+
+---
+
+## 6. SEO & Growth Strategy
+Marliz Intel is built for search traffic growth through automated high-precision SEO.
+
+| Feature | Implementation | Growth Impact |
+| :--- | :--- | :--- |
+| **Hook Titles** | Entity-led clickable headlines | Higher CTR in Search Results |
+| **Meta Dynamics** | Stat-driven meta descriptions | Improved user click-through |
+| **Internal Linking** | Slug-based canonical routing | Better indexing by Google |
+| **Performance** | HSTS & Lite Static Assets | Core Web Vitals (LCP/FID) optimization |
+
+---
+
+## 7. Directory Structure
 
 | Location | Component | Description |
 | :--- | :--- | :--- |
@@ -97,24 +124,20 @@ graph TD
 | `backend/app/main.py` | **Core** | Entry point & API Routes |
 | `backend/app/models.py` | **Database** | Database Tables (SQLAlchemy) |
 | `backend/app/database.py` | **Database** | Connection Logic |
-| `backend/app/services/news_fetcher.py` | **Service** | NewsData.io Integration Logic |
-| `backend/app/services/ai_simplifier.py` | **Service** | Groq AI Integration Logic |
+| `backend/app/services/news_fetcher.py` | **Intelligence** | NewsData.io Smart Fetcher |
+| `backend/app/services/ai_simplifier.py` | **Intelligence** | Groq AI Strategic Simplifier |
 | `backend/app/services/scheduler.py` | **Service** | Background Job Manager |
-| `backend/cybersec_news.db` | **Data** | SQLite Database File |
-| `backend/requirements.txt` | **Config** | Python Dependencies |
 | **Frontend** | | |
-| `frontend/src/components/` | **UI** | Reusable Components (Header, Cards) |
-| `frontend/src/pages/` | **UI** | Page Views (Home, ArticleDetail) |
-| `frontend/src/services/` | **API** | API Client (Axios) |
-| `frontend/vite.config.js` | **Build** | Vite Build Configuration |
+| `frontend/src/pages/AdminDashboard.jsx` | **UI** | Dark "Console" Analytics Center |
+| `frontend/src/index.css` | **Styling** | Global Design Tokens & Cards |
 | **Root** | | |
 | `Dockerfile` | **DevOps** | Container Build Instructions |
-| `docker-compose.yml` | **DevOps** | Production Orchestration |
+| `deploy.sh` | **DevOps** | Automation Deployment Script |
 | `DEPLOYMENT.md` | **Docs** | Operations Manual |
 
 ---
 
-## 6. Maintenance Commands
+## 8. Maintenance Commands
 
 **Deploy/Update:**
 ```bash
@@ -122,10 +145,9 @@ git pull origin main
 sudo docker compose up -d --build
 ```
 
-**Manual News Fetch (Force Run):**
-```bash
-sudo docker compose exec web python -c "import asyncio; from app.services.news_fetcher import news_fetcher; print(asyncio.run(news_fetcher.fetch_news()))"
-```
+**Force Intelligence Cycle (Manual):**
+1. **Fetch News:** Trigger via Admin Console (Articles Tab)
+2. **AI Simplify:** Trigger via Admin Console (Overview Tab)
 
 **Check Logs:**
 ```bash

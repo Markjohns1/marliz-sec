@@ -91,15 +91,15 @@ app.include_router(subscribers.router)
 app.include_router(seo.router)
 
 @app.get("/api/health")
-def health_check():
+async def health_check():
     """Detailed health check"""
     from app.database import engine
     from sqlalchemy import text
     
     try:
-        # Test database connection
-        with engine.connect() as conn:
-            conn.execute(text("SELECT 1"))
+        # Test database connection (Async)
+        async with engine.connect() as conn:
+            await conn.execute(text("SELECT 1"))
         db_status = "healthy"
     except Exception as e:
         db_status = f"unhealthy: {str(e)}"
