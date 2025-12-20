@@ -257,14 +257,18 @@ export default function AdminDashboard() {
                 {/* Primary Admin Top Bar */}
                 <div className="bg-slate-900 border-b border-white/5 text-white px-4 sm:px-8 py-3 flex items-center justify-between shadow-2xl">
                     <div className="flex items-center gap-3">
-                        <div className="p-2 bg-primary-600 rounded-xl shadow-lg shadow-primary-900/40">
+                        <div className="p-2 bg-blue-600 rounded-lg shadow-lg shadow-blue-900/40">
                             <Shield className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                            <h1 className="text-sm sm:text-lg font-black tracking-tight uppercase text-white">Marliz<span className="text-primary-500">Intel</span> <span className="text-slate-500 border-l border-slate-800 ml-2 pl-2">Console</span></h1>
+                            <h1 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+                                <span>Marliz<span className="text-red-500">Intel</span></span>
+                                <span className="h-4 w-px bg-slate-800 mx-1"></span>
+                                <span className="text-sm font-black text-blue-400 uppercase tracking-widest">Admin</span>
+                            </h1>
                             <div className="flex items-center gap-1.5 -mt-0.5">
                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">System Online</span>
+                                <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Digital Intelligence Dashboard</span>
                             </div>
                         </div>
                     </div>
@@ -295,8 +299,8 @@ export default function AdminDashboard() {
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`flex items-center gap-2 px-6 h-full text-xs sm:text-sm font-black uppercase tracking-widest transition-all border-b-2 whitespace-nowrap ${activeTab === tab.id
-                                    ? 'border-primary-500 text-primary-400 bg-primary-400/5'
+                                className={`flex items-center gap-2 px-6 h-full text-xs sm:text-sm font-bold opacity-90 transition-all border-b-2 whitespace-nowrap ${activeTab === tab.id
+                                    ? 'border-red-500 text-red-500 bg-red-500/5'
                                     : 'border-transparent text-slate-500 hover:text-slate-300 hover:bg-white/5'
                                     }`}
                             >
@@ -314,8 +318,8 @@ export default function AdminDashboard() {
                     <div className="animate-in fade-in duration-500">
                         {/* Welcome */}
                         <div className="mb-6 sm:mb-8">
-                            <h2 className="text-xl sm:text-2xl font-black text-white uppercase tracking-tight">System Overview</h2>
-                            <p className="text-sm sm:text-base text-slate-400 font-medium">Real-time performance metrics for Marliz Intel Intelligence.</p>
+                            <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">System Overview</h2>
+                            <p className="text-sm sm:text-base text-slate-400 font-medium italic">Integrated Intelligence Dashboard</p>
                         </div>
 
                         {/* Primary Stats Grid */}
@@ -408,7 +412,7 @@ export default function AdminDashboard() {
                 {activeTab === 'articles' && (
                     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                            <h2 className="text-2xl font-black text-white uppercase tracking-tight">Article Management</h2>
+                            <h2 className="text-2xl font-black text-white tracking-tight">Article Management</h2>
                             <div className="flex items-center gap-2 w-full sm:w-auto">
                                 <div className="relative flex-1 sm:w-64">
                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
