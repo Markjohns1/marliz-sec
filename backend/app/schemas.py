@@ -83,8 +83,8 @@ class Article(ArticleBase):
     draft_meta_description: Optional[str] = None
     draft_keywords: Optional[str] = None
     has_draft: bool = False
-    impressions: int = 0
-    position: float = 0.0
+    impressions: Optional[int] = 0
+    position: Optional[float] = 0.0
     last_edited_at: Optional[datetime] = None
     last_edited_by: Optional[str] = None
     

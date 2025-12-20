@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey, Enum as SQLEnum
+from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey, Float, Enum as SQLEnum
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from datetime import datetime
@@ -68,7 +68,7 @@ class Article(Base):
     
     # NEW: SEO Performance Metrics
     impressions = Column(Integer, default=0)
-    position = Column(func.float(), default=0.0)
+    position = Column(Float, default=0.0)
     
     # Tiered Content System
     content_type = Column(String(20), default="news") # 'news' or 'evergreen'
