@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../services/api';
 import { Helmet } from 'react-helmet-async';
-import { Lock, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Lock, ArrowRight, ShieldCheck, Home } from 'lucide-react';
 
 export default function AdminLogin() {
     const [key, setKey] = useState('');
@@ -89,9 +89,21 @@ export default function AdminLogin() {
                         </button>
                     </form>
 
-                    <p className="text-center mt-6 text-xs text-slate-500">
+                    <p className="text-center mt-6 text-xs text-slate-500 mb-6">
                         Authorized personnel only. All attempts are logged.
                     </p>
+
+                    <div className="border-t border-slate-800 pt-6 text-center">
+                        <a
+                            href="/"
+                            className="inline-flex items-center text-sm font-medium text-slate-400 hover:text-primary-400 transition-colors group"
+                        >
+                            <span className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center mr-3 group-hover:bg-primary-900/20 group-hover:text-primary-400 transition-all">
+                                <Home className="w-4 h-4" />
+                            </span>
+                            Return to Live Site
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
