@@ -28,7 +28,8 @@ import {
     Save,
     ExternalLink,
     AlertCircle,
-    Settings as SettingsIcon
+    Settings as SettingsIcon,
+    Globe
 } from 'lucide-react';
 import { getAdminArticles, publishArticle } from '../services/api';
 
@@ -252,8 +253,8 @@ export default function AdminDashboard() {
                 <title>Admin Dashboard | Marliz Security</title>
             </Helmet>
 
-            {/* Enhanced Admin Navigation Shell */}
-            <div className="sticky top-0 z-50">
+            {/* Enhanced Admin Navigation Shell - Fixed Top */}
+            <div className="fixed top-0 left-0 right-0 z-50">
                 {/* Primary Admin Top Bar */}
                 <div className="bg-slate-900 border-b border-white/5 text-white px-4 sm:px-8 py-3 flex items-center justify-between shadow-2xl">
                     <div className="flex items-center gap-3">
@@ -312,7 +313,8 @@ export default function AdminDashboard() {
                 </div>
             </div>
 
-            <div className="container mx-auto max-w-6xl px-4 pt-8">
+            {/* Main Content - Added padding-top to account for fixed header */}
+            <div className="container mx-auto max-w-6xl px-4 pt-36 pb-24">
 
                 {activeTab === 'overview' && (
                     <div className="animate-in fade-in duration-500">
@@ -647,6 +649,49 @@ export default function AdminDashboard() {
                         </p>
                     </div>
                 )}
+            </div>
+
+            {/* Mobile Bottom Navigation */}
+            <div className="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-800 z-50 safe-area-bottom">
+                <div className="grid grid-cols-5 h-16">
+                    <button
+                        onClick={() => setActiveTab('overview')}
+                        className={`flex flex-col items-center justify-center space-y-1 ${activeTab === 'overview' ? 'text-primary-400' : 'text-slate-500'}`}
+                    >
+                        <LayoutDashboard className={`w-5 h-5 ${activeTab === 'overview' ? 'fill-current opacity-20' : ''}`} />
+                        <span className="text-[9px] font-black uppercase tracking-wider">Stats</span>
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('articles')}
+                        className={`flex flex-col items-center justify-center space-y-1 ${activeTab === 'articles' ? 'text-primary-400' : 'text-slate-500'}`}
+                    >
+                        <FileText className={`w-5 h-5 ${activeTab === 'articles' ? 'fill-current opacity-20' : ''}`} />
+                        <span className="text-[9px] font-black uppercase tracking-wider">News</span>
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('categories')}
+                        className={`flex flex-col items-center justify-center space-y-1 ${activeTab === 'categories' ? 'text-primary-400' : 'text-slate-500'}`}
+                    >
+                        <FolderOpen className={`w-5 h-5 ${activeTab === 'categories' ? 'fill-current opacity-20' : ''}`} />
+                        <span className="text-[9px] font-black uppercase tracking-wider">Insight</span>
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('settings')}
+                        className={`flex flex-col items-center justify-center space-y-1 ${activeTab === 'settings' ? 'text-primary-400' : 'text-slate-500'}`}
+                    >
+                        <SettingsIcon className={`w-5 h-5 ${activeTab === 'settings' ? 'fill-current opacity-20' : ''}`} />
+                        <span className="text-[9px] font-black uppercase tracking-wider">Set</span>
+                    </button>
+                    <a
+                        href="/"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex flex-col items-center justify-center space-y-1 text-emerald-500"
+                    >
+                        <Globe className="w-5 h-5" />
+                        <span className="text-[9px] font-black uppercase tracking-wider">Live</span>
+                    </a>
+                </div>
             </div>
 
             {editingArticle && (
