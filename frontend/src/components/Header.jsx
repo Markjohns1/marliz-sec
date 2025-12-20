@@ -30,8 +30,8 @@ export default function Header({ categories }) {
               <Shield className="w-6 h-6 text-white" />
             </div>
             <div className="flex flex-col">
-              <span className="text-xl font-bold text-white tracking-tight">Marliz<span className="text-red-500">Admin</span></span>
-              <span className="text-xs text-slate-400 font-mono tracking-wider uppercase">Advanced Threat Intelligence</span>
+              <span className="text-xl font-bold text-white tracking-tight">Marliz<span className="text-red-500">Intel</span></span>
+              <span className="text-xs text-slate-400 font-mono tracking-wider">CYBER SECURITY FOR EVERYONE</span>
             </div>
           </Link>
           <div className="hidden md:flex items-center space-x-8 ml-8">

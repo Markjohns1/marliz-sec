@@ -277,7 +277,7 @@ export default function AdminDashboard() {
                             <Shield className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                            <h1 className="text-sm sm:text-lg font-black tracking-tight uppercase">Marliz<span className="text-primary-400">Admin</span></h1>
+                            <h1 className="text-sm sm:text-lg font-black tracking-tight uppercase text-white">Marliz<span className="text-red-500">Intel</span> <span className="text-primary-400 border-l border-slate-700 ml-2 pl-2">Admin</span></h1>
                             <div className="flex items-center gap-1.5 -mt-0.5">
                                 <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
                                 <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">System Online</span>
