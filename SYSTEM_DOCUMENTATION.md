@@ -137,13 +137,27 @@ Marliz Intel is built for search traffic growth through automated high-precision
 
 ---
 
-## 8. Maintenance Commands
+## 8. Deployment & Architecture
 
-**Deploy/Update:**
+The system uses a **Hybrid Reverse Proxy** architecture for maximum stability on shared servers:
+1. **Edge Proxy:** Host-level **Nginx** manages SSL and domain routing (Port 80/443).
+2. **Application Layer:** **Docker Compose** runs the integrated FastAPI + React bundle.
+3. **Internal Port:** The application is exposed internally at `localhost:3005`.
+
+### Deployment Steps
 ```bash
+# 1. Update Code
+cd /root/marliz-sec
 git pull origin main
+
+# 2. Rebuild Container
 sudo docker compose up -d --build
+
+# 3. Nginx Configuration
+# Point marlizintel.tymirahealth.com -> http://localhost:3005
 ```
+
+### Maintenance Commands
 
 **Force Intelligence Cycle (Manual):**
 1. **Fetch News:** Trigger via Admin Console (Articles Tab)
