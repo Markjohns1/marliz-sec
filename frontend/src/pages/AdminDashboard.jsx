@@ -304,7 +304,7 @@ export default function AdminDashboard() {
                                     : 'border-transparent text-slate-500 hover:text-slate-300 hover:bg-white/5'
                                     }`}
                             >
-                                <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? 'text-primary-400' : 'text-slate-500'}`} />
+                                <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? 'text-red-500' : 'text-slate-500'}`} />
                                 {tab.label}
                             </button>
                         ))}

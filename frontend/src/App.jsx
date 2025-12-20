@@ -51,7 +51,7 @@ function AppContent() {
   });
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100">
       {!isAdminPath && <Header categories={categories} />}
       <main className={`flex-grow ${!isAdminPath ? 'pt-16' : ''}`}>
         <Routes>

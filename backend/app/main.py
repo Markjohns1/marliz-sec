@@ -78,9 +78,12 @@ async def add_security_headers(request, call_next):
     # Referrer Policy
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
 
-    # Caching (Keep existing logic mixed in or separate)
+    # Caching - Prevent caching for HTML entry points to ensure latest build is seen
     if request.method == "GET" and response.status_code == 200:
-        response.headers["Cache-Control"] = "public, max-age=3600" 
+        if request.url.path == "/" or request.url.path.startswith("/console") or "index.html" in request.url.path:
+            response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        else:
+            response.headers["Cache-Control"] = "public, max-age=3600"
         
     return response
 
