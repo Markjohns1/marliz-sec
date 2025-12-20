@@ -53,7 +53,7 @@ export default function Terms() {
                         <section>
                             <h2 className="text-xl font-semibold text-white mb-4">6. Contact Information</h2>
                             <p>
-                                If you have any questions about these Terms, please contact us at: <a href="mailto:admin@marlizintel.tymirahealth.com" className="text-blue-400 hover:text-blue-300">admin@marlizintel.tymirahealth.com</a>.
+                                If you have any questions about these Terms, please <a href="mailto:johnmarkoguta@gmail.com" className="text-blue-400 hover:text-blue-300 underline">contact us here</a>.
                             </p>
                         </section>
                     </div>

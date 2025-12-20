@@ -29,7 +29,7 @@ export default function Footer({ categories }) {
               <a href="#" className="hover:text-primary-400 transition-colors">
                 <Linkedin className="w-5 h-5" />
               </a>
-              <a href="mailto:hello@cybersecure.news" className="hover:text-primary-400 transition-colors">
+              <a href="mailto:johnmarkoguta@gmail.com" className="hover:text-primary-400 transition-colors">
                 <Mail className="w-5 h-5" />
               </a>
             </div>
@@ -108,7 +108,7 @@ export default function Footer({ categories }) {
             <Link to="/terms" className="hover:text-primary-400 transition-colors">
               Terms of Service
             </Link>
-            <a href="mailto:admin@marlizintel.tymirahealth.com" className="hover:text-primary-400 transition-colors">
+            <a href="mailto:johnmarkoguta@gmail.com" className="hover:text-primary-400 transition-colors">
               Contact
             </a>
           </div>
