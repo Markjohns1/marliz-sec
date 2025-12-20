@@ -1,4 +1,4 @@
-import { Twitter, Linkedin, Facebook, Link2, Check } from 'lucide-react';
+import { Twitter, Linkedin, Facebook, Link2, Check, MessageCircle } from 'lucide-react';
 import { useState } from 'react';
 
 /**
@@ -19,7 +19,8 @@ export default function SocialShare({ url, title, summary = '' }) {
     const shareLinks = {
         twitter: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`,
         linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
-        facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`
+        facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedTitle}&src=sdkpreparse`,
+        whatsapp: `https://wa.me/?text=${encodedTitle}%20${encodedUrl}`
     };
 
     const handleCopyLink = async () => {
@@ -69,6 +70,17 @@ export default function SocialShare({ url, title, summary = '' }) {
                 title="Share on Facebook"
             >
                 <Facebook className="w-4 h-4" />
+            </a>
+
+            {/* WhatsApp */}
+            <a
+                href={shareLinks.whatsapp}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${buttonBase} bg-slate-800/50 border-slate-700 hover:bg-[#25D366]/20 hover:border-[#25D366]/50 hover:text-[#25D366] text-slate-400`}
+                title="Share on WhatsApp"
+            >
+                <MessageCircle className="w-4 h-4" />
             </a>
 
             {/* Copy Link */}
