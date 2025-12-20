@@ -1,5 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
-import { useLocation, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
+import { HelmetProvider } from 'react-helmet-async';
 import { getCategories } from './services/api';
 
 // CSS IMPORTS ADDED HERE
@@ -31,7 +32,6 @@ const queryClient = new QueryClient({
 
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
-import { Navigate } from 'react-router-dom';
 
 const ProtectedRoute = ({ children }) => {
   const apiKey = localStorage.getItem('admin_api_key');
