@@ -1,7 +1,5 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { HelmetProvider } from 'react-helmet-async';
 import { useQuery } from '@tanstack/react-query';
+import { useLocation, Navigate } from 'react-router-dom';
 import { getCategories } from './services/api';
 
 // CSS IMPORTS ADDED HERE
@@ -44,6 +42,9 @@ const ProtectedRoute = ({ children }) => {
 };
 
 function AppContent() {
+  const location = useLocation();
+  const isAdminPath = location.pathname.startsWith('/console');
+
   const { data: categories } = useQuery({
     queryKey: ['categories'],
     queryFn: getCategories
@@ -51,8 +52,8 @@ function AppContent() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header categories={categories} />
-      <main className="flex-grow pt-16">
+      {!isAdminPath && <Header categories={categories} />}
+      <main className={`flex-grow ${!isAdminPath ? 'pt-16' : ''}`}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/all-threats" element={<AllThreats />} />
@@ -75,8 +76,12 @@ function AppContent() {
 
         </Routes>
       </main>
-      <Footer categories={categories} />
-      <BottomNav />
+      {!isAdminPath && (
+        <>
+          <Footer categories={categories} />
+          <BottomNav />
+        </>
+      )}
     </div>
   );
 }

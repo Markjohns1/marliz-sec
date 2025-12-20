@@ -268,49 +268,63 @@ export default function AdminDashboard() {
                 <title>Admin Dashboard | Marliz Security</title>
             </Helmet>
 
-            {/* Top Bar */}
-            <div className="bg-white border-b border-slate-200 px-4 sm:px-6 py-4 flex items-center justify-between sticky top-16 z-30">
-                <div className="flex items-center gap-2">
-                    <LayoutDashboard className="w-5 h-5 text-primary-600" />
-                    <h1 className="text-base sm:text-lg font-bold text-slate-900">Analytics Dashboard</h1>
-                </div>
-                <div className="flex items-center gap-4">
-                    <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-slate-100 rounded-full text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                        <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                        Live System
+            {/* Enhanced Admin Navigation Shell */}
+            <div className="sticky top-0 z-50">
+                {/* Primary Admin Top Bar */}
+                <div className="bg-slate-900 text-white px-4 sm:px-8 py-3 flex items-center justify-between shadow-xl">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-primary-600 rounded-lg shadow-lg shadow-primary-900/50">
+                            <Shield className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                            <h1 className="text-sm sm:text-lg font-black tracking-tight uppercase">Marliz<span className="text-primary-400">Admin</span></h1>
+                            <div className="flex items-center gap-1.5 -mt-0.5">
+                                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">System Online</span>
+                            </div>
+                        </div>
                     </div>
-                    <button
-                        onClick={handleLogout}
-                        className="flex items-center gap-2 text-sm text-slate-500 hover:text-red-600 transition-colors"
-                    >
-                        <LogOut className="w-4 h-4" />
-                        <span className="hidden sm:inline">Logout</span>
-                    </button>
+
+                    <div className="flex items-center gap-4">
+                        <button
+                            onClick={handleLogout}
+                            className="flex items-center gap-2 group px-3 py-1.5 rounded-xl hover:bg-slate-800 transition-all border border-transparent hover:border-slate-700"
+                        >
+                            <div className="text-right hidden sm:block">
+                                <p className="text-[10px] text-slate-500 font-bold leading-none">SIGNED IN AS</p>
+                                <p className="text-xs font-bold text-slate-300">Super Admin</p>
+                            </div>
+                            <LogOut className="w-4 h-4 text-slate-400 group-hover:text-red-400 transition-colors" />
+                        </button>
+                    </div>
+                </div>
+
+                {/* Sticky Secondary Navigation (Tabs) */}
+                <div className="bg-white border-b border-slate-200 shadow-sm overflow-x-auto no-scrollbar">
+                    <div className="container mx-auto max-w-6xl px-4 flex items-center gap-1 h-14">
+                        {[
+                            { id: 'overview', label: 'Overview', icon: BarChart3 },
+                            { id: 'articles', label: 'Article Editor', icon: Edit3 },
+                            { id: 'categories', label: 'Categories', icon: FolderOpen },
+                            { id: 'settings', label: 'Settings', icon: SettingsIcon },
+                        ].map((tab) => (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id)}
+                                className={`flex items-center gap-2 px-5 h-full text-xs sm:text-sm font-bold transition-all border-b-2 whitespace-nowrap ${activeTab === tab.id
+                                    ? 'border-primary-600 text-primary-600 bg-primary-50/50'
+                                    : 'border-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+                                    }`}
+                            >
+                                <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? 'text-primary-600' : 'text-slate-400'}`} />
+                                {tab.label}
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </div>
 
-            <div className="container mx-auto max-w-6xl px-4 pt-6">
-                {/* Navigation Tabs */}
-                <div className="flex items-center gap-1 bg-white p-1 rounded-2xl border border-slate-200 mb-8 w-fit shadow-sm">
-                    {[
-                        { id: 'overview', label: 'Overview', icon: BarChart3 },
-                        { id: 'articles', label: 'Edit Articles', icon: Edit3 },
-                        { id: 'categories', label: 'Categories', icon: FolderOpen },
-                        { id: 'settings', label: 'Settings', icon: SettingsIcon },
-                    ].map((tab) => (
-                        <button
-                            key={tab.id}
-                            onClick={() => setActiveTab(tab.id)}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${activeTab === tab.id
-                                ? 'bg-primary-600 text-white shadow-lg shadow-primary-200'
-                                : 'text-slate-500 hover:bg-slate-50'
-                                }`}
-                        >
-                            <tab.icon className="w-4 h-4" />
-                            {tab.label}
-                        </button>
-                    ))}
-                </div>
+            <div className="container mx-auto max-w-6xl px-4 pt-8">
 
                 {activeTab === 'overview' && (
                     <div className="animate-in fade-in duration-500">
