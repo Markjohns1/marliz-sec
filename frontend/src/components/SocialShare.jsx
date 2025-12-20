@@ -19,7 +19,7 @@ export default function SocialShare({ url, title, summary = '' }) {
     const shareLinks = {
         twitter: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`,
         linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
-        facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedTitle}&src=sdkpreparse`,
+        facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
         whatsapp: `https://wa.me/?text=${encodedTitle}%20${encodedUrl}`
     };
 
@@ -36,63 +36,65 @@ export default function SocialShare({ url, title, summary = '' }) {
     const buttonBase = "flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 border";
 
     return (
-        <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-500 uppercase tracking-wide font-semibold mr-2">Share</span>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+            <span className="text-xs text-slate-500 uppercase tracking-wide font-semibold">Share</span>
 
-            {/* Twitter/X */}
-            <a
-                href={shareLinks.twitter}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`${buttonBase} bg-slate-800/50 border-slate-700 hover:bg-[#1DA1F2]/20 hover:border-[#1DA1F2]/50 hover:text-[#1DA1F2] text-slate-400`}
-                title="Share on Twitter"
-            >
-                <Twitter className="w-4 h-4" />
-            </a>
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 no-scrollbar">
+                {/* Twitter/X */}
+                <a
+                    href={shareLinks.twitter}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`${buttonBase} bg-slate-800/50 border-slate-700 hover:bg-[#1DA1F2]/20 hover:border-[#1DA1F2]/50 hover:text-[#1DA1F2] text-slate-400 shrink-0`}
+                    title="Share on Twitter"
+                >
+                    <Twitter className="w-4 h-4" />
+                </a>
 
-            {/* LinkedIn */}
-            <a
-                href={shareLinks.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`${buttonBase} bg-slate-800/50 border-slate-700 hover:bg-[#0A66C2]/20 hover:border-[#0A66C2]/50 hover:text-[#0A66C2] text-slate-400`}
-                title="Share on LinkedIn"
-            >
-                <Linkedin className="w-4 h-4" />
-            </a>
+                {/* LinkedIn */}
+                <a
+                    href={shareLinks.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`${buttonBase} bg-slate-800/50 border-slate-700 hover:bg-[#0A66C2]/20 hover:border-[#0A66C2]/50 hover:text-[#0A66C2] text-slate-400 shrink-0`}
+                    title="Share on LinkedIn"
+                >
+                    <Linkedin className="w-4 h-4" />
+                </a>
 
-            {/* Facebook */}
-            <a
-                href={shareLinks.facebook}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`${buttonBase} bg-slate-800/50 border-slate-700 hover:bg-[#1877F2]/20 hover:border-[#1877F2]/50 hover:text-[#1877F2] text-slate-400`}
-                title="Share on Facebook"
-            >
-                <Facebook className="w-4 h-4" />
-            </a>
+                {/* Facebook */}
+                <a
+                    href={shareLinks.facebook}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`${buttonBase} bg-slate-800/50 border-slate-700 hover:bg-[#1877F2]/20 hover:border-[#1877F2]/50 hover:text-[#1877F2] text-slate-400 shrink-0`}
+                    title="Share on Facebook"
+                >
+                    <Facebook className="w-4 h-4" />
+                </a>
 
-            {/* WhatsApp */}
-            <a
-                href={shareLinks.whatsapp}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`${buttonBase} bg-slate-800/50 border-slate-700 hover:bg-[#25D366]/20 hover:border-[#25D366]/50 hover:text-[#25D366] text-slate-400`}
-                title="Share on WhatsApp"
-            >
-                <MessageCircle className="w-4 h-4" />
-            </a>
+                {/* WhatsApp */}
+                <a
+                    href={shareLinks.whatsapp}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`${buttonBase} bg-slate-800/50 border-slate-700 hover:bg-[#25D366]/20 hover:border-[#25D366]/50 hover:text-[#25D366] text-slate-400 shrink-0`}
+                    title="Share on WhatsApp"
+                >
+                    <MessageCircle className="w-4 h-4" />
+                </a>
 
-            {/* Copy Link */}
-            <button
-                onClick={handleCopyLink}
-                className={`${buttonBase} ${copied
-                    ? 'bg-green-500/20 border-green-500/50 text-green-400'
-                    : 'bg-slate-800/50 border-slate-700 hover:bg-slate-700 text-slate-400 hover:text-slate-300'}`}
-                title={copied ? 'Copied!' : 'Copy link'}
-            >
-                {copied ? <Check className="w-4 h-4" /> : <Link2 className="w-4 h-4" />}
-            </button>
+                {/* Copy Link */}
+                <button
+                    onClick={handleCopyLink}
+                    className={`${buttonBase} shrink-0 ${copied
+                        ? 'bg-green-500/20 border-green-500/50 text-green-400'
+                        : 'bg-slate-800/50 border-slate-700 hover:bg-slate-700 text-slate-400 hover:text-slate-300'}`}
+                    title={copied ? 'Copied!' : 'Copy link'}
+                >
+                    {copied ? <Check className="w-4 h-4" /> : <Link2 className="w-4 h-4" />}
+                </button>
+            </div>
         </div>
     );
 }
