@@ -57,6 +57,12 @@ class ArticleUpdate(BaseModel):
     edited_by: str
     content_type: Optional[str] = None
     protected_from_deletion: Optional[bool] = None
+    
+    # Draft fields
+    draft_title: Optional[str] = None
+    draft_meta_description: Optional[str] = None
+    draft_keywords: Optional[str] = None
+    publish_now: Optional[bool] = False
 
 class Article(ArticleBase):
     model_config = ConfigDict(from_attributes=True)
@@ -68,8 +74,19 @@ class Article(ArticleBase):
     is_edited: bool
     edited_at: Optional[datetime] = None
     meta_description: Optional[str] = None
+    keywords: Optional[str] = None
     content_type: Optional[str] = "news"
     protected_from_deletion: Optional[bool] = False
+    
+    # Draft & Metrics
+    draft_title: Optional[str] = None
+    draft_meta_description: Optional[str] = None
+    draft_keywords: Optional[str] = None
+    has_draft: bool = False
+    impressions: int = 0
+    position: float = 0.0
+    last_edited_at: Optional[datetime] = None
+    last_edited_by: Optional[str] = None
     
 class ArticleWithContent(Article):
     simplified: Optional[SimplifiedContent] = None

@@ -36,6 +36,23 @@ export const getArticles = async ({
   return data;
 };
 
+export const getAdminArticles = async ({
+  page = 1,
+  limit = 20,
+  category = '',
+  status = '',
+  sort_by = 'date',
+  search = ''
+} = {}) => {
+  const params = { page, limit, sort_by };
+  if (category) params.category = category;
+  if (status) params.status = status;
+  if (search) params.search = search;
+
+  const { data } = await api.get('/api/articles/admin/list', { params });
+  return data;
+};
+
 export const getArticle = async (slug) => {
   const { data } = await api.get(`/api/articles/${slug}`);
   return data;
@@ -43,6 +60,11 @@ export const getArticle = async (slug) => {
 
 export const updateArticle = async (id, updates) => {
   const { data } = await api.put(`/api/articles/${id}`, updates);
+  return data;
+};
+
+export const publishArticle = async (id) => {
+  const { data } = await api.post(`/api/articles/${id}/publish`);
   return data;
 };
 

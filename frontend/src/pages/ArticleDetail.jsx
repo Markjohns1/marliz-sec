@@ -10,6 +10,13 @@ import { Helmet } from 'react-helmet-async';
 import AdUnit from '../components/AdUnit';
 import SocialShare from '../components/SocialShare';
 
+const stripHtml = (html) => {
+  if (!html) return '';
+  const doc = new Image().ownerDocument.createElement('div');
+  doc.innerHTML = html;
+  return doc.textContent || doc.innerText || '';
+};
+
 export default function ArticleDetail() {
   const { slug } = useParams();
 
@@ -76,10 +83,10 @@ export default function ArticleDetail() {
     <>
       <Helmet>
         <title>{article.title} | Marliz Threat Intel</title>
-        <meta name="description" content={article.simplified?.friendly_summary || article.meta_description} />
+        <meta name="description" content={stripHtml(article.simplified?.friendly_summary || article.meta_description)} />
         <meta name="keywords" content={article.keywords} />
         <meta property="og:title" content={article.title} />
-        <meta property="og:description" content={article.simplified?.friendly_summary} />
+        <meta property="og:description" content={stripHtml(article.simplified?.friendly_summary)} />
         {article.image_url && <meta property="og:image" content={article.image_url} />}
         <meta property="og:type" content="article" />
         <link rel="canonical" href={`https://marlizintel.tymirahealth.com/article/${article.slug}`} />

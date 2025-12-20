@@ -205,7 +205,9 @@ class AISimplifier:
             
             # UPDATE META DESCRIPTION with AI version
             if result.get("meta_description"):
-                article.meta_description = result["meta_description"]
+                # Ensure no HTML tags in meta description
+                clean_meta = re.sub(r'<[^>]*>', '', result["meta_description"])
+                article.meta_description = clean_meta[:160]
             
             # Update category based on AI classification
             ai_category = result.get("category", "general").lower().replace(" ", "-")
@@ -288,6 +290,8 @@ Generate 5-7 keywords focusing on SEARCH VOLUME:
 - "Major data breaches 2024"
 - "Cybersecurity news 2024"
 - "[Company Name] hack"
+- "twothirds country" (if relevant)
+- "data breach that hit" (if relevant)
 
 CATEGORY DEFINITIONS:
 - ransomware: Encryption attacks, ransom demands

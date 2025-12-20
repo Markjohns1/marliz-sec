@@ -60,6 +60,16 @@ class Article(Base):
     meta_description = Column(String(160))
     keywords = Column(Text)  # comma-separated
     
+    # NEW: Draft Workflow columns
+    draft_title = Column(String(500))
+    draft_meta_description = Column(String(160))
+    draft_keywords = Column(Text)
+    has_draft = Column(Boolean, default=False)
+    
+    # NEW: SEO Performance Metrics
+    impressions = Column(Integer, default=0)
+    position = Column(func.float(), default=0.0)
+    
     # Tiered Content System
     content_type = Column(String(20), default="news") # 'news' or 'evergreen'
     protected_from_deletion = Column(Boolean, default=False)
@@ -73,6 +83,8 @@ class Article(Base):
     is_edited = Column(Boolean, default=False)
     edited_by = Column(String(100))
     edited_at = Column(DateTime(timezone=True))
+    last_edited_at = Column(DateTime(timezone=True))
+    last_edited_by = Column(String(100))
     
     category = relationship("Category", back_populates="articles")
     simplified = relationship("SimplifiedContent", back_populates="article", uselist=False)

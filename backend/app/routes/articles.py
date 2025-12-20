@@ -95,6 +95,56 @@ async def get_articles(
         "pages": pages
     }
 
+@router.get("/admin/list", response_model=schemas.ArticleList)
+async def get_admin_articles(
+    page: int = Query(1, ge=1),
+    limit: int = Query(20, ge=1, le=100),
+    category: Optional[str] = None,
+    status: Optional[str] = None,
+    sort_by: Optional[str] = "date", # date, views, impressions, position
+    search: Optional[str] = None,
+    api_key = Depends(verify_api_key),
+    db: AsyncSession = Depends(get_db)
+):
+    """Admin-only article listing with metrics and private statuses"""
+    query = select(models.Article).options(
+        selectinload(models.Article.simplified), 
+        selectinload(models.Article.category)
+    )
+    
+    if category:
+        query = query.join(models.Category).filter(models.Category.slug == category)
+    if status:
+        query = query.filter(models.Article.status == status)
+    if search:
+        search_term = f"%{search}%"
+        query = query.filter(models.Article.title.ilike(search_term))
+        
+    # Sorting
+    if sort_by == "views":
+        query = query.order_by(desc(models.Article.views))
+    elif sort_by == "impressions":
+        query = query.order_by(desc(models.Article.impressions))
+    elif sort_by == "position":
+        query = query.order_by(models.Article.position.asc())
+    else:
+        query = query.order_by(desc(models.Article.created_at))
+        
+    # Count & Paginate
+    count_query = select(func.count()).select_from(query.subquery())
+    total = (await db.execute(count_query)).scalar_one()
+    
+    query = query.offset((page - 1) * limit).limit(limit)
+    result = await db.execute(query)
+    articles = result.scalars().all()
+    
+    return {
+        "articles": articles,
+        "total": total,
+        "page": page,
+        "pages": (total + limit - 1) // limit
+    }
+
 @router.get("/{slug}", response_model=schemas.ArticleWithContent)
 async def get_article(slug: str, db: AsyncSession = Depends(get_db)):
     """Get single article by slug (Async)"""
@@ -226,7 +276,7 @@ async def update_article(
         raise HTTPException(status_code=404, detail="Simplified content not found")
     
     # Update fields
-    if updates.title:
+    if updates.title and updates.publish_now:
         article.title = updates.title
         article.slug = slugify(updates.title)
     
@@ -240,17 +290,65 @@ async def update_article(
     if updates.content_type: article.content_type = updates.content_type
     if updates.protected_from_deletion is not None: article.protected_from_deletion = updates.protected_from_deletion
     
-    article.is_edited = True
-    article.edited_by = updates.edited_by
-    article.edited_at = datetime.now()
-    article.status = ArticleStatus.EDITED
+    # Draft Logic
+    if updates.draft_title is not None: article.draft_title = updates.draft_title
+    if updates.draft_meta_description is not None: article.draft_meta_description = updates.draft_meta_description
+    if updates.draft_keywords is not None: article.draft_keywords = updates.draft_keywords
+    
+    if any([updates.draft_title, updates.draft_meta_description, updates.draft_keywords]):
+        article.has_draft = True
+        article.last_edited_at = datetime.now()
+        article.last_edited_by = updates.edited_by
+
+    # Publish Logic
+    if updates.publish_now:
+        if article.draft_title: article.title = article.draft_title
+        if article.draft_meta_description: article.meta_description = article.draft_meta_description
+        if article.draft_keywords: article.keywords = article.draft_keywords
+        
+        article.has_draft = False
+        article.is_edited = True
+        article.edited_by = updates.edited_by
+        article.edited_at = datetime.now()
+        article.status = ArticleStatus.PUBLISHED # Move to published
     
     await db.commit()
     
     # Reload with relationships
-    stmt = select(models.Article).filter_by(id=article.id).options(selectinload(models.Article.category))
+    stmt = select(models.Article).filter_by(id=article.id).options(
+        selectinload(models.Article.category),
+        selectinload(models.Article.simplified)
+    )
     res = await db.execute(stmt)
     return res.scalars().first()
+
+@router.post("/{article_id}/publish")
+async def publish_article(
+    article_id: int,
+    api_key_obj = Depends(verify_api_key),
+    db: AsyncSession = Depends(get_db)
+):
+    """Move draft to live immediately"""
+    stmt = select(models.Article).filter_by(id=article_id)
+    result = await db.execute(stmt)
+    article = result.scalars().first()
+    
+    if not article:
+        raise HTTPException(status_code=404, detail="Article not found")
+        
+    if article.has_draft:
+        if article.draft_title: article.title = article.draft_title
+        if article.draft_meta_description: article.meta_description = article.draft_meta_description
+        if article.draft_keywords: article.keywords = article.draft_keywords
+        
+        article.has_draft = False
+        article.is_edited = True
+        article.edited_at = datetime.now()
+        article.status = ArticleStatus.PUBLISHED
+        
+        await db.commit()
+        
+    return {"status": "published", "article_id": article_id}
 
 @router.get("/stats/dashboard")
 async def get_dashboard_stats(
