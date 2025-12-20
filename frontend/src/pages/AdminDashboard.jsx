@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
+import AdminGuide from '../components/AdminGuide';
 import { getDashboardStats, triggerNewsFetch, triggerSimplify, logout, updateArticle } from '../services/api';
 import { Helmet } from 'react-helmet-async';
 import {
@@ -29,7 +30,8 @@ import {
     ExternalLink,
     AlertCircle,
     Settings as SettingsIcon,
-    Globe
+    Globe,
+    BookOpen
 } from 'lucide-react';
 import { getAdminArticles, publishArticle } from '../services/api';
 
@@ -296,6 +298,7 @@ export default function AdminDashboard() {
                             { id: 'articles', label: 'Articles', icon: Edit3 },
                             { id: 'categories', label: 'Insights', icon: FolderOpen },
                             { id: 'settings', label: 'Settings', icon: SettingsIcon },
+                            { id: 'guide', label: 'Playbook', icon: BookOpen },
                         ].map((tab) => (
                             <button
                                 key={tab.id}
@@ -649,6 +652,9 @@ export default function AdminDashboard() {
                         </p>
                     </div>
                 )}
+
+                {activeTab === 'guide' && <AdminGuide />}
+
             </div>
 
             {/* Mobile Bottom Navigation */}
