@@ -493,7 +493,7 @@ export default function AdminDashboard() {
                                                     )}
                                                 </td>
                                                 <td className="px-6 py-4 text-right">
-                                                    <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                                                    <div className="flex items-center justify-end gap-1 transition-all">
                                                         <button
                                                             onClick={() => setEditingArticle(article)}
                                                             className="p-2 text-primary-400 hover:bg-primary-500/10 rounded-xl transition-all border border-transparent hover:border-primary-500/20"
@@ -606,7 +606,7 @@ export default function AdminDashboard() {
                                                                         <Eye className="w-3 h-3 text-primary-400" />
                                                                         <span className="text-slate-300">{article.views.toLocaleString()}</span>
                                                                     </div>
-                                                                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                                                                    <div className="flex items-center gap-1 transition-all">
                                                                         <button
                                                                             onClick={() => setEditingArticle(article)}
                                                                             className="p-1.5 text-primary-400 hover:bg-primary-500/10 rounded-lg"
