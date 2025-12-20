@@ -145,7 +145,7 @@ export default function AdminGuide() {
                         </button>
 
                         <div
-                            className={`transition-all duration-300 ease-in-out overflow-hidden ${openSection === idx ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+                            className={`transition-all duration-300 ease-in-out ${openSection === idx ? 'max-h-[1000px] overflow-y-auto opacity-100' : 'max-h-0 overflow-hidden opacity-0'
                                 }`}
                         >
                             <div className="p-5 pt-0 border-t border-slate-800/50">
