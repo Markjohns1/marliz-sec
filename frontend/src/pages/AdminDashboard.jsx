@@ -92,7 +92,7 @@ function QuickEditModal({ article, onClose, onSave }) {
 
     return (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in duration-200 text-slate-900">
                 <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                     <div className="flex items-center gap-2">
                         <Edit3 className="w-5 h-5 text-primary-600" />
@@ -115,7 +115,7 @@ function QuickEditModal({ article, onClose, onSave }) {
                             type="text"
                             value={draftTitle}
                             onChange={(e) => setDraftTitle(e.target.value)}
-                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all font-medium"
+                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all font-medium text-slate-900"
                             placeholder="Enter catchy SEO title..."
                         />
                         <p className="text-[10px] text-slate-400 mt-1">Rule: [Entity] [Event]: [Impact] – [Urgency]</p>
@@ -132,7 +132,7 @@ function QuickEditModal({ article, onClose, onSave }) {
                             value={draftMeta}
                             onChange={(e) => setDraftMeta(e.target.value)}
                             rows={3}
-                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all text-sm"
+                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all text-sm text-slate-900"
                             placeholder="Hook + Details + Call to Action..."
                         />
                     </div>
@@ -143,7 +143,7 @@ function QuickEditModal({ article, onClose, onSave }) {
                             type="text"
                             value={draftKeywords}
                             onChange={(e) => setDraftKeywords(e.target.value)}
-                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all text-sm"
+                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all text-sm text-slate-900"
                             placeholder="keyword1, keyword2, keyword3..."
                         />
                     </div>
@@ -556,14 +556,72 @@ export default function AdminDashboard() {
                     </div>
                 )}
 
-                {(activeTab === 'categories' || activeTab === 'settings') && (
+                {activeTab === 'categories' && (
+                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-2xl font-bold text-slate-900">Category Insights</h2>
+                        </div>
+
+                        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left">
+                                    <thead>
+                                        <tr className="bg-slate-50/50 border-b border-slate-100">
+                                            <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Category</th>
+                                            <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Articles</th>
+                                            <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Total Views</th>
+                                            <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Avg. Pos</th>
+                                            <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Top Performing</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-50">
+                                        {stats?.categories_performance?.map((cat) => (
+                                            <tr key={cat.name} className="hover:bg-slate-50/50 transition-colors">
+                                                <td className="px-6 py-4">
+                                                    <div className="font-bold text-slate-900 uppercase tracking-tight">{cat.name}</div>
+                                                </td>
+                                                <td className="px-6 py-4 text-center">
+                                                    <span className="text-sm font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded-lg">
+                                                        {cat.count}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 text-center">
+                                                    <div className="text-sm font-black text-primary-600">
+                                                        {cat.total_views.toLocaleString()}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 text-center">
+                                                    <div className={`text-sm font-bold ${cat.avg_position < 10 ? 'text-green-600' : 'text-slate-500'}`}>
+                                                        {cat.avg_position > 0 ? cat.avg_position.toFixed(1) : '-'}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    {cat.top_article ? (
+                                                        <div className="flex flex-col">
+                                                            <span className="text-xs font-bold text-slate-700 line-clamp-1">{cat.top_article.title}</span>
+                                                            <span className="text-[10px] text-slate-400 font-medium">✨ {cat.top_article.views} views</span>
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-xs text-slate-300 italic">No data</span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {activeTab === 'settings' && (
                     <div className="bg-white rounded-3xl border border-slate-200 p-12 text-center animate-in fade-in zoom-in duration-500">
                         <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
                             <Clock className="w-10 h-10 text-slate-300" />
                         </div>
                         <h3 className="text-2xl font-black text-slate-900 mb-2">Coming Soon</h3>
                         <p className="text-slate-500 max-w-sm mx-auto">
-                            We're currently perfecting the {activeTab} management system to ensure maximum security performance.
+                            We're currently perfecting the settings management system to ensure maximum security performance.
                         </p>
                     </div>
                 )}

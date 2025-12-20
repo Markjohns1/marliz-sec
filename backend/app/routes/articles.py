@@ -272,25 +272,19 @@ async def update_article(
     res_simp = await db.execute(stmt_simp)
     simplified = res_simp.scalars().first()
     
-    if not simplified:
-        raise HTTPException(status_code=404, detail="Simplified content not found")
-    
-    # Update fields
-    if updates.title and updates.publish_now:
-        article.title = updates.title
-        article.slug = slugify(updates.title)
-    
-    if updates.friendly_summary: simplified.friendly_summary = updates.friendly_summary
-    if updates.business_impact: simplified.business_impact = updates.business_impact
-    if updates.action_steps: simplified.action_steps = updates.action_steps
-    if updates.threat_level: simplified.threat_level = updates.threat_level
+    # Update fields (Article Level)
     if updates.category_id: article.category_id = updates.category_id
-    
-    # Tier 1 / Tier 2 Strategy Updates
     if updates.content_type: article.content_type = updates.content_type
     if updates.protected_from_deletion is not None: article.protected_from_deletion = updates.protected_from_deletion
+
+    # Update fields (Simplified Level - Optional)
+    if simplified:
+        if updates.friendly_summary: simplified.friendly_summary = updates.friendly_summary
+        if updates.business_impact: simplified.business_impact = updates.business_impact
+        if updates.action_steps: simplified.action_steps = updates.action_steps
+        if updates.threat_level: simplified.threat_level = updates.threat_level
     
-    # Draft Logic
+    # Draft Logic (Article Level)
     if updates.draft_title is not None: article.draft_title = updates.draft_title
     if updates.draft_meta_description is not None: article.draft_meta_description = updates.draft_meta_description
     if updates.draft_keywords is not None: article.draft_keywords = updates.draft_keywords
@@ -422,18 +416,43 @@ async def get_dashboard_stats(
     trending_res = await db.execute(q_trending)
     trending_articles = trending_res.scalars().all()
     
-    # === CATEGORIES BREAKDOWN ===
-    q_cats = select(
+    # === CATEGORIES BREAKDOWN (ENHANCED) ===
+    q_cats_base = select(
+        models.Category.id,
         models.Category.name,
-        func.count(models.Article.id).label("count")
+        func.count(models.Article.id).label("count"),
+        func.sum(models.Article.views).label("total_views"),
+        func.sum(models.Article.impressions).label("total_impressions"),
+        func.avg(models.Article.position).label("avg_position")
     ).join(models.Article, models.Article.category_id == models.Category.id
-    ).group_by(models.Category.name
-    ).order_by(desc("count"))
-    cats_res = await db.execute(q_cats)
-    categories_breakdown = [{"name": r[0], "count": r[1]} for r in cats_res.fetchall()]
+    ).group_by(models.Category.id, models.Category.name
+    ).order_by(desc("total_views"))
     
-    # Top category
-    top_category = categories_breakdown[0]["name"] if categories_breakdown else "N/A"
+    cats_res = await db.execute(q_cats_base)
+    rows = cats_res.fetchall()
+    
+    categories_performance = []
+    for row in rows:
+        cat_id, cat_name, count, cat_views, cat_impressions, avg_pos = row
+        
+        # Get top article for this specific category
+        stmt_top = select(models.Article.title, models.Article.views).filter(
+            models.Article.category_id == cat_id
+        ).order_by(desc(models.Article.views)).limit(1)
+        top_res = await db.execute(stmt_top)
+        top_art_row = top_res.fetchone()
+        
+        categories_performance.append({
+            "name": cat_name,
+            "count": count,
+            "total_views": cat_views or 0,
+            "total_impressions": cat_impressions or 0,
+            "avg_position": float(avg_pos) if avg_pos else 0.0,
+            "top_article": {"title": top_art_row[0], "views": top_art_row[1]} if top_art_row else None
+        })
+    
+    # Top category by views
+    top_category = categories_performance[0]["name"] if categories_performance else "N/A"
     
     return {
         # Basic
@@ -454,5 +473,5 @@ async def get_dashboard_stats(
         "trending_articles": [{"id": a.id, "title": a.title, "views": a.views, "protected": a.protected_from_deletion} for a in trending_articles],
         
         # Categories
-        "categories_breakdown": categories_breakdown
+        "categories_performance": categories_performance
     }
