@@ -34,7 +34,7 @@ graph TD
 
 ### Core Components
 1.  **Host Layer (Security):**
-    *   **Nginx:** Handles SSL termination (Let's Encrypt) and forwards traffic from `https://marlizintel.tymirahealth.com` to the internal app.
+    *   **Nginx:** Handles SSL termination (Let's Encrypt) and forwards traffic from `https://marlizintel.com` to the internal app.
     *   **Firewall (UFW):** Restricts access to essential ports only.
 
 2.  **Application Layer (Docker):**
@@ -132,7 +132,6 @@ Marliz Intel is built for search traffic growth through automated high-precision
 | `frontend/src/index.css` | **Styling** | Global Design Tokens & Cards |
 | **Root** | | |
 | `Dockerfile` | **DevOps** | Container Build Instructions |
-| `deploy.sh` | **DevOps** | Automation Deployment Script |
 | `DEPLOYMENT.md` | **Docs** | Operations Manual |
 
 ---
@@ -154,7 +153,7 @@ git pull origin main
 sudo docker compose up -d --build
 
 # 3. Nginx Configuration
-# Point marlizintel.tymirahealth.com -> http://localhost:3005
+# Point marlizintel.com -> http://localhost:3005
 ```
 
 ### Maintenance Commands
