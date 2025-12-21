@@ -6,7 +6,7 @@ from app.models import Article, ArticleStatus
 
 router = APIRouter()
 
-@router.get("/sitemap.xml")
+@router.api_route("/sitemap.xml", methods=["GET", "HEAD"])
 async def get_sitemap(db: AsyncSession = Depends(get_db)):
     """Generate dynamic sitemap for all published articles"""
     stmt = select(Article).filter(Article.status.in_([ArticleStatus.READY, ArticleStatus.EDITED, ArticleStatus.PUBLISHED]))
@@ -44,7 +44,7 @@ async def get_sitemap(db: AsyncSession = Depends(get_db)):
     
     return Response(content="".join(xml_content), media_type="application/xml")
 
-@router.get("/robots.txt")
+@router.api_route("/robots.txt", methods=["GET", "HEAD"])
 def get_robots():
     """Serve robots.txt"""
     content = """User-agent: *
