@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { getArticles, getCategory } from '../services/api';
 import ArticleCard from '../components/ArticleCard';
 import { Helmet } from 'react-helmet-async';
+import config from '../config';
 
 export default function CategoryPage() {
   const { slug } = useParams();
@@ -39,8 +40,9 @@ export default function CategoryPage() {
   return (
     <>
       <Helmet>
-        <title>{category.name} Security News | Marliz Sec</title>
+        <title>{category.name} Security News | {config.SITE_NAME}</title>
         <meta name="description" content={category.description} />
+        <link rel="canonical" href={`${config.CANONICAL_BASE}/category/${slug}`} />
       </Helmet>
 
       <div className="bg-slate-950 min-h-screen">

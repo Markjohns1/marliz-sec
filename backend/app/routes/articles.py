@@ -8,7 +8,8 @@ from app.auth import verify_api_key
 from app.models import ArticleStatus
 from typing import List, Optional
 import json
-from datetime import datetime
+import asyncio
+from datetime import datetime, timedelta
 from slugify import slugify
 
 router = APIRouter(prefix="/api/articles", tags=["articles"])
@@ -350,7 +351,6 @@ async def get_dashboard_stats(
     db: AsyncSession = Depends(get_db)
 ):
     """Get stats for admin dashboard (Async) - Advanced Analytics"""
-    from datetime import datetime, timedelta
     
     now = datetime.utcnow()
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -358,41 +358,43 @@ async def get_dashboard_stats(
     two_weeks_ago = now - timedelta(days=14)
     two_days_ago = now - timedelta(hours=48)
     
-    # === BASIC COUNTS ===
+    # === BASIC COUNTS & TIME-BASED METRICS (PARALLEL) ===
     q_total = select(func.count()).select_from(models.Article)
-    total_articles = (await db.execute(q_total)).scalar_one()
-
     q_pub = select(func.count()).select_from(models.Article).filter(
         models.Article.status.in_([ArticleStatus.READY, ArticleStatus.EDITED, ArticleStatus.PUBLISHED])
     )
-    published = (await db.execute(q_pub)).scalar_one()
-
     q_pend = select(func.count()).select_from(models.Article).filter_by(status=ArticleStatus.RAW)
-    pending = (await db.execute(q_pend)).scalar_one()
-
     q_views = select(func.sum(models.Article.views))
-    total_views = (await db.execute(q_views)).scalar_one() or 0
-    
-    # === TIME-BASED METRICS ===
-    # Articles today
     q_today = select(func.count()).select_from(models.Article).filter(
         models.Article.created_at >= today_start
     )
-    articles_today = (await db.execute(q_today)).scalar_one()
-    
-    # Articles this week
     q_week = select(func.count()).select_from(models.Article).filter(
         models.Article.created_at >= week_ago
     )
-    articles_this_week = (await db.execute(q_week)).scalar_one()
-    
-    # Articles last week (for comparison)
     q_last_week = select(func.count()).select_from(models.Article).filter(
         models.Article.created_at >= two_weeks_ago,
         models.Article.created_at < week_ago
     )
-    articles_last_week = (await db.execute(q_last_week)).scalar_one()
-    
+
+    # Execute all count queries in parallel
+    results = await asyncio.gather(
+        db.execute(q_total),
+        db.execute(q_pub),
+        db.execute(q_pend),
+        db.execute(q_views),
+        db.execute(q_today),
+        db.execute(q_week),
+        db.execute(q_last_week)
+    )
+
+    total_articles = results[0].scalar_one()
+    published = results[1].scalar_one()
+    pending = results[2].scalar_one()
+    total_views = results[3].scalar_one() or 0
+    articles_today = results[4].scalar_one()
+    articles_this_week = results[5].scalar_one()
+    articles_last_week = results[6].scalar_one()
+
     # Growth percentage
     if articles_last_week > 0:
         growth_pct = round(((articles_this_week - articles_last_week) / articles_last_week) * 100, 1)
