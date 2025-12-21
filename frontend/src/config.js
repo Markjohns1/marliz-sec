@@ -7,7 +7,7 @@ const config = {
     // API Endpoints
     API_BASE_URL: window.location.hostname === "localhost"
         ? "http://localhost:8000"
-        : "https://marlizintel.com/api",
+        : "https://marlizintel.com",
 
     // SEO
     CANONICAL_BASE: "https://marlizintel.com",
