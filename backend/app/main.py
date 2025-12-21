@@ -148,7 +148,7 @@ if os.path.exists(FRONTEND_DIST):
     app.mount("/assets", StaticFiles(directory=f"{FRONTEND_DIST}/assets"), name="assets")
 
     # Catch-all route for React Router (SPA)
-    @app.get("/{full_path:path}")
+    @app.api_route("/{full_path:path}", methods=["GET", "HEAD"])
     async def serve_react_app(full_path: str):
         # Explicitly ignore API paths so they don't get swallowed
         if full_path.startswith("api"):
@@ -163,7 +163,7 @@ if os.path.exists(FRONTEND_DIST):
         return FileResponse(f"{FRONTEND_DIST}/index.html")
 
 # Root path handler
-@app.get("/")
+@app.api_route("/", methods=["GET", "HEAD"])
 async def root():
     if os.path.exists(f"{FRONTEND_DIST}/index.html"):
          return FileResponse(f"{FRONTEND_DIST}/index.html")
