@@ -35,7 +35,7 @@ Run this once to configure the server to forward traffic to your app:
 ```bash
 sudo bash -c 'cat > /etc/nginx/sites-available/marlizintel <<EOF
 server {
-    server_name marlizintel.tymirahealth.com;
+    server_name marlizintel.com www.marlizintel.com;
     location / {
         proxy_pass http://localhost:3005;
         proxy_set_header Host $host;
@@ -48,14 +48,31 @@ EOF'
 
 sudo ln -s /etc/nginx/sites-available/marlizintel /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
-sudo certbot --nginx -d marlizintel.tymirahealth.com
+sudo certbot --nginx -d marlizintel.com -d www.marlizintel.com
 ```
 
 ## 5. Check Status
-- **Visit Site (Production):** `https://marlizintel.tymirahealth.com`
+- **Visit Site (Production):** `https://marlizintel.com`
 - **Check Logs:** `sudo docker compose logs -f web`
 
-## 6. DNS Update
-Go to your DNS provider (DigitalOcean Networking) and update the **A Record**:
-- **Hostname:** `marlizintel`
-- **Will Direct To:** `146.190.146.121` (Select your Droplet)
+## 6. DNS Update (CRITICAL)
+Since you bought the domain at **Host Africa**, you have two options:
+
+### Option A: Manage DNS at Host Africa (Simple)
+1. Log in to Host Africa.
+2. Go to DNS Management for `marlizintel.com`.
+3. Add an **A Record**:
+   - **Name:** `@` (or leave blank)
+   - **Value:** `146.190.146.121`
+4. Add another **A Record**:
+   - **Name:** `www`
+   - **Value:** `146.190.146.121`
+
+### Option B: Manage DNS via DigitalOcean (Recommended)
+1. Log in to Host Africa.
+2. Change **Nameservers** to:
+   - `ns1.digitalocean.com`
+   - `ns2.digitalocean.com`
+   - `ns3.digitalocean.com`
+3. Go to DigitalOcean -> Networking -> Domains.
+4. Add `marlizintel.com` and point it to your Droplet.

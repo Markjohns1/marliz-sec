@@ -14,7 +14,7 @@ async def get_sitemap(db: AsyncSession = Depends(get_db)):
     articles = result.scalars().all()
     
     # Base URL - use the custom domain for GSC
-    base_url = "https://marlizintel.tymirahealth.com"
+    base_url = "https://marlizintel.com"
     
     xml_content = ['<?xml version="1.0" encoding="UTF-8"?>']
     xml_content.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
@@ -50,5 +50,5 @@ def get_robots():
     content = """User-agent: *
 Allow: /
 
-Sitemap: https://marlizintel.tymirahealth.com/sitemap.xml"""
+Sitemap: https://marlizintel.com/sitemap.xml"""
     return Response(content=content, media_type="text/plain")

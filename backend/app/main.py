@@ -50,7 +50,8 @@ app.add_middleware(
         "http://localhost:3000",
         "http://localhost:5173",
         "https://marlizintel.146.190.146.121.nip.io",
-        "https://marlizintel.tymirahealth.com"
+        "https://marlizintel.com",
+        "https://www.marlizintel.com"
     ],
     allow_credentials=True,
     allow_methods=["*"],

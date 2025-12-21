@@ -89,7 +89,7 @@ export default function ArticleDetail() {
         <meta property="og:description" content={stripHtml(article.simplified?.friendly_summary)} />
         {article.image_url && <meta property="og:image" content={article.image_url} />}
         <meta property="og:type" content="article" />
-        <link rel="canonical" href={`https://marlizintel.tymirahealth.com/article/${article.slug}`} />
+        <link rel="canonical" href={`https://marlizintel.com/article/${article.slug}`} />
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
@@ -197,7 +197,7 @@ export default function ArticleDetail() {
 
               <div className="ml-auto">
                 <SocialShare
-                  url={`https://marlizintel.tymirahealth.com/article/${article.slug}`}
+                  url={`https://marlizintel.com/article/${article.slug}`}
                   title={article.title}
                   summary={article.simplified?.friendly_summary}
                 />
