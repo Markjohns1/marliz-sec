@@ -9,6 +9,7 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import CategorySection from '../components/CategorySection';
 import AdUnit from '../components/AdUnit';
+import config from '../config';
 
 const stripHtml = (html) => {
   return (html || '').replace(/<[^>]+>/g, '');
@@ -69,7 +70,7 @@ export default function Home() {
           content="Real-time threat intelligence for East African businesses. Monitor, Detect, and Prevent cyber attacks with Marliz Sec."
         />
         <meta name="keywords" content="Kenya cybersecurity, M-Pesa fraud, business threat intel, ransomware alerts" />
-        <link rel="canonical" href="https://marlizintel.com/" />
+        <link rel="canonical" href={config.CANONICAL_BASE} />
       </Helmet>
 
       {/* Live Threat Dashboard */}

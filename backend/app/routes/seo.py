@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.database import get_db
 from app.models import Article, ArticleStatus
+from app.config import settings
 
 router = APIRouter()
 
@@ -13,8 +14,8 @@ async def get_sitemap(db: AsyncSession = Depends(get_db)):
     result = await db.execute(stmt)
     articles = result.scalars().all()
     
-    # Base URL - use the custom domain for GSC
-    base_url = "https://marlizintel.com"
+    # Base URL - use centralized settings
+    base_url = settings.BASE_URL
     
     xml_content = ['<?xml version="1.0" encoding="UTF-8"?>']
     xml_content.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
@@ -47,8 +48,8 @@ async def get_sitemap(db: AsyncSession = Depends(get_db)):
 @router.api_route("/robots.txt", methods=["GET", "HEAD"])
 def get_robots():
     """Serve robots.txt"""
-    content = """User-agent: *
+    content = f"""User-agent: *
 Allow: /
 
-Sitemap: https://marlizintel.com/sitemap.xml"""
+Sitemap: {settings.BASE_URL}/sitemap.xml"""
     return Response(content=content, media_type="text/plain")

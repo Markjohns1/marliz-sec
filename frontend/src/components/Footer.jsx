@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Shield, Mail, Twitter, Linkedin } from 'lucide-react';
+import config from '../config';
 
 export default function Footer({ categories }) {
   const currentYear = new Date().getFullYear();
@@ -15,7 +16,9 @@ export default function Footer({ categories }) {
                 <Shield className="w-6 h-6 text-white" />
               </div>
               <div className="flex flex-col">
-                <span className="text-xl font-bold text-white tracking-tight">Marliz<span className="text-red-500">Intel</span></span>
+                <span className="text-xl font-bold text-white tracking-tight">
+                  {config.SITE_NAME.split(' ')[0]}<span className="text-red-500">{config.SITE_NAME.split(' ')[1] || ''}</span>
+                </span>
                 <span className="text-[10px] text-slate-400 font-mono tracking-wider uppercase">Cyber Security For Everyone</span>
               </div>
             </Link>
@@ -98,7 +101,7 @@ export default function Footer({ categories }) {
         <div className="border-t border-slate-800 pt-8 text-left">
           <div className="mb-4">
             <p className="text-sm">
-              © {currentYear} Marliz Sec News. All rights reserved.
+              © {currentYear} {config.SITE_NAME}. All rights reserved.
             </p>
           </div>
           <div className="flex flex-wrap gap-4 text-sm">

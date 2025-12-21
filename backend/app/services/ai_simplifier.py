@@ -1,12 +1,13 @@
 import os
 import json
-import requests
+import httpx
 import asyncio
 from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.models import Article, SimplifiedContent, ArticleStatus, ThreatLevel, Category
 from app.database import get_db_context
+from app.config import settings
 import logging
 import re
 
@@ -15,9 +16,8 @@ logger = logging.getLogger(__name__)
 
 class AISimplifier:
     def __init__(self):
-        self.api_key = os.getenv("GROQ_API_KEY")
-        # Changed to faster model with higher rate limits
-        self.model = "llama-3.1-8b-instant"  # 30k tokens/min vs 12k
+        self.api_key = settings.GROQ_API_KEY
+        self.model = settings.AI_MODEL
         self.base_url = "https://api.groq.com/openai/v1/chat/completions"
         
         # Category mapping (slug -> database ID)
@@ -120,7 +120,8 @@ class AISimplifier:
                 "stream": False
             }
             
-            response = requests.post(self.base_url, headers=headers, json=data, timeout=45)
+            async with httpx.AsyncClient(timeout=60.0) as client:
+                response = await client.post(self.base_url, headers=headers, json=data)
             
             # Handle rate limiting with exponential backoff
             if response.status_code == 429:
@@ -218,7 +219,7 @@ class AISimplifier:
             await db.commit()
             return True
             
-        except requests.exceptions.RequestException as e:
+        except httpx.HTTPError as e:
             logger.error(f"Groq API request error: {str(e)}")
             if hasattr(e, 'response') and e.response is not None:
                 logger.error(f"Response body: {e.response.text}")

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Search, Bell, Shield, Activity } from 'lucide-react';
+import config from '../config';
 
 export default function Header({ categories }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -30,7 +31,9 @@ export default function Header({ categories }) {
               <Shield className="w-6 h-6 text-white" />
             </div>
             <div className="flex flex-col">
-              <span className="text-xl font-bold text-white tracking-tight">Marliz<span className="text-red-500">Intel</span></span>
+              <span className="text-xl font-bold text-white tracking-tight">
+                {config.SITE_NAME.split(' ')[0]}<span className="text-red-500">{config.SITE_NAME.split(' ')[1] || ''}</span>
+              </span>
               <span className="text-xs text-slate-400 font-mono tracking-wider">CYBER SECURITY FOR EVERYONE</span>
             </div>
           </Link>

@@ -9,6 +9,7 @@ import { formatDistanceToNow, format } from 'date-fns';
 import { Helmet } from 'react-helmet-async';
 import AdUnit from '../components/AdUnit';
 import SocialShare from '../components/SocialShare';
+import config from '../config';
 
 const stripHtml = (html) => {
   if (!html) return '';
@@ -89,7 +90,7 @@ export default function ArticleDetail() {
         <meta property="og:description" content={stripHtml(article.simplified?.friendly_summary)} />
         {article.image_url && <meta property="og:image" content={article.image_url} />}
         <meta property="og:type" content="article" />
-        <link rel="canonical" href={`https://marlizintel.com/article/${article.slug}`} />
+        <link rel="canonical" href={`${config.CANONICAL_BASE}/article/${article.slug}`} />
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
@@ -197,7 +198,7 @@ export default function ArticleDetail() {
 
               <div className="ml-auto">
                 <SocialShare
-                  url={`https://marlizintel.com/article/${article.slug}`}
+                  url={`${config.CANONICAL_BASE}/article/${article.slug}`}
                   title={article.title}
                   summary={article.simplified?.friendly_summary}
                 />

@@ -2,13 +2,10 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from contextlib import asynccontextmanager
-import os
-from dotenv import load_dotenv
+from app.config import settings
 
-load_dotenv()
-
-# Use standard sqlite url for sync (compatibility) but async for main engine
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./cybersec_news.db")
+# Use settings for database URL
+DATABASE_URL = settings.DATABASE_URL
 
 # Ensure using an async driver for SQLite if default is used
 if "sqlite:///" in DATABASE_URL and "aiosqlite" not in DATABASE_URL:
