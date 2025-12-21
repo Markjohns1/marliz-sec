@@ -57,32 +57,37 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Security Headers Middleware
+# Security & Caching Middleware
 @app.middleware("http")
-async def add_security_headers(request, call_next):
+async def security_and_cache_middleware(request, call_next):
     response = await call_next(request)
     
-    # HSTS (Strict-Transport-Security) - Force HTTPS for 1 year
-    # Only suitable if site is fully HTTPS.
+    # 1. Security Headers
     response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
-    
-    # Prevent clickjacking
-    response.headers["X-Frame-Options"] = "DENY"
-    
-    # Prevent MIME type sniffing
     response.headers["X-Content-Type-Options"] = "nosniff"
-    
-    # Basic Content Security Policy (Allow everything for now to prevent breaking, but block mixed content)
-    response.headers["Content-Security-Policy"] = "upgrade-insecure-requests; frame-ancestors 'none';"
-    
-    # Referrer Policy
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    
+    # Content Security Policy (Allowing Google Analytics and Fonts)
+    csp = (
+        "upgrade-insecure-requests; "
+        "default-src 'self' https:; "
+        "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; "
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+        "font-src 'self' https://fonts.gstatic.com; "
+        "img-src 'self' data: https:; "
+        "connect-src 'self' https:;"
+    )
+    response.headers["Content-Security-Policy"] = csp
 
-    # Caching - Prevent caching for HTML entry points to ensure latest build is seen
+    # 2. Caching Logic (Prevent stale React builds)
     if request.method == "GET" and response.status_code == 200:
-        if request.url.path == "/" or request.url.path.startswith("/console") or "index.html" in request.url.path:
+        path = request.url.path
+        if path == "/" or path.startswith("/console") or "index.html" in path:
             response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
         else:
+            # Standard assets can be cached
             response.headers["Cache-Control"] = "public, max-age=3600"
         
     return response
