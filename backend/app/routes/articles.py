@@ -376,24 +376,14 @@ async def get_dashboard_stats(
         models.Article.created_at < week_ago
     )
 
-    # Execute all count queries in parallel
-    results = await asyncio.gather(
-        db.execute(q_total),
-        db.execute(q_pub),
-        db.execute(q_pend),
-        db.execute(q_views),
-        db.execute(q_today),
-        db.execute(q_week),
-        db.execute(q_last_week)
-    )
-
-    total_articles = results[0].scalar_one()
-    published = results[1].scalar_one()
-    pending = results[2].scalar_one()
-    total_views = results[3].scalar_one() or 0
-    articles_today = results[4].scalar_one()
-    articles_this_week = results[5].scalar_one()
-    articles_last_week = results[6].scalar_one()
+    # Execute count queries sequentially (SQLite doesn't support parallel session access)
+    total_articles = (await db.execute(q_total)).scalar_one()
+    published = (await db.execute(q_pub)).scalar_one()
+    pending = (await db.execute(q_pend)).scalar_one()
+    total_views = (await db.execute(q_views)).scalar_one() or 0
+    articles_today = (await db.execute(q_today)).scalar_one()
+    articles_this_week = (await db.execute(q_week)).scalar_one()
+    articles_last_week = (await db.execute(q_last_week)).scalar_one()
 
     # Growth percentage
     if articles_last_week > 0:
