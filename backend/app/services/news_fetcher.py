@@ -190,15 +190,17 @@ class NewsFetcher:
             "app ", "application", "code", "file", "database", "linux", "windows"
         ]
 
-        # 1. Check exclusions (Medical/Sports/Finance/General)
+        # 1. Check exclusions (Medical/Sports/Finance/General/War)
         excluded_terms = [
             "cancer", "tumor", "pancreatic", "surgery", "football", "soccer", "cricket", "nba ",
             "financial advice", "stock market", "investment", "family sharing", "dating", "relationship",
             "lifestyle", "fashion", "diet", "recipe", "celebrity", "gossip", "movie", "cinema",
-            "sex", "prince", "royal", "wedding", "horoscope", "astrology"
+            "sex", "prince", "royal", "wedding", "horoscope", "astrology",
+            "ukraine", "russia", "putin", "zelensky", "israel", "hamas", "gaza", "palestine",
+            "battlefield", "frontline", "invasion", "military conflict", "war in"
         ]
         if any(term in full_text for term in excluded_terms):
-            logger.info(f"Skipping article (Excluded Term): {title[:50]}...")
+            logger.info(f"Skipping article (Excluded/Sensitive Term): {title[:50]}...")
             return True
 
         # 2. Check Strong Terms (Auto-Pass)
