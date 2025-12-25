@@ -53,7 +53,7 @@ export default function SocialShare({ url, title, summary = '' }) {
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
             <span className="text-xs text-slate-500 uppercase tracking-wide font-semibold">Share</span>
 
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 no-scrollbar">
+            <div className="flex flex-wrap items-center gap-2">
                 {/* Native Share (Mobile) */}
                 {typeof navigator !== 'undefined' && navigator.share && (
                     <button
