@@ -1,4 +1,4 @@
-import { Twitter, Linkedin, Facebook, Link2, Check, MessageCircle } from 'lucide-react';
+import { Twitter, Linkedin, Facebook, Link2, Check, MessageCircle, Share2 } from 'lucide-react';
 import { useState } from 'react';
 
 /**
@@ -35,11 +35,36 @@ export default function SocialShare({ url, title, summary = '' }) {
 
     const buttonBase = "flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 border";
 
+    const handleNativeShare = async () => {
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: title,
+                    text: summary,
+                    url: url
+                });
+            } catch (err) {
+                console.log('Error sharing:', err);
+            }
+        }
+    };
+
     return (
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
             <span className="text-xs text-slate-500 uppercase tracking-wide font-semibold">Share</span>
 
             <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 no-scrollbar">
+                {/* Native Share (Mobile) */}
+                {typeof navigator !== 'undefined' && navigator.share && (
+                    <button
+                        onClick={handleNativeShare}
+                        className={`${buttonBase} bg-blue-600/20 border-blue-600/50 text-blue-400 hover:bg-blue-600 hover:text-white md:hidden shrink-0`}
+                        title="Share via..."
+                    >
+                        <Share2 className="w-4 h-4" />
+                    </button>
+                )}
+
                 {/* Twitter/X */}
                 <a
                     href={shareLinks.twitter}
