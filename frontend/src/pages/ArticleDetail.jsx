@@ -67,7 +67,7 @@ export default function ArticleDetail() {
     critical: { badge: 'threat-badge-critical', icon: <Shield className="w-4 h-4 mr-2" />, text: 'CRITICAL ALERT' }
   };
 
-  const config = threatConfig[article.simplified?.threat_level || 'medium'];
+  const activeThreatConfig = threatConfig[article.simplified?.threat_level || 'medium'];
   const actionSteps = article.simplified?.action_steps
     ? JSON.parse(article.simplified.action_steps)
     : [];
@@ -160,8 +160,8 @@ export default function ArticleDetail() {
 
             {/* Threat Level Badge */}
             <div className="mb-6">
-              <span className={`${config.badge} text-base`}>
-                {config.icon} {config.text}
+              <span className={`${activeThreatConfig.badge} text-base`}>
+                {activeThreatConfig.icon} {activeThreatConfig.text}
               </span>
             </div>
 
