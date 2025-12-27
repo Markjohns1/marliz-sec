@@ -31,18 +31,18 @@ const Contact = () => {
                                     <Mail className="w-5 h-5 text-blue-400" />
                                 </div>
                                 <div>
-                                    <h3 className="text-white font-medium">Email Analytics</h3>
-                                    <p className="text-slate-400 text-sm">admin@marlizintel.com</p>
+                                    <h3 className="text-white font-medium">Email</h3>
+                                    <a href="mailto:admin@marlizintel.com" className="text-blue-400 hover:underline text-sm">admin@marlizintel.com</a>
                                 </div>
                             </div>
 
                             <div className="flex items-start gap-4">
-                                <div className="p-2 bg-blue-500/10 rounded-lg">
-                                    <MessageSquare className="w-5 h-5 text-blue-400" />
+                                <div className="p-2 bg-green-500/10 rounded-lg">
+                                    <MessageSquare className="w-5 h-5 text-green-400" />
                                 </div>
                                 <div>
-                                    <h3 className="text-white font-medium">Media & Press</h3>
-                                    <p className="text-slate-400 text-sm">press@marlizintel.com</p>
+                                    <h3 className="text-white font-medium">WhatsApp</h3>
+                                    <a href="https://wa.me/254799366734" target="_blank" rel="noopener noreferrer" className="text-green-400 hover:underline text-sm">+254 799 366 734</a>
                                 </div>
                             </div>
 
