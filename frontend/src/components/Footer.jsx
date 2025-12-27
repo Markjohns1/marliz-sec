@@ -60,8 +60,18 @@ export default function Footer({ categories }) {
             <h3 className="text-white font-semibold mb-4">Resources</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link to="/about" className="hover:text-primary-400 transition-colors">
+                <Link to="/about" className="text-slate-400 hover:text-white transition-colors">
                   About Us
+                </Link>
+              </li>
+              <li>
+                <Link to="/privacy" className="text-slate-400 hover:text-white transition-colors">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" className="text-slate-400 hover:text-white transition-colors">
+                  Contact Us
                 </Link>
               </li>
               <li>

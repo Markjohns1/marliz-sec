@@ -20,6 +20,7 @@ import AllThreats from './pages/AllThreats';
 import SearchResults from './pages/SearchResults';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
+import Contact from './pages/Contact';
 
 
 const queryClient = new QueryClient({
@@ -64,7 +65,9 @@ function AppContent() {
           <Route path="/category/:slug" element={<CategoryPage />} />
           <Route path="/subscribe" element={<Subscribe />} />
           <Route path="/about" element={<About />} />
-          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/search" element={<SearchResults />} />
           <Route path="/privacy" element={<Privacy />} />
 
           {/* Admin Routes (Obfuscated) */}
