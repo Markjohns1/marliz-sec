@@ -21,6 +21,7 @@ import SearchResults from './pages/SearchResults';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
 import Contact from './pages/Contact';
+import Glossary from './pages/Glossary';
 
 
 const queryClient = new QueryClient({
@@ -67,6 +68,7 @@ function AppContent() {
           <Route path="/about" element={<About />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/glossary" element={<Glossary />} />
           <Route path="/search" element={<SearchResults />} />
           <Route path="/privacy" element={<Privacy />} />
 

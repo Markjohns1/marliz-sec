@@ -80,14 +80,9 @@ export default function Footer({ categories }) {
                 </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-primary-400 transition-colors">
-                  Security Checklist
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-primary-400 transition-colors">
+                <Link to="/glossary" className="hover:text-primary-400 transition-colors">
                   Glossary
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
