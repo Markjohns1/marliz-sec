@@ -118,7 +118,7 @@ export default function Home() {
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h2 className="text-3xl font-bold text-white mb-2">Latest Threats</h2>
-                <p className="text-slate-400">Updated every 4 hours with actionable insights</p>
+                <p className="text-slate-400">Updated twice daily with actionable insights</p>
               </div>
             </div>
 

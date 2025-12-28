@@ -98,7 +98,7 @@ export default function About() {
                 {
                   icon: Zap,
                   title: '24/7 Monitoring',
-                  description: 'Our system scans for new threats every 4 hours, ensuring you never miss a critical alert.'
+                  description: 'Our system scans for new threats twice daily, ensuring you never miss a critical alert.'
                 },
                 {
                   icon: Shield,

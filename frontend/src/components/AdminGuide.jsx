@@ -65,7 +65,7 @@ export default function AdminGuide() {
                         <p className="text-sm text-slate-300 mb-2">If you have high impressions but low views, your title is boring.</p>
                         <div className="text-xs bg-slate-900 p-3 rounded">
                             <span className="text-red-400 line-through">Before: "Update on Cisco Router Vulnerability"</span><br />
-                            <span className="text-emerald-400">After: "Cisco Warning: 50,000 Routers at Risk – Patch Now"</span>
+                            <span className="text-emerald-400">After: "Cisco Warning: 50,000 Routers at Risk - Patch Now"</span>
                         </div>
                     </div>
                 </div>
