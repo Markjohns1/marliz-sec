@@ -9,6 +9,7 @@ import { formatDistanceToNow, format } from 'date-fns';
 import { Helmet } from 'react-helmet-async';
 import AdUnit from '../components/AdUnit';
 import SocialShare from '../components/SocialShare';
+import AudioBrief from '../components/AudioBrief';
 import config from '../config';
 
 const stripHtml = (html) => {
@@ -204,6 +205,9 @@ export default function ArticleDetail() {
                 />
               </div>
             </div>
+
+            {/* AI Audio Briefing */}
+            <AudioBrief article={article} />
 
             {/* Featured Image */}
             {article.image_url && (
