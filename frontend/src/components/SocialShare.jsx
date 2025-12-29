@@ -54,7 +54,7 @@ export default function SocialShare({ url, title, summary = '' }) {
             <span className="text-xs text-slate-500 uppercase tracking-wide font-semibold">Share</span>
 
             <div className="flex flex-wrap items-center gap-2">
-                {/* Native Share (Mobile) */}
+                {/* Native Share (Mobile Only) */}
                 {typeof navigator !== 'undefined' && navigator.share && (
                     <button
                         onClick={handleNativeShare}
@@ -65,40 +65,40 @@ export default function SocialShare({ url, title, summary = '' }) {
                     </button>
                 )}
 
-                {/* Twitter/X */}
+                {/* Twitter/X - Desktop Only */}
                 <a
                     href={shareLinks.twitter}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`${buttonBase} bg-slate-800/50 border-slate-700 hover:bg-[#1DA1F2]/20 hover:border-[#1DA1F2]/50 hover:text-[#1DA1F2] text-slate-400 shrink-0`}
+                    className={`${buttonBase} bg-slate-800/50 border-slate-700 hover:bg-[#1DA1F2]/20 hover:border-[#1DA1F2]/50 hover:text-[#1DA1F2] text-slate-400 shrink-0 hidden md:flex`}
                     title="Share on Twitter"
                 >
                     <Twitter className="w-4 h-4" />
                 </a>
 
-                {/* LinkedIn */}
+                {/* LinkedIn - Desktop Only */}
                 <a
                     href={shareLinks.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`${buttonBase} bg-slate-800/50 border-slate-700 hover:bg-[#0A66C2]/20 hover:border-[#0A66C2]/50 hover:text-[#0A66C2] text-slate-400 shrink-0`}
+                    className={`${buttonBase} bg-slate-800/50 border-slate-700 hover:bg-[#0A66C2]/20 hover:border-[#0A66C2]/50 hover:text-[#0A66C2] text-slate-400 shrink-0 hidden md:flex`}
                     title="Share on LinkedIn"
                 >
                     <Linkedin className="w-4 h-4" />
                 </a>
 
-                {/* Facebook */}
+                {/* Facebook - Desktop Only */}
                 <a
                     href={shareLinks.facebook}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`${buttonBase} bg-slate-800/50 border-slate-700 hover:bg-[#1877F2]/20 hover:border-[#1877F2]/50 hover:text-[#1877F2] text-slate-400 shrink-0`}
+                    className={`${buttonBase} bg-slate-800/50 border-slate-700 hover:bg-[#1877F2]/20 hover:border-[#1877F2]/50 hover:text-[#1877F2] text-slate-400 shrink-0 hidden md:flex`}
                     title="Share on Facebook"
                 >
                     <Facebook className="w-4 h-4" />
                 </a>
 
-                {/* WhatsApp */}
+                {/* WhatsApp - All Devices */}
                 <a
                     href={shareLinks.whatsapp}
                     target="_blank"
@@ -109,7 +109,7 @@ export default function SocialShare({ url, title, summary = '' }) {
                     <MessageCircle className="w-4 h-4" />
                 </a>
 
-                {/* Copy Link */}
+                {/* Copy Link - All Devices */}
                 <button
                     onClick={handleCopyLink}
                     className={`${buttonBase} shrink-0 ${copied
