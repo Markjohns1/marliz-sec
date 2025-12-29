@@ -19,7 +19,7 @@ export default function About() {
                 Protecting You. Protecting Everyone.
               </h1>
               <p className="text-xl text-primary-100">
-                We believe everyone—from grandmothers to CEOs—deserves to be safe online without needing a computer science degree.
+                We believe everyone, from grandmothers to CEOs, deserves to be safe online without needing a computer science degree.
               </p>
             </div>
           </div>

@@ -94,7 +94,7 @@ export default function Home() {
             </h1>
 
             <p className="text-lg md:text-2xl text-primary-100 mb-8 leading-relaxed">
-              Cybersecurity doesn't have to be complicated. We keep you safe—no matter who you are or what device you use.
+              Cybersecurity doesn't have to be complicated. We keep you safe, no matter who you are or what device you use.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
