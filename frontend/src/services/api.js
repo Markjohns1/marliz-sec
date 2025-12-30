@@ -125,4 +125,9 @@ export const getDashboardStats = async () => {
   return data;
 };
 
+export const getArticleStats = async (articleId) => {
+  const { data } = await api.get(`/api/articles/stats/${articleId}`);
+  return data;
+};
+
 export default api;

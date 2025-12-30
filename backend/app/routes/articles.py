@@ -58,6 +58,24 @@ def get_source_type(referer: str, user_agent: str = None, query_ref: str = None)
     
     return "Other Referrals"
 
+@router.get("/stats/{article_id}")
+async def get_article_stats(
+    article_id: int,
+    api_key_obj = Depends(verify_api_key),
+    db: AsyncSession = Depends(get_db)
+):
+    """Get traffic source breakdown for a specific article"""
+    q_sources = select(
+        models.ViewLog.source_type,
+        func.count(models.ViewLog.id).label("count")
+    ).filter(models.ViewLog.article_id == article_id).group_by(models.ViewLog.source_type).order_by(desc("count"))
+    
+    res = await db.execute(q_sources)
+    sources = [{"platform": row[0], "hits": row[1]} for row in res.fetchall()]
+    
+    return sources
+
+# === EXISTING GLOBAL STATS ===
 @router.get("/", response_model=schemas.ArticleList)
 async def get_articles(
     page: int = Query(1, ge=1),
