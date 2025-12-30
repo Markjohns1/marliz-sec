@@ -190,7 +190,7 @@ export default function AdminDashboard() {
         queryKey: ['admin-stats'],
         queryFn: getDashboardStats,
         retry: false,
-        refetchInterval: 30000,
+        refetchInterval: actionLoading ? 3000 : 30000, // Sync every 3s during active processing
         onError: () => {
             logout();
             navigate('/console/login');
@@ -232,6 +232,10 @@ export default function AdminDashboard() {
     const handleAction = async (actionFn, name) => {
         setActionLoading(name);
         setMessage(null);
+
+        // Immediate UI refresh pulse
+        const progressInterval = setInterval(() => refetch(), 2000);
+
         try {
             const result = await actionFn();
             if (result.processed !== undefined) {
@@ -241,11 +245,12 @@ export default function AdminDashboard() {
             } else {
                 setMessage({ type: 'success', text: `✓ ${name} completed.` });
             }
-            await refetch();
         } catch (error) {
             setMessage({ type: 'error', text: `Error: ${error.message}` });
         } finally {
+            clearInterval(progressInterval);
             setActionLoading(null);
+            await refetch();
         }
     };
 
@@ -452,6 +457,24 @@ export default function AdminDashboard() {
                                     </div>
                                 </button>
                             </div>
+
+                            {actionLoading && (
+                                <div className="mt-4 p-4 rounded-2xl bg-blue-900/20 border border-blue-500/30 flex items-center justify-between animate-pulse">
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex space-x-1">
+                                            <div className="w-1.5 h-4 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                                            <div className="w-1.5 h-4 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                                            <div className="w-1.5 h-4 bg-blue-500 rounded-full animate-bounce"></div>
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Live Intelligence Pulse</p>
+                                            <p className="text-xs font-bold text-white">System is processing live data. Dashboard is auto-syncing every 2s...</p>
+                                        </div>
+                                    </div>
+                                    <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest px-2 py-1 bg-blue-500/10 rounded-lg border border-blue-500/20">Active</span>
+                                </div>
+                            )}
+
                             {message && (
                                 <div className={`mt-4 p-3 rounded-xl text-xs font-black uppercase tracking-widest ${message.type === 'error' ? 'bg-red-950/50 text-red-500 border border-red-900/50' : 'bg-emerald-950/50 text-emerald-500 border border-emerald-900/50'}`}>
                                     {message.text}
