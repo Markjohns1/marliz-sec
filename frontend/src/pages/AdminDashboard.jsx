@@ -402,25 +402,21 @@ export default function AdminDashboard() {
                         <div className="mb-8">
                             <h3 className="font-black text-white uppercase tracking-widest text-xs mb-4 flex items-center gap-2">
                                 <Search className="w-4 h-4 text-blue-400" />
-                                Traffic Origins (Know where they find you)
+                                Traffic Origins (Dynamic Recognition)
                             </h3>
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                                <div className="card p-4 bg-slate-900/40 border-slate-800">
-                                    <p className="text-[10px] text-slate-500 font-bold uppercase mb-1">Google/Search</p>
-                                    <p className="text-xl font-black text-white">{stats?.traffic_sources?.search || 0}</p>
-                                </div>
-                                <div className="card p-4 bg-slate-900/40 border-slate-800">
-                                    <p className="text-[10px] text-slate-500 font-bold uppercase mb-1">Social (Discord/FB)</p>
-                                    <p className="text-xl font-black text-white">{stats?.traffic_sources?.social || 0}</p>
-                                </div>
-                                <div className="card p-4 bg-slate-900/40 border-slate-800">
-                                    <p className="text-[10px] text-slate-500 font-bold uppercase mb-1">Direct Entry</p>
-                                    <p className="text-xl font-black text-white">{stats?.traffic_sources?.direct || 0}</p>
-                                </div>
-                                <div className="card p-4 bg-slate-900/40 border-slate-800">
-                                    <p className="text-[10px] text-slate-500 font-bold uppercase mb-1">Other/Referral</p>
-                                    <p className="text-xl font-black text-white">{stats?.traffic_sources?.other || 0}</p>
-                                </div>
+                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                                {stats?.traffic_sources && stats.traffic_sources.length > 0 ? (
+                                    stats.traffic_sources.map((source, idx) => (
+                                        <div key={idx} className="card p-3 bg-slate-900/40 border-slate-800 flex flex-col justify-center border-t-2 border-t-primary-500/30">
+                                            <p className="text-[9px] text-slate-500 font-black uppercase mb-1 truncate">{source.platform}</p>
+                                            <p className="text-xl font-black text-white">{source.hits}</p>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="col-span-full card p-4 bg-slate-900/40 border-slate-800 text-center text-slate-500 text-[10px] font-bold uppercase italic">
+                                        Waiting for first visitor intel...
+                                    </div>
+                                )}
                             </div>
                         </div>
                         <div className="lg:col-span-2 card p-6">

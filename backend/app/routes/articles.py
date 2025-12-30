@@ -16,13 +16,23 @@ router = APIRouter(prefix="/api/articles", tags=["articles"])
 
 def get_source_type(referer: str) -> str:
     if not referer:
-        return "direct"
+        return "Direct Access"
     referer = referer.lower()
-    if "google" in referer or "bing" in referer or "yahoo" in referer or "duckduckgo" in referer:
-        return "search"
-    if any(x in referer for x in ["facebook", "fb.me", "t.co", "twitter", "x.com", "discord", "linkedin", "whatsapp", "wa.me", "telegram"]):
-        return "social"
-    return "other"
+    
+    # Search
+    if "google" in referer: return "Google Search"
+    if "bing" in referer: return "Bing Search"
+    if "duckduckgo" in referer: return "DuckDuckGo"
+    
+    # Social
+    if "facebook" in referer or "fb.me" in referer: return "Facebook"
+    if "linkedin" in referer: return "LinkedIn"
+    if "discord" in referer: return "Discord"
+    if "whatsapp" in referer or "wa.me" in referer: return "WhatsApp"
+    if "telegram" in referer: return "Telegram"
+    if "t.co" in referer or "twitter" in referer or "x.com" in referer: return "X (Twitter)"
+    
+    return "Other Referrals"
 
 @router.get("/", response_model=schemas.ArticleList)
 async def get_articles(
@@ -491,18 +501,14 @@ async def get_dashboard_stats(
     valid_positions = [c["avg_position"] for c in categories_performance if c["avg_position"] > 0]
     global_avg_position = round(sum(valid_positions) / len(valid_positions), 1) if valid_positions else 0.0
     
-    # === TRAFFIC SOURCES ===
+    # === TRAFFIC SOURCES (GRANULAR) ===
     q_sources = select(
         models.ViewLog.source_type,
         func.count(models.ViewLog.id).label("count")
-    ).group_by(models.ViewLog.source_type)
+    ).group_by(models.ViewLog.source_type).order_by(desc("count"))
+    
     sources_res = await db.execute(q_sources)
-    sources_rows = sources_res.fetchall()
-    traffic_sources = {row[0]: row[1] for row in sources_rows}
-    # Ensure all types exist
-    for stype in ["direct", "search", "social", "other"]:
-        if stype not in traffic_sources:
-            traffic_sources[stype] = 0
+    traffic_sources = [{"platform": row[0], "hits": row[1]} for row in sources_res.fetchall()]
 
     return {
         # Basic
