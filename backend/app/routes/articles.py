@@ -15,6 +15,13 @@ from slugify import slugify
 router = APIRouter(prefix="/api/articles", tags=["articles"])
 
 def get_source_type(referer: str, user_agent: str = None, query_ref: str = None) -> str:
+    # 0. Bot Identification (AI & Crawlers)
+    if user_agent:
+        ua = user_agent.lower()
+        if any(bot in ua for bot in ["googlebot", "bingbot", "ahrefs", "semrush", "ia_archiver"]): return "Search Engine Bot"
+        if any(ai in ua for bot in ["gpt", "claude", "gemini", "perplex", "commoncrawl"]): return "AI Intelligence Bot"
+        if "whatsapp" in ua and not referer: return "WhatsApp Preview"
+
     # 1. Priority: Manual Parameter (The "Tattoo")
     if query_ref:
         qr = query_ref.lower()
@@ -52,11 +59,59 @@ def get_source_type(referer: str, user_agent: str = None, query_ref: str = None)
     
     # 4. Old Data Merging (Legacy support)
     if ref in ["other", "other referrals"]: return "Other Referrals"
-    if ref == "social": return "Social Platforms"
-    if ref == "search": return "Search Engines"
-    if ref == "direct": return "Direct Access"
     
     return "Other Referrals"
+
+# In-memory deduplication (IP + ArticleID : Timestamp)
+# Expire views from same IP within 1 hour to keep numbers "Professional"
+view_dedup_cache = {}
+
+async def track_view(article_id: int, request: Request, db: AsyncSession):
+    """
+    Log a view and increment the article counter.
+    Uses simple in-memory deduplication for IP (1 hour expiry).
+    """
+    client_ip = request.client.host if request.client else "unknown"
+    cache_key = f"{client_ip}:{article_id}"
+    now = datetime.now()
+    
+    # Check deduplication
+    is_duplicate = False
+    if cache_key in view_dedup_cache:
+        last_view = view_dedup_cache[cache_key]
+        if (now - last_view) < timedelta(hours=1):
+            is_duplicate = True
+            
+    referer = request.headers.get("referer")
+    user_agent = request.headers.get("user-agent")
+    query_ref = request.query_params.get("ref") or request.query_params.get("s")
+    
+    source_type = get_source_type(referer, user_agent, query_ref)
+    
+    # 1. ALWAYS Log the hit in ViewLog (For granular analytics)
+    view_log = models.ViewLog(
+        article_id=article_id,
+        referrer=referer,
+        source_type=source_type
+    )
+    db.add(view_log)
+    
+    # 2. ONLY Increment the master counter if NOT a redundant refresh
+    if not is_duplicate:
+        stmt = select(models.Article).filter_by(id=article_id)
+        res = await db.execute(stmt)
+        article = res.scalars().first()
+        if article:
+            article.views += 1
+            view_dedup_cache[cache_key] = now
+            
+    await db.commit()
+
+    # Cleanup cache occasionally (primitive)
+    if len(view_dedup_cache) > 10000:
+        # Remove keys older than 1 hour
+        expired_keys = [k for k, v in view_dedup_cache.items() if (now - v) > timedelta(hours=1)]
+        for k in expired_keys: del view_dedup_cache[k]
 
 @router.get("/stats/dashboard")
 async def get_dashboard_stats(
@@ -355,23 +410,8 @@ async def get_article(slug: str, request: Request, db: AsyncSession = Depends(ge
     if not article:
         raise HTTPException(status_code=404, detail="Article not found")
     
-    # Track View Source (Stage 2: Multi-Factor Recognition)
-    referer = request.headers.get("referer")
-    user_agent = request.headers.get("user-agent")
-    query_ref = request.query_params.get("ref") or request.query_params.get("s")
-    
-    source_type = get_source_type(referer, user_agent, query_ref)
-    
-    view_log = models.ViewLog(
-        article_id=article.id,
-        referrer=referer,
-        source_type=source_type
-    )
-    db.add(view_log)
-    
-    # Increment views
-    article.views += 1
-    await db.commit()
+    # Track View Source (Integrated Helper)
+    await track_view(article.id, request, db)
     # Re-fetch with relationships to ensure everything is loaded for Pydantic
     # We reuse the logic from the initial query or just execute a new simple one with options
     stmt = select(models.Article).filter_by(id=article.id).options(

@@ -3,10 +3,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import logging
 
-from app.database import init_db
+from app.database import init_db, get_db
 from app.config import settings
-from app import models, auth  # Updated
+from app import models, auth
 from app.routes import articles, categories, subscribers, seo
+from app.routes.articles import track_view
+from sqlalchemy import select
 from app.services.scheduler import start_scheduler, stop_scheduler
 from app.auth import verify_api_key
 
@@ -165,6 +167,24 @@ if os.path.exists(FRONTEND_DIST):
             return FileResponse(file_path)
         
         # 2. Otherwise serve index.html (Client-side routing)
+        # BOT VIEW CAPTURE: If this is an article path and User-Agent is a bot, track it now.
+        if full_path.startswith("article/"):
+            ua = request.headers.get("user-agent", "").lower()
+            # Known Bots & Previews
+            bots = ["gpt", "gemini", "claude", "googlebot", "bingbot", "whatsapp", "facebookexternalhit", "linkedinbot", "twitterbot"]
+            if any(b in ua for b in bots):
+                try:
+                    slug = full_path.split("/")[-1]
+                    async for db in get_db():
+                        stmt = select(models.Article.id).filter_by(slug=slug)
+                        res = await db.execute(stmt)
+                        article_id = res.scalar()
+                        if article_id:
+                            await track_view(article_id, request, db)
+                        break # Only need one session
+                except Exception as e:
+                    logger.error(f"Failed to track bot view for {full_path}: {e}")
+
         return FileResponse(f"{FRONTEND_DIST}/index.html")
 
 # Root path handler
