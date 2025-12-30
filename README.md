@@ -1,6 +1,5 @@
 # Marliz Sec News
-
-AI-Powered Cybersecurity News for Everyone
+Human-Led Cybersecurity Intelligence for Everyone
 
 SEO-optimized news aggregator that translates technical cybersecurity threats into actionable advice for non-technical individuals and businesses.
 
@@ -31,7 +30,7 @@ SEO-optimized news aggregator that translates technical cybersecurity threats in
 An automated system that:
 
 - Fetches cybersecurity news every 4 hours via NewsData.io API
-- Simplifies technical jargon using Groq AI (Llama 3.3 model)
+- Simplifies technical jargon into actionable intelligence
 - Delivers clear, actionable advice in plain English
 - Ranks threats by urgency (Low/Medium/High/Critical)
 - Provides specific action steps for each threat
@@ -191,7 +190,8 @@ curl "http://localhost:8000/api/articles/"
 - **View tracking** for analytics
 - **Threat level indexing** (Low/Medium/High/Critical)
 - **Full-text search ready**
-- **AI-powered simplification** of technical content
+- **Audio Intelligence Briefing** for hands-free report consumption
+- **AI-assisted simplification** of technical content with human-led branding
 
 ### How AI Simplification Works
 
@@ -281,8 +281,7 @@ python init_db.py
 |--------|--------|
 | API response time | <200ms |
 | News fetch interval | Every 4 hours |
-| AI processing time | <30 seconds per article |
-| Uptime | >99.5% |
+| System uptime | >99.5% |
 
 ### Business
 

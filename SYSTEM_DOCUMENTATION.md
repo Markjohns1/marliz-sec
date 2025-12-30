@@ -1,7 +1,7 @@
 # Marliz Intel Sec - System Documentation
 
 ## 1. Executive Summary
-**Marliz Intel Sec** is a real-time cybersecurity news aggregator and intelligence platform. It automates the collection of high-priority threat intelligence (Ransomware, Zero-day exploits, Malware) and uses AI to simplify complex technical jargon into actionable "friendly summaries" for business owners and general users.
+**Marliz Intel Sec** is a real-time cybersecurity news aggregator and human-led intelligence platform. It automates the collection of high-priority threat intelligence (Ransomware, Zero-day exploits, Malware) and provides expert-curated "friendly summaries" for business owners and general users.
 
 ---
 
@@ -26,8 +26,11 @@ graph TD
             Scheduler[Background Scheduler] -->|Every 4h| Fetcher[News Fetcher Module]
             Fetcher -->|GET| NewsAPI[NewsData.io API]
             
-            Simplifier[AI Simplifier Module] -->|Process| Groq[Groq AI API]
+            Simplifier[Intelligence Simplifier] -->|Process| Groq[Groq AI API]
             Simplifier -->|Update| SQLite
+            
+            Uvicorn -->|TTS| WebSpeech[Browser Web Speech API]
+            WebSpeech -->|Audio| User
         end
     end
 ```
@@ -50,6 +53,7 @@ graph TD
 *   **Styling:** Tailwind CSS (Utility-first, responsive design).
 *   **State Management:** TanStack Query (Efficient data fetching and caching).
 *   **Icons:** Lucide React.
+*   **Audio Briefing:** Web Speech API (Local browser-side synthesis for zero-server-cost audio reports).
 *   **Hosting:** Served statically via the Python Backend (Single Page Application pattern).
 
 ### Backend (Server-Side)
@@ -83,7 +87,8 @@ graph TD
 1.  **Load:** User visits the site.
 2.  **Serve:** Nginx proxies the request -> FastAPI serves `index.html`.
 3.  **Data:** React fetches `/api/articles` -> FastAPI returns JSON data from SQLite.
-4.  **Display:** User sees the "Friendly" summary by default, with an option to view technical details.
+4.  **Briefing:** User can click "Listen to Briefing" to hear a synthesized audio report generated on-the-fly.
+5.  **Display:** User sees the "Friendly" summary by default, with an option to view technical details.
 
 ---
 
@@ -95,6 +100,7 @@ The AI (Groq/Llama-3.1) is prompted to act as a **Senior Cyber Threat Intelligen
 - **Technical Mechanism Analysis:** Translating zero-days and exploits into actionable insights.
 - **Operational Impact Modeling:** Explaining *why* a threat matters to business stability.
 - **Strategic SEO Optimization:** Automatically generating click-worthy titles and meta descriptions using the `ENTITY + EVENT` formula.
+- **Human-Centric Branding:** De-emphasizing "AI" to focus on high-quality, expert-led intelligence delivery.
 
 ### 🛡️ Smart Fetching Logic
 The `NewsFetcher` uses a multi-layered filtering system:
@@ -112,6 +118,7 @@ Marliz Intel is built for search traffic growth through automated high-precision
 | **Hook Titles** | Entity-led clickable headlines | Higher CTR in Search Results |
 | **Meta Dynamics** | Stat-driven meta descriptions | Improved user click-through |
 | **Internal Linking** | Slug-based canonical routing | Better indexing by Google |
+| **Sitemap Logic** | Dynamic XML generation (including categories/statics) | Faster discovery of new content |
 | **Performance** | HSTS & Lite Static Assets | Core Web Vitals (LCP/FID) optimization |
 
 ---
