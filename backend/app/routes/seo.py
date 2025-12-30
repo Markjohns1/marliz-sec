@@ -21,13 +21,26 @@ async def get_sitemap(db: AsyncSession = Depends(get_db)):
     xml_content.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
     
     # Add static pages
-    static_pages = ["/", "/about", "/subscribe", "/all-threats"]
+    static_pages = ["/", "/about", "/subscribe", "/all-threats", "/privacy", "/contact", "/glossary", "/search"]
     for page in static_pages:
         xml_content.append(f"""
     <url>
         <loc>{base_url}{page}</loc>
         <changefreq>daily</changefreq>
         <priority>0.8</priority>
+    </url>""")
+    
+    # Add Categories
+    from app.models import Category
+    stmt_cat = select(Category)
+    res_cat = await db.execute(stmt_cat)
+    categories = res_cat.scalars().all()
+    for cat in categories:
+        xml_content.append(f"""
+    <url>
+        <loc>{base_url}/category/{cat.slug}</loc>
+        <changefreq>daily</changefreq>
+        <priority>0.7</priority>
     </url>""")
         
     # Add articles

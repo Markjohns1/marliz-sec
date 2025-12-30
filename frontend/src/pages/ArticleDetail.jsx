@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, Navigate } from 'react-router-dom';
 import { getArticle, getRelatedArticles } from '../services/api';
 import {
   Clock, CheckCircle2, AlertCircle,
@@ -24,8 +24,14 @@ export default function ArticleDetail() {
 
   const { data: article, isLoading, error } = useQuery({
     queryKey: ['article', slug],
-    queryFn: () => getArticle(slug)
+    queryFn: () => getArticle(slug),
+    enabled: !!slug && slug !== 'undefined'
   });
+
+  // Redirect if slug is 'undefined' or follows the broken pattern
+  if (slug === 'undefined' || slug.includes('undefined/article/')) {
+    return <Navigate to="/" replace />;
+  }
 
   const { data: related } = useQuery({
     queryKey: ['related', article?.id],

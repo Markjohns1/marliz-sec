@@ -69,9 +69,6 @@ function AppContent() {
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/glossary" element={<Glossary />} />
-          <Route path="/search" element={<SearchResults />} />
-          <Route path="/privacy" element={<Privacy />} />
-
           {/* Admin Routes (Obfuscated) */}
           <Route path="/console/login" element={<AdminLogin />} />
           <Route
