@@ -212,7 +212,7 @@ export default function ArticleDetail() {
               </div>
             </div>
 
-            {/* AI Audio Briefing */}
+            {/* Audio Briefing Content */}
             <AudioBrief article={article} />
 
             {/* Featured Image */}

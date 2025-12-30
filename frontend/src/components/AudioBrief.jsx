@@ -48,7 +48,7 @@ const AudioBrief = ({ article }) => {
 
         setIsLoading(true);
 
-        // Comprehensive script for the AI Voice
+        // Comprehensive script for the Voice Briefing
         const title = article.title;
         const summary = stripHtml(article.simplified?.friendly_summary);
         const impact = stripHtml(article.simplified?.business_impact);
@@ -129,7 +129,7 @@ const AudioBrief = ({ article }) => {
                 </div>
                 <div>
                     <h3 className="text-white font-bold text-lg">Listen to Briefing</h3>
-                    <p className="text-slate-400 text-sm">AI-generated audio intelligence report</p>
+                    <p className="text-slate-400 text-sm">Audio intelligence briefing for this report</p>
                 </div>
             </div>
 

@@ -39,7 +39,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Marliz Sec News API",
-    description="AI-powered cybersecurity news for small businesses",
+    description="Cybersecurity news and intelligence for small businesses",
     version="1.0.0",
     lifespan=lifespan
 )

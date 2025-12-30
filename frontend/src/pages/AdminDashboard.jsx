@@ -332,7 +332,7 @@ export default function AdminDashboard() {
                             <StatCard title="Total Articles" value={stats?.total_articles} icon={FileText} color="bg-blue-500" loading={isLoading} />
                             <StatCard title="Total Views" value={stats?.total_views} icon={Eye} color="bg-purple-500" loading={isLoading} />
                             <StatCard title="Published" value={stats?.published} icon={CheckCircle} color="bg-green-500" loading={isLoading} />
-                            <StatCard title="Pending AI" value={stats?.pending} icon={Clock} color="bg-orange-500" loading={isLoading} />
+                            <StatCard title="Ready for Review" value={stats?.pending} icon={Clock} color="bg-orange-500" loading={isLoading} />
                         </div>
 
                         {/* Growth & Performance */}
@@ -364,16 +364,16 @@ export default function AdminDashboard() {
                                         </div>
                                     </button>
                                     <button
-                                        onClick={() => handleAction(triggerSimplify, 'AI Simplifier')}
+                                        onClick={() => handleAction(triggerSimplify, 'Intel Processing')}
                                         disabled={actionLoading}
                                         className="flex items-center gap-4 p-4 rounded-2xl bg-slate-950 border border-slate-800 hover:border-purple-500 transition-all group"
                                     >
                                         <div className="p-2.5 bg-purple-900/40 rounded-xl text-purple-400 group-hover:bg-purple-500 group-hover:text-white transition-all">
-                                            <Zap className={`w-5 h-5 ${actionLoading === 'AI Simplifier' ? 'animate-pulse' : ''}`} />
+                                            <Zap className={`w-5 h-5 ${actionLoading === 'Intel Processing' ? 'animate-pulse' : ''}`} />
                                         </div>
                                         <div className="text-left">
-                                            <div className="font-black text-white uppercase tracking-tight text-sm">AI Processor</div>
-                                            <div className="text-[10px] text-slate-500 font-bold uppercase">Simplify Drafts</div>
+                                            <div className="font-black text-white uppercase tracking-tight text-sm">Intelligence Processor</div>
+                                            <div className="text-[10px] text-slate-500 font-bold uppercase">Generate Human-Friendly Briefings</div>
                                         </div>
                                     </button>
                                 </div>
