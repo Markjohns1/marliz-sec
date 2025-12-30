@@ -20,7 +20,7 @@ def get_source_type(referer: str) -> str:
     referer = referer.lower()
     if "google" in referer or "bing" in referer or "yahoo" in referer or "duckduckgo" in referer:
         return "search"
-    if "facebook" in referer or "fb.me" in referer or "t.co" in referer or "twitter" in referer or "x.com" in referer or "discord" in referer or "linkedin" in referer:
+    if any(x in referer for x in ["facebook", "fb.me", "t.co", "twitter", "x.com", "discord", "linkedin", "whatsapp", "wa.me", "telegram"]):
         return "social"
     return "other"
 
