@@ -50,11 +50,10 @@ graph TD
 
 ### Frontend (Client-Side)
 *   **Framework:** React 18 + Vite (Fast, optimized build).
-*   **Styling:** Tailwind CSS (Utility-first, responsive design).
+*   **Styling:** Vanilla CSS + Tailwind (Utility-first, responsive design).
 *   **State Management:** TanStack Query (Efficient data fetching and caching).
 *   **Icons:** Lucide React.
-*   **Audio Briefing:** Web Speech API (Local browser-side synthesis for zero-server-cost audio reports).
-*   **Hosting:** Served statically via the Python Backend (Single Page Application pattern).
+*   **Hosting:** Served statically via the Python Backend.
 
 ### Backend (Server-Side)
 *   **Framework:** FastAPI (High-performance Python ASGI framework).
@@ -62,114 +61,84 @@ graph TD
 *   **ORM:** SQLAlchemy (Database modeling and queries).
 *   **Task Scheduling:** APScheduler (Manages background jobs).
 
-### Intelligence & AI
-*   **News Source:** NewsData.io API (Aggregates global tech news).
-*   **AI Engine:** Groq API (High-speed LLM inference).
-*   **Logic:** Custom filters for "Context-Aware" keyword matching (e.g., distinguishing "Virus" in software vs. biology).
-
 ---
 
 ## 4. Key Workflows
 
 ### A. The News Cycle (Automated)
 1.  **Trigger:** Every 4 hours, the `Scheduler` wakes up `news_fetcher.py`.
-2.  **Fetch:** Queries the external API for specific keywords (e.g., "Ransomware", "Digital Forensics").
-3.  **Filter:** Applies logic to exclude irrelevant noise (e.g., "Stock Market", "Medical Surgery").
-4.  **Deduplicate:** Checks `slugs` to ensure the same article isn't saved twice.
-5.  **Save:** Stores raw articles in the Database with `Status: RAW`.
+2.  **Fetch:** Queries the external API for specific keywords (e.g., "Ransomware").
+3.  **Deduplicate:** Checks slugs to ensure the same article isn't saved twice.
+4.  **Save:** Stores articles as `RAW`.
 
 ### B. The Simplification Cycle (AI)
 1.  **Trigger:** Detects new `RAW` articles.
-2.  **Process:** Sends the complex text to **Groq AI** with a strict prompt: *"Summarize this for a non-technical CEO. Explain the 'Business Impact' and 'Action Steps'."*
-3.  **Update:** Saves the simplified summary and changes status to `PROCESSED`.
-
-### C. The User Experience
-1.  **Load:** User visits the site.
-2.  **Serve:** Nginx proxies the request -> FastAPI serves `index.html`.
-3.  **Data:** React fetches `/api/articles` -> FastAPI returns JSON data from SQLite.
-4.  **Briefing:** User can click "Listen to Briefing" to hear a synthesized audio report generated on-the-fly.
-5.  **Display:** User sees the "Friendly" summary by default, with an option to view technical details.
+2.  **Process:** Sends text to **Groq AI** for human-friendly summarization.
+3.  **Update:** Changes status to `PROCESSED`.
 
 ---
 
 ## 5. Intelligence Engine (The "Brain")
-The system's core value lies in its proprietary AI-driven processing pipeline, optimized for business relevance and search visibility.
+The system's core value lies in its proprietary AI-driven processing pipeline.
 
 ### 🧠 The Marliz Intelligence Persona
-The AI (Groq/Llama-3.1) is prompted to act as a **Senior Cyber Threat Intelligence Analyst**. It doesn't just summarize; it performs:
-- **Technical Mechanism Analysis:** Translating zero-days and exploits into actionable insights.
-- **Operational Impact Modeling:** Explaining *why* a threat matters to business stability.
-- **Strategic SEO Optimization:** Automatically generating click-worthy titles and meta descriptions using the `ENTITY + EVENT` formula.
-- **Human-Centric Branding:** De-emphasizing "AI" to focus on high-quality, expert-led intelligence delivery.
-
-### 🛡️ Smart Fetching Logic
-The `NewsFetcher` uses a multi-layered filtering system:
-1.  **Context-Aware Keywords:** Targets specific high-priority intel (Ransomware, Zero-day, Supply Chain).
-2.  **Noise Reduction:** Automatically rejects lifestyle, marketing, and irrelevant medical "virus" news.
-3.  **Deduplication:** Ensures unique content is served per fetch cycle.
+The AI is prompted to act as a **Senior Cyber Threat Intelligence Analyst**.
+- **Technical Mechanism Analysis:** Translating zero-days into actionable insights.
+- **Operational Impact Modeling:** Explaining *why* a threat matters to business.
+- **Strategic SEO Optimization:** Automatically generating click-worthy titles.
+- **Traffic Intelligence Tracking:** A context-aware referral engine that identifies traffic from platforms like WhatsApp and LinkedIn in real-time.
 
 ---
 
-## 6. SEO & Growth Strategy
+## 6. Traffic Intelligence Engine
+Marliz Intel includes a built-in, zero-privacy-risk traffic analyzer.
+
+### How it Works
+1. **The Signal:** Captures the `Referer` header from the browser.
+2. **The Logic:** A pattern-matching engine identifies the platform.
+3. **The Storage:** Logged in the `view_logs` table for granular analytics.
+
+### Detection Matrix
+| Source | Header Pattern Detected |
+| :--- | :--- |
+| **WhatsApp** | `wa.me`, `whatsapp.com`, `android-app://com.whatsapp` |
+| **Facebook** | `facebook.com`, `fb.me`, `l.facebook.com` |
+| **LinkedIn** | `linkedin.com` |
+| **Discord** | `discord.com` |
+| **Google Search**| `google.com/search`, `google.co.ke` |
+| **X (Twitter)**   | `t.co`, `twitter.com`, `x.com` |
+
+---
+
+## 7. SEO & Growth Strategy
 Marliz Intel is built for search traffic growth through automated high-precision SEO.
 
 | Feature | Implementation | Growth Impact |
 | :--- | :--- | :--- |
-| **Hook Titles** | Entity-led clickable headlines | Higher CTR in Search Results |
+| **Hook Titles** | Entity-led clickable headlines | Higher CTR in Search |
 | **Meta Dynamics** | Stat-driven meta descriptions | Improved user click-through |
 | **Internal Linking** | Slug-based canonical routing | Better indexing by Google |
-| **Sitemap Logic** | Dynamic XML generation (including categories/statics) | Faster discovery of new content |
-| **Performance** | HSTS & Lite Static Assets | Core Web Vitals (LCP/FID) optimization |
 
 ---
 
-## 7. Directory Structure
+## 8. Directory Structure
 
 | Location | Component | Description |
 | :--- | :--- | :--- |
-| **Backend** | | |
 | `backend/app/main.py` | **Core** | Entry point & API Routes |
 | `backend/app/models.py` | **Database** | Database Tables (SQLAlchemy) |
-| `backend/app/database.py` | **Database** | Connection Logic |
-| `backend/app/services/news_fetcher.py` | **Intelligence** | NewsData.io Smart Fetcher |
-| `backend/app/services/ai_simplifier.py` | **Intelligence** | Groq AI Strategic Simplifier |
-| `backend/app/services/scheduler.py` | **Service** | Background Job Manager |
-| **Frontend** | | |
-| `frontend/src/pages/AdminDashboard.jsx` | **UI** | Dark "Console" Analytics Center |
-| `frontend/src/index.css` | **Styling** | Global Design Tokens & Cards |
-| **Root** | | |
-| `Dockerfile` | **DevOps** | Container Build Instructions |
-| `DEPLOYMENT.md` | **Docs** | Operations Manual |
+| `frontend/src/pages/AdminDashboard.jsx` | **UI** | Dark "Console" Analytics Center + Traffic Table |
 
 ---
 
-## 8. Deployment & Architecture
+## 9. Deployment & Architecture
+The system uses a **Hybrid Reverse Proxy** architecture.
 
-The system uses a **Hybrid Reverse Proxy** architecture for maximum stability on shared servers:
-1. **Edge Proxy:** Host-level **Nginx** manages SSL and domain routing (Port 80/443).
+1. **Edge Proxy:** Host-level **Nginx** manages SSL.
 2. **Application Layer:** **Docker Compose** runs the integrated FastAPI + React bundle.
-3. **Internal Port:** The application is exposed internally at `localhost:3005`.
 
 ### Deployment Steps
 ```bash
-# 1. Update Code
-cd /root/marliz-sec
 git pull origin main
-
-# 2. Rebuild Container
 sudo docker compose up -d --build
-
-# 3. Nginx Configuration
-# Point marlizintel.com -> http://localhost:3005
-```
-
-### Maintenance Commands
-
-**Force Intelligence Cycle (Manual):**
-1. **Fetch News:** Trigger via Admin Console (Articles Tab)
-2. **AI Simplify:** Trigger via Admin Console (Overview Tab)
-
-**Check Logs:**
-```bash
-sudo docker compose logs -f web
 ```
