@@ -1,0 +1,160 @@
+import React from 'react';
+import {
+    Search, Calendar, BarChart3, Share2,
+    Edit3, ExternalLink
+} from 'lucide-react';
+
+export default function ArticlesTab({
+    artSearch, setArtSearch, setArtPage, artSort, setArtSort,
+    artLoading, articleData, artPage,
+    setViewingStats, setSharingArticle, setEditingArticle
+}) {
+    return (
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                <h2 className="text-2xl font-black text-white tracking-tight">Article Management</h2>
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <div className="relative flex-1 sm:w-64">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                        <input
+                            type="text"
+                            placeholder="Quick search..."
+                            value={artSearch}
+                            onChange={(e) => { setArtSearch(e.target.value); setArtPage(1); }}
+                            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 focus:ring-2 focus:ring-primary-500 outline-none text-sm transition-all text-white"
+                        />
+                    </div>
+                    <select
+                        value={artSort}
+                        onChange={(e) => setArtSort(e.target.value)}
+                        className="px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 text-sm font-bold outline-none focus:ring-2 focus:ring-primary-500 transition-all cursor-pointer hover:bg-slate-800"
+                    >
+                        <option value="date">Most Recent</option>
+                        <option value="views">High Traffic</option>
+                        <option value="impressions">SEO Impressions</option>
+                        <option value="position">GSC Visibility</option>
+                    </select>
+                </div>
+            </div>
+
+            {/* Article Table */}
+            <div className="card overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                        <thead>
+                            <tr className="bg-slate-900/50 border-b border-slate-800">
+                                <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Intelligence Report</th>
+                                <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">Metrics</th>
+                                <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">Status</th>
+                                <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-800/50">
+                            {artLoading ? (
+                                <tr><td colSpan="4" className="px-6 py-12 text-center text-slate-500 font-bold italic">Scanning database...</td></tr>
+                            ) : articleData?.articles.map((article) => (
+                                <tr key={article.id} className="hover:bg-white/5 transition-colors group">
+                                    <td className="px-6 py-4 max-w-md">
+                                        <div className="font-bold text-slate-200 group-hover:text-primary-400 transition-colors line-clamp-1">{article.title}</div>
+                                        <div className="flex items-center gap-2 mt-1">
+                                            <span className="text-[9px] font-black px-1.5 py-0.5 bg-slate-800 text-slate-400 rounded uppercase tracking-tighter border border-slate-700">
+                                                {article.category?.name || 'General'}
+                                            </span>
+                                            <span className="text-[9px] text-slate-500 font-bold uppercase flex items-center gap-1">
+                                                <Calendar className="w-3 h-3" />
+                                                {new Date(article.published_at).toLocaleDateString()}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center justify-center gap-6">
+                                            <div className="text-center">
+                                                <div className="text-[9px] text-slate-500 font-black uppercase mb-0.5">Views</div>
+                                                <div className="text-xs font-black text-primary-400">{article.views.toLocaleString()}</div>
+                                            </div>
+                                            <div className="text-center">
+                                                <div className="text-[9px] text-slate-500 font-black uppercase mb-0.5">Pos</div>
+                                                <div className={`text-xs font-black ${article.position < 10 && article.position > 0 ? 'text-emerald-400' : 'text-slate-400'}`}>
+                                                    {article.position > 0 ? article.position.toFixed(1) : '-'}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 text-center">
+                                        {article.has_draft ? (
+                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 text-[9px] font-black uppercase tracking-widest border border-amber-500/20">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                                Draft
+                                            </span>
+                                        ) : (
+                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-[9px] font-black uppercase tracking-widest border border-emerald-500/20">
+                                                Live
+                                            </span>
+                                        )}
+                                    </td>
+                                    <td className="px-6 py-4 text-right">
+                                        <div className="flex items-center justify-end gap-1 transition-all">
+                                            <button
+                                                onClick={() => setViewingStats(article)}
+                                                className="p-2 text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-all border border-transparent hover:border-emerald-500/20"
+                                                title="Intel Breakdown"
+                                            >
+                                                <BarChart3 className="w-4 h-4" />
+                                            </button>
+                                            <button
+                                                onClick={() => setSharingArticle(article)}
+                                                className="p-2 text-blue-400 hover:bg-blue-500/10 rounded-xl transition-all border border-transparent hover:border-blue-500/20"
+                                                title="Tracked Share"
+                                            >
+                                                <Share2 className="w-4 h-4" />
+                                            </button>
+                                            <button
+                                                onClick={() => setEditingArticle(article)}
+                                                className="p-2 text-primary-400 hover:bg-primary-500/10 rounded-xl transition-all border border-transparent hover:border-primary-500/20"
+                                                title="Quick SEO Edit"
+                                            >
+                                                <Edit3 className="w-4 h-4" />
+                                            </button>
+                                            <a
+                                                href={`/article/${article.slug}`}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="p-2 text-slate-500 hover:bg-white/5 rounded-xl transition-all"
+                                                title="Preview"
+                                            >
+                                                <ExternalLink className="w-4 h-4" />
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+
+                {/* Pagination */}
+                <div className="px-6 py-4 bg-slate-900/30 border-t border-slate-800 flex items-center justify-between">
+                    <div className="text-[10px] text-slate-500 font-black uppercase tracking-widest">
+                        Page {artPage} / {articleData?.pages || 1}
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <button
+                            disabled={artPage <= 1}
+                            onClick={() => setArtPage(p => p - 1)}
+                            className="px-4 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-xs font-black text-slate-400 uppercase tracking-widest disabled:opacity-30 hover:bg-slate-800 hover:text-white transition-all shadow-sm"
+                        >
+                            Prev
+                        </button>
+                        <button
+                            disabled={artPage >= (articleData?.pages || 1)}
+                            onClick={() => setArtPage(p => p + 1)}
+                            className="px-4 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-xs font-black text-slate-400 uppercase tracking-widest disabled:opacity-30 hover:bg-slate-800 hover:text-white transition-all shadow-sm"
+                        >
+                            Next
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
