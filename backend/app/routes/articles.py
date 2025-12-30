@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, desc, or_, func
 from sqlalchemy.orm import selectinload
@@ -13,6 +13,16 @@ from datetime import datetime, timedelta
 from slugify import slugify
 
 router = APIRouter(prefix="/api/articles", tags=["articles"])
+
+def get_source_type(referer: str) -> str:
+    if not referer:
+        return "direct"
+    referer = referer.lower()
+    if "google" in referer or "bing" in referer or "yahoo" in referer or "duckduckgo" in referer:
+        return "search"
+    if "facebook" in referer or "fb.me" in referer or "t.co" in referer or "twitter" in referer or "x.com" in referer or "discord" in referer or "linkedin" in referer:
+        return "social"
+    return "other"
 
 @router.get("/", response_model=schemas.ArticleList)
 async def get_articles(
@@ -147,12 +157,12 @@ async def get_admin_articles(
     }
 
 @router.get("/{slug}", response_model=schemas.ArticleWithContent)
-async def get_article(slug: str, db: AsyncSession = Depends(get_db)):
-    """Get single article by slug (Async)"""
+async def get_article(slug: str, request: Request, db: AsyncSession = Depends(get_db)):
+    """Get single article by slug (Async) and log view source"""
     
     stmt = select(models.Article).filter(
         models.Article.slug == slug,
-        models.Article.status.in_([s.value for s in [ArticleStatus.READY, ArticleStatus.EDITED, ArticleStatus.PUBLISHED]])
+        models.Article.status.in_([ArticleStatus.READY, ArticleStatus.EDITED, ArticleStatus.PUBLISHED])
     ).options(selectinload(models.Article.simplified), selectinload(models.Article.category))
     
     result = await db.execute(stmt)
@@ -160,6 +170,17 @@ async def get_article(slug: str, db: AsyncSession = Depends(get_db)):
     
     if not article:
         raise HTTPException(status_code=404, detail="Article not found")
+    
+    # Track View Source
+    referer = request.headers.get("referer")
+    source_type = get_source_type(referer)
+    
+    view_log = models.ViewLog(
+        article_id=article.id,
+        referrer=referer,
+        source_type=source_type
+    )
+    db.add(view_log)
     
     # Increment views
     article.views += 1
@@ -470,6 +491,19 @@ async def get_dashboard_stats(
     valid_positions = [c["avg_position"] for c in categories_performance if c["avg_position"] > 0]
     global_avg_position = round(sum(valid_positions) / len(valid_positions), 1) if valid_positions else 0.0
     
+    # === TRAFFIC SOURCES ===
+    q_sources = select(
+        models.ViewLog.source_type,
+        func.count(models.ViewLog.id).label("count")
+    ).group_by(models.ViewLog.source_type)
+    sources_res = await db.execute(q_sources)
+    sources_rows = sources_res.fetchall()
+    traffic_sources = {row[0]: row[1] for row in sources_rows}
+    # Ensure all types exist
+    for stype in ["direct", "search", "social", "other"]:
+        if stype not in traffic_sources:
+            traffic_sources[stype] = 0
+
     return {
         # Basic
         "total_articles": total_articles,
@@ -486,6 +520,7 @@ async def get_dashboard_stats(
         "avg_views": avg_views,
         "top_category": top_category,
         "global_avg_position": global_avg_position,
+        "traffic_sources": traffic_sources,
         "top_articles": [{"id": a.id, "title": a.title, "views": a.views, "protected": a.protected_from_deletion} for a in top_articles],
         "trending_articles": [{"id": a.id, "title": a.title, "views": a.views, "protected": a.protected_from_deletion} for a in trending_articles],
         

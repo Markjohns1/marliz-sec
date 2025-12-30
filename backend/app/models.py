@@ -125,3 +125,14 @@ class Subscriber(Base):
     # For tracking
     last_email_sent = Column(DateTime(timezone=True))
     open_rate = Column(Integer, default=0)  # percentage
+
+class ViewLog(Base):
+    __tablename__ = "view_logs"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    article_id = Column(Integer, ForeignKey("articles.id"))
+    referrer = Column(String(500))  # e.g., facebook.com, discord.com, google.com
+    source_type = Column(String(50)) # 'social', 'search', 'direct', 'other'
+    viewed_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    article = relationship("Article")
