@@ -1,5 +1,7 @@
-﻿from fastapi import FastAPI, HTTPException, Depends
+﻿from fastapi import FastAPI, HTTPException, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from contextlib import asynccontextmanager
 import logging
 
@@ -156,7 +158,7 @@ if os.path.exists(FRONTEND_DIST):
 
     # Catch-all route for React Router (SPA)
     @app.api_route("/{full_path:path}", methods=["GET", "HEAD"])
-    async def serve_react_app(full_path: str):
+    async def serve_react_app(full_path: str, request: Request):
         # Explicitly ignore API paths so they don't get swallowed
         if full_path.startswith("api"):
             raise HTTPException(status_code=404, detail="Not Found")

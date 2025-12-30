@@ -19,7 +19,7 @@ def get_source_type(referer: str, user_agent: str = None, query_ref: str = None)
     if user_agent:
         ua = user_agent.lower()
         if any(bot in ua for bot in ["googlebot", "bingbot", "ahrefs", "semrush", "ia_archiver"]): return "Search Engine Bot"
-        if any(ai in ua for bot in ["gpt", "claude", "gemini", "perplex", "commoncrawl"]): return "AI Intelligence Bot"
+        if any(ai in ua for ai in ["gpt", "claude", "gemini", "perplex", "commoncrawl"]): return "AI Intelligence Bot"
         if "whatsapp" in ua and not referer: return "WhatsApp Preview"
 
     # 1. Priority: Manual Parameter (The "Tattoo")
