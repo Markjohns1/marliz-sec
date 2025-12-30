@@ -14,29 +14,47 @@ from slugify import slugify
 
 router = APIRouter(prefix="/api/articles", tags=["articles"])
 
-def get_source_type(referer: str) -> str:
+def get_source_type(referer: str, user_agent: str = None, query_ref: str = None) -> str:
+    # 1. Priority: Manual Parameter (The "Tattoo")
+    if query_ref:
+        qr = query_ref.lower()
+        if "wa" in qr or "whatsapp" in qr: return "WhatsApp"
+        if "fb" in qr or "facebook" in qr: return "Facebook"
+        if "li" in qr or "linkedin" in qr: return "LinkedIn"
+        if "tg" in qr or "telegram" in qr: return "Telegram"
+        if "dc" in qr or "discord" in qr: return "Discord"
+        if "tw" in qr or "x" in qr: return "X (Twitter)"
+
+    # 2. Secondary: User-Agent Fingerprinting (For mobile apps that hide headers)
+    if user_agent:
+        ua = user_agent.lower()
+        if "whatsapp" in ua: return "WhatsApp"
+        if "fbav" in ua or "fb_iab" in ua: return "Facebook" # Facebook In-App Browser
+        if "linkedin" in ua: return "LinkedIn"
+        if "telegram" in ua: return "Telegram"
+        if "discord" in ua: return "Discord"
+
+    # 3. Third: Referer Header (Standard web clicks)
     if not referer:
         return "Direct Access"
-    referer = referer.lower()
     
-    # Search
-    if "google" in referer: return "Google Search"
-    if "bing" in referer: return "Bing Search"
-    if "duckduckgo" in referer: return "DuckDuckGo"
+    ref = referer.lower()
+    if "google" in ref: return "Google Search"
+    if "bing" in ref: return "Bing Search"
+    if "duckduckgo" in ref: return "DuckDuckGo"
     
-    # Social - Added mobile app detection strings
-    if any(x in referer for x in ["facebook", "fb.me", "facebook.com"]): return "Facebook"
-    if "linkedin" in referer: return "LinkedIn"
-    if "discord" in referer: return "Discord"
-    if any(x in referer for x in ["whatsapp", "wa.me", "com.whatsapp"]): return "WhatsApp"
-    if "telegram" in referer: return "Telegram"
-    if any(x in referer for x in ["t.co", "twitter", "x.com"]): return "X (Twitter)"
+    if any(x in ref for x in ["facebook", "fb.me", "facebook.com"]): return "Facebook"
+    if "linkedin" in ref: return "LinkedIn"
+    if "discord" in ref: return "Discord"
+    if any(x in ref for x in ["whatsapp", "wa.me", "com.whatsapp"]): return "WhatsApp"
+    if "telegram" in ref: return "Telegram"
+    if any(x in ref for x in ["t.co", "twitter", "x.com"]): return "X (Twitter)"
     
-    # Handle old data merging (cleanup for the user)
-    if referer == "other": return "Other Referrals"
-    if referer == "social": return "Social Platforms"
-    if referer == "search": return "Search Engines"
-    if referer == "direct": return "Direct Access"
+    # 4. Old Data Merging (Legacy support)
+    if ref in ["other", "other referrals"]: return "Other Referrals"
+    if ref == "social": return "Social Platforms"
+    if ref == "search": return "Search Engines"
+    if ref == "direct": return "Direct Access"
     
     return "Other Referrals"
 
@@ -187,9 +205,12 @@ async def get_article(slug: str, request: Request, db: AsyncSession = Depends(ge
     if not article:
         raise HTTPException(status_code=404, detail="Article not found")
     
-    # Track View Source
+    # Track View Source (Stage 2: Multi-Factor Recognition)
     referer = request.headers.get("referer")
-    source_type = get_source_type(referer)
+    user_agent = request.headers.get("user-agent")
+    query_ref = request.query_params.get("ref") or request.query_params.get("s")
+    
+    source_type = get_source_type(referer, user_agent, query_ref)
     
     view_log = models.ViewLog(
         article_id=article.id,
