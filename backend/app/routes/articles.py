@@ -466,6 +466,10 @@ async def get_dashboard_stats(
     # Top category by views
     top_category = categories_performance[0]["name"] if categories_performance else "N/A"
     
+    # Global average position (of categories that have articles)
+    valid_positions = [c["avg_position"] for c in categories_performance if c["avg_position"] > 0]
+    global_avg_position = round(sum(valid_positions) / len(valid_positions), 1) if valid_positions else 0.0
+    
     return {
         # Basic
         "total_articles": total_articles,
@@ -481,6 +485,7 @@ async def get_dashboard_stats(
         # Content
         "avg_views": avg_views,
         "top_category": top_category,
+        "global_avg_position": global_avg_position,
         "top_articles": [{"id": a.id, "title": a.title, "views": a.views, "protected": a.protected_from_deletion} for a in top_articles],
         "trending_articles": [{"id": a.id, "title": a.title, "views": a.views, "protected": a.protected_from_deletion} for a in trending_articles],
         
