@@ -58,6 +58,138 @@ def get_source_type(referer: str, user_agent: str = None, query_ref: str = None)
     
     return "Other Referrals"
 
+@router.get("/stats/dashboard")
+async def get_dashboard_stats(
+    api_key = Depends(verify_api_key),
+    db: AsyncSession = Depends(get_db)
+):
+    """Get stats for admin dashboard (Async) - Advanced Analytics"""
+    
+    now = datetime.utcnow()
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    week_ago = now - timedelta(days=7)
+    two_weeks_ago = now - timedelta(days=14)
+    two_days_ago = now - timedelta(hours=48)
+    
+    # === BASIC COUNTS & TIME-BASED METRICS (PARALLEL) ===
+    q_total = select(func.count()).select_from(models.Article)
+    q_pub = select(func.count()).select_from(models.Article).filter(
+        models.Article.status.in_([ArticleStatus.READY, ArticleStatus.EDITED, ArticleStatus.PUBLISHED])
+    )
+    q_pend = select(func.count()).select_from(models.Article).filter_by(status=ArticleStatus.RAW)
+    q_views = select(func.sum(models.Article.views))
+    q_today = select(func.count()).select_from(models.Article).filter(
+        models.Article.created_at >= today_start
+    )
+    q_week = select(func.count()).select_from(models.Article).filter(
+        models.Article.created_at >= week_ago
+    )
+    q_last_week = select(func.count()).select_from(models.Article).filter(
+        models.Article.created_at >= two_weeks_ago,
+        models.Article.created_at < week_ago
+    )
+
+    # Execute count queries
+    total_articles = (await db.execute(q_total)).scalar_one()
+    published = (await db.execute(q_pub)).scalar_one()
+    pending = (await db.execute(q_pend)).scalar_one()
+    total_views = (await db.execute(q_views)).scalar_one() or 0
+    articles_today = (await db.execute(q_today)).scalar_one()
+    articles_this_week = (await db.execute(q_week)).scalar_one()
+    articles_last_week = (await db.execute(q_last_week)).scalar_one()
+
+    # Growth percentage
+    if articles_last_week > 0:
+        growth_pct = round(((articles_this_week - articles_last_week) / articles_last_week) * 100, 1)
+    else:
+        growth_pct = 100 if articles_this_week > 0 else 0
+    
+    # === CONTENT INSIGHTS ===
+    avg_views = round(total_views / total_articles, 1) if total_articles > 0 else 0
+    
+    stmt = select(models.Article).order_by(desc(models.Article.views)).limit(5)
+    top_articles_res = await db.execute(stmt)
+    top_articles = top_articles_res.scalars().all()
+    
+    q_trending = select(models.Article).filter(
+        models.Article.created_at >= two_days_ago,
+        models.Article.status.in_([ArticleStatus.READY, ArticleStatus.EDITED, ArticleStatus.PUBLISHED])
+    ).order_by(desc(models.Article.views)).limit(5)
+    trending_res = await db.execute(q_trending)
+    trending_articles = trending_res.scalars().all()
+    
+    # === CATEGORIES BREAKDOWN ===
+    q_cats_base = select(
+        models.Category.id,
+        models.Category.name,
+        func.count(models.Article.id).label("count"),
+        func.sum(models.Article.views).label("total_views"),
+        func.sum(models.Article.impressions).label("total_impressions"),
+        func.avg(models.Article.position).label("avg_position")
+    ).join(models.Article, models.Article.category_id == models.Category.id
+    ).group_by(models.Category.id, models.Category.name
+    ).order_by(desc("total_views"))
+    
+    cats_res = await db.execute(q_cats_base)
+    rows = cats_res.fetchall()
+    
+    categories_performance = []
+    for row in rows:
+        cat_id, cat_name, count, cat_views, cat_impressions, avg_pos = row
+        stmt_top = select(
+            models.Article.id,
+            models.Article.title,
+            models.Article.views,
+            models.Article.slug,
+            models.Article.draft_title,
+            models.Article.draft_meta_description,
+            models.Article.draft_keywords
+        ).filter(
+            models.Article.category_id == cat_id
+        ).order_by(desc(models.Article.views)).limit(5)
+        top_res = await db.execute(stmt_top)
+        top_art_rows = top_res.fetchall()
+        
+        top_articles_list = [{"id": a[0], "title": a[1], "views": a[2], "slug": a[3]} for a in top_art_rows]
+        
+        categories_performance.append({
+            "name": cat_name,
+            "count": count,
+            "total_views": cat_views or 0,
+            "total_impressions": cat_impressions or 0,
+            "avg_position": float(avg_pos) if avg_pos else 0.0,
+            "top_articles": top_articles_list
+        })
+    
+    top_category = categories_performance[0]["name"] if categories_performance else "N/A"
+    valid_positions = [c["avg_position"] for c in categories_performance if c["avg_position"] > 0]
+    global_avg_position = round(sum(valid_positions) / len(valid_positions), 1) if valid_positions else 0.0
+    
+    q_sources = select(
+        models.ViewLog.source_type,
+        func.count(models.ViewLog.id).label("count")
+    ).group_by(models.ViewLog.source_type).order_by(desc("count"))
+    
+    sources_res = await db.execute(q_sources)
+    traffic_sources = [{"platform": row[0], "hits": row[1]} for row in sources_res.fetchall()]
+
+    return {
+        "total_articles": total_articles,
+        "published": published,
+        "pending": pending,
+        "total_views": total_views,
+        "articles_today": articles_today,
+        "articles_this_week": articles_this_week,
+        "growth_pct": growth_pct,
+        "avg_views": avg_views,
+        "top_category": top_category,
+        "global_avg_position": global_avg_position,
+        "traffic_sources": traffic_sources,
+        "top_articles": [{"id": a.id, "title": a.title, "views": a.views, "protected": a.protected_from_deletion} for a in top_articles],
+        "trending_articles": [{"id": a.id, "title": a.title, "views": a.views, "protected": a.protected_from_deletion} for a in trending_articles],
+        "categories_performance": categories_performance
+    }
+
 @router.get("/stats/{article_id}")
 async def get_article_stats(
     article_id: int,
@@ -421,160 +553,3 @@ async def publish_article(
         
     return {"status": "published", "article_id": article_id}
 
-@router.get("/stats/dashboard")
-async def get_dashboard_stats(
-    api_key = Depends(verify_api_key),
-    db: AsyncSession = Depends(get_db)
-):
-    """Get stats for admin dashboard (Async) - Advanced Analytics"""
-    
-    now = datetime.utcnow()
-    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
-    week_ago = now - timedelta(days=7)
-    two_weeks_ago = now - timedelta(days=14)
-    two_days_ago = now - timedelta(hours=48)
-    
-    # === BASIC COUNTS & TIME-BASED METRICS (PARALLEL) ===
-    q_total = select(func.count()).select_from(models.Article)
-    q_pub = select(func.count()).select_from(models.Article).filter(
-        models.Article.status.in_([ArticleStatus.READY, ArticleStatus.EDITED, ArticleStatus.PUBLISHED])
-    )
-    q_pend = select(func.count()).select_from(models.Article).filter_by(status=ArticleStatus.RAW)
-    q_views = select(func.sum(models.Article.views))
-    q_today = select(func.count()).select_from(models.Article).filter(
-        models.Article.created_at >= today_start
-    )
-    q_week = select(func.count()).select_from(models.Article).filter(
-        models.Article.created_at >= week_ago
-    )
-    q_last_week = select(func.count()).select_from(models.Article).filter(
-        models.Article.created_at >= two_weeks_ago,
-        models.Article.created_at < week_ago
-    )
-
-    # Execute count queries sequentially (SQLite doesn't support parallel session access)
-    total_articles = (await db.execute(q_total)).scalar_one()
-    published = (await db.execute(q_pub)).scalar_one()
-    pending = (await db.execute(q_pend)).scalar_one()
-    total_views = (await db.execute(q_views)).scalar_one() or 0
-    articles_today = (await db.execute(q_today)).scalar_one()
-    articles_this_week = (await db.execute(q_week)).scalar_one()
-    articles_last_week = (await db.execute(q_last_week)).scalar_one()
-
-    # Growth percentage
-    if articles_last_week > 0:
-        growth_pct = round(((articles_this_week - articles_last_week) / articles_last_week) * 100, 1)
-    else:
-        growth_pct = 100 if articles_this_week > 0 else 0
-    
-    # === CONTENT INSIGHTS ===
-    # Average views per article
-    avg_views = round(total_views / total_articles, 1) if total_articles > 0 else 0
-    
-    # Top articles (all time)
-    stmt = select(models.Article).order_by(desc(models.Article.views)).limit(5)
-    top_articles_res = await db.execute(stmt)
-    top_articles = top_articles_res.scalars().all()
-    
-    # Trending articles (last 48 hours, sorted by views)
-    q_trending = select(models.Article).filter(
-        models.Article.created_at >= two_days_ago,
-        models.Article.status.in_([ArticleStatus.READY, ArticleStatus.EDITED, ArticleStatus.PUBLISHED])
-    ).order_by(desc(models.Article.views)).limit(5)
-    trending_res = await db.execute(q_trending)
-    trending_articles = trending_res.scalars().all()
-    
-    # === CATEGORIES BREAKDOWN (ENHANCED) ===
-    q_cats_base = select(
-        models.Category.id,
-        models.Category.name,
-        func.count(models.Article.id).label("count"),
-        func.sum(models.Article.views).label("total_views"),
-        func.sum(models.Article.impressions).label("total_impressions"),
-        func.avg(models.Article.position).label("avg_position")
-    ).join(models.Article, models.Article.category_id == models.Category.id
-    ).group_by(models.Category.id, models.Category.name
-    ).order_by(desc("total_views"))
-    
-    cats_res = await db.execute(q_cats_base)
-    rows = cats_res.fetchall()
-    
-    categories_performance = []
-    for row in rows:
-        cat_id, cat_name, count, cat_views, cat_impressions, avg_pos = row
-        
-        # Get top 5 articles for this specific category
-        stmt_top = select(
-            models.Article.id,
-            models.Article.title,
-            models.Article.views,
-            models.Article.slug,
-            models.Article.draft_title,
-            models.Article.draft_meta_description,
-            models.Article.draft_keywords
-        ).filter(
-            models.Article.category_id == cat_id
-        ).order_by(desc(models.Article.views)).limit(5)
-        top_res = await db.execute(stmt_top)
-        top_art_rows = top_res.fetchall()
-        
-        top_articles_list = []
-        for art in top_art_rows:
-            top_articles_list.append({
-                "id": art[0],
-                "title": art[1],
-                "views": art[2],
-                "slug": art[3],
-                "draft_title": art[4],
-                "draft_meta_description": art[5],
-                "draft_keywords": art[6]
-            })
-        
-        categories_performance.append({
-            "name": cat_name,
-            "count": count,
-            "total_views": cat_views or 0,
-            "total_impressions": cat_impressions or 0,
-            "avg_position": float(avg_pos) if avg_pos else 0.0,
-            "top_articles": top_articles_list
-        })
-    
-    # Top category by views
-    top_category = categories_performance[0]["name"] if categories_performance else "N/A"
-    
-    # Global average position (of categories that have articles)
-    valid_positions = [c["avg_position"] for c in categories_performance if c["avg_position"] > 0]
-    global_avg_position = round(sum(valid_positions) / len(valid_positions), 1) if valid_positions else 0.0
-    
-    # === TRAFFIC SOURCES (GRANULAR) ===
-    q_sources = select(
-        models.ViewLog.source_type,
-        func.count(models.ViewLog.id).label("count")
-    ).group_by(models.ViewLog.source_type).order_by(desc("count"))
-    
-    sources_res = await db.execute(q_sources)
-    traffic_sources = [{"platform": row[0], "hits": row[1]} for row in sources_res.fetchall()]
-
-    return {
-        # Basic
-        "total_articles": total_articles,
-        "published": published,
-        "pending": pending,
-        "total_views": total_views,
-        
-        # Time-based
-        "articles_today": articles_today,
-        "articles_this_week": articles_this_week,
-        "growth_pct": growth_pct,
-        
-        # Content
-        "avg_views": avg_views,
-        "top_category": top_category,
-        "global_avg_position": global_avg_position,
-        "traffic_sources": traffic_sources,
-        "top_articles": [{"id": a.id, "title": a.title, "views": a.views, "protected": a.protected_from_deletion} for a in top_articles],
-        "trending_articles": [{"id": a.id, "title": a.title, "views": a.views, "protected": a.protected_from_deletion} for a in trending_articles],
-        
-        # Categories
-        "categories_performance": categories_performance
-    }

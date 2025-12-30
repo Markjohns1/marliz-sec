@@ -398,14 +398,14 @@ export default function AdminDashboard() {
                             <Shield className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                            <h1 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+                            <h1 className="text-lg sm:text-xl font-bold text-white tracking-tight flex items-center gap-2">
                                 <span>Marliz<span className="text-red-500">Intel</span></span>
                                 <span className="h-4 w-px bg-slate-800 mx-1"></span>
-                                <span className="text-sm font-black text-blue-400 uppercase tracking-widest">Admin</span>
+                                <span className="text-xs sm:text-sm font-black text-blue-400 uppercase tracking-widest">Admin</span>
                             </h1>
-                            <div className="flex items-center gap-1.5 -mt-0.5">
+                            <div className="hidden min-[450px]:flex items-center gap-1.5 -mt-0.5">
                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Digital Intelligence Dashboard</span>
+                                <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest truncate max-w-[150px] sm:max-w-none">Digital Intelligence Dashboard</span>
                             </div>
                         </div>
                     </div>
@@ -636,22 +636,22 @@ export default function AdminDashboard() {
                                         <div className="text-xl font-black text-slate-800 group-hover:text-primary-500/50 transition-colors w-8">0{idx + 1}</div>
                                         <div className="flex-1 min-w-0">
                                             <div className="text-sm font-bold text-white group-hover:text-primary-400 transition-colors truncate">{article.title}</div>
-                                            <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">{article.views} total views</div>
+                                            <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5 whitespace-nowrap">{article.views} views</div>
                                         </div>
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-1 sm:gap-2">
                                             <button
                                                 onClick={() => setViewingStats(article)}
-                                                className="p-2 rounded-xl bg-slate-950 text-emerald-500 border border-slate-800 hover:border-emerald-500/30 transition-all"
+                                                className="p-1.5 sm:p-2 rounded-xl bg-slate-950 text-emerald-500 border border-slate-800 hover:border-emerald-500/30 transition-all"
                                                 title="Intel Breakdown"
                                             >
-                                                <BarChart3 className="w-4 h-4" />
+                                                <BarChart3 className="w-3.5 h-3.5 sm:w-4 h-4" />
                                             </button>
                                             <button
                                                 onClick={() => setSharingArticle(article)}
-                                                className="p-2 rounded-xl bg-slate-950 text-blue-500 border border-slate-800 hover:border-blue-500/30 transition-all"
+                                                className="p-1.5 sm:p-2 rounded-xl bg-slate-950 text-blue-500 border border-slate-800 hover:border-blue-500/30 transition-all"
                                                 title="Tracked Share"
                                             >
-                                                <Share2 className="w-4 h-4" />
+                                                <Share2 className="w-3.5 h-3.5 sm:w-4 h-4" />
                                             </button>
                                             <button
                                                 onClick={() => handleToggleProtection(article.id, article.protected)}
