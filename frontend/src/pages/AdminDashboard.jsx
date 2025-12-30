@@ -403,25 +403,38 @@ export default function AdminDashboard() {
                             </div>
                         </div>
 
-                        {/* Traffic Source Wisdom */}
+                        {/* Traffic Source Intelligence Table */}
                         <div className="mb-8">
-                            <h3 className="font-black text-white uppercase tracking-widest text-xs mb-4 flex items-center gap-2">
-                                <Search className="w-4 h-4 text-blue-400" />
-                                Traffic Origins (Dynamic Recognition)
+                            <h3 className="font-black text-white uppercase tracking-widest text-[10px] mb-4 flex items-center gap-2">
+                                <Search className="w-3.5 h-3.5 text-blue-400" />
+                                Traffic Origins (Context-Aware Recognition)
                             </h3>
-                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                                {stats?.traffic_sources && stats.traffic_sources.length > 0 ? (
-                                    stats.traffic_sources.map((source, idx) => (
-                                        <div key={idx} className="card p-3 bg-slate-900/40 border-slate-800 flex flex-col justify-center border-t-2 border-t-primary-500/30">
-                                            <p className="text-[9px] text-slate-500 font-black uppercase mb-1 truncate">{source.platform}</p>
-                                            <p className="text-xl font-black text-white">{source.hits}</p>
+                            <div className="card overflow-hidden border-slate-800 bg-slate-900/20">
+                                <div className="grid grid-cols-2 bg-slate-900/60 p-3 border-b border-slate-800">
+                                    <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Platform / Source</div>
+                                    <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest text-right">Impact (Hits)</div>
+                                </div>
+                                <div className="divide-y divide-slate-800/50">
+                                    {stats?.traffic_sources && stats.traffic_sources.length > 0 ? (
+                                        stats.traffic_sources.map((source, idx) => (
+                                            <div key={idx} className="grid grid-cols-2 p-3 hover:bg-white/[0.02] transition-colors items-center">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500/40 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
+                                                    <span className="text-xs font-bold text-slate-200">{source.platform}</span>
+                                                </div>
+                                                <div className="text-right">
+                                                    <span className="text-sm font-black text-white px-2 py-0.5 bg-slate-950 rounded-lg border border-slate-800">
+                                                        {source.hits.toLocaleString()}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="p-8 text-center">
+                                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">Waiting for incoming intelligence signals...</p>
                                         </div>
-                                    ))
-                                ) : (
-                                    <div className="col-span-full card p-4 bg-slate-900/40 border-slate-800 text-center text-slate-500 text-[10px] font-bold uppercase italic">
-                                        Waiting for first visitor intel...
-                                    </div>
-                                )}
+                                    )}
+                                </div>
                             </div>
                         </div>
                         <div className="lg:col-span-2 card p-6">

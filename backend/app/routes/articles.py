@@ -24,13 +24,19 @@ def get_source_type(referer: str) -> str:
     if "bing" in referer: return "Bing Search"
     if "duckduckgo" in referer: return "DuckDuckGo"
     
-    # Social
-    if "facebook" in referer or "fb.me" in referer: return "Facebook"
+    # Social - Added mobile app detection strings
+    if any(x in referer for x in ["facebook", "fb.me", "facebook.com"]): return "Facebook"
     if "linkedin" in referer: return "LinkedIn"
     if "discord" in referer: return "Discord"
-    if "whatsapp" in referer or "wa.me" in referer: return "WhatsApp"
+    if any(x in referer for x in ["whatsapp", "wa.me", "com.whatsapp"]): return "WhatsApp"
     if "telegram" in referer: return "Telegram"
-    if "t.co" in referer or "twitter" in referer or "x.com" in referer: return "X (Twitter)"
+    if any(x in referer for x in ["t.co", "twitter", "x.com"]): return "X (Twitter)"
+    
+    # Handle old data merging (cleanup for the user)
+    if referer == "other": return "Other Referrals"
+    if referer == "social": return "Social Platforms"
+    if referer == "search": return "Search Engines"
+    if referer == "direct": return "Direct Access"
     
     return "Other Referrals"
 
