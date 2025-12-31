@@ -246,7 +246,7 @@ YOUR MISSION:
 4. ACTIONABLE PROTOCOLS: Provide clear, prioritized mitigation steps.
 
 RESPOND WITH VALID JSON ONLY:
-{
+{{
   "is_relevant": true,
   "category": "ransomware|phishing|data-breach|malware|vulnerability|general",
   "seo_title": "[Entity] [Event]: [Impact/Discovery] – [Urgency/Action]",
