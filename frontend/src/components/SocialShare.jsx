@@ -87,12 +87,12 @@ export default function SocialShare({ url, title, summary = '' }) {
                     <Linkedin className="w-4 h-4" />
                 </a>
 
-                {/* Facebook - All Devices */}
+                {/* Facebook - Desktop Only */}
                 <a
                     href={shareLinks.facebook}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`${buttonBase} bg-slate-800/50 border-slate-700 hover:bg-[#1877F2]/20 hover:border-[#1877F2]/50 hover:text-[#1877F2] text-slate-400 shrink-0`}
+                    className={`${buttonBase} hidden md:flex bg-slate-800/50 border-slate-700 hover:bg-[#1877F2]/20 hover:border-[#1877F2]/50 hover:text-[#1877F2] text-slate-400 shrink-0`}
                     title="Share on Facebook"
                 >
                     <Facebook className="w-4 h-4" />
