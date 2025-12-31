@@ -15,26 +15,21 @@ export default function AdUnit({ format = 'auto', className = '', slotId = '1234
 
     return (
         <div className={`ad-container flex justify-center my-6 ${className}`}>
-            {/* 
-        ADSENSE PLACEHOLDER 
-        When ready for production, replace the div below with the <ins> tag
-      */}
             <div className={`bg-slate-900/40 border border-slate-800/50 border-dashed rounded-lg flex flex-col items-center justify-center p-4 text-center overflow-hidden ${getDimensions()}`}>
-                <span className="text-[10px] bg-slate-800 text-slate-500 px-1.5 py-0.5 rounded uppercase tracking-wider mb-1">
+                <span className="text-[10px] bg-slate-800 text-slate-500 px-1.5 py-0.5 rounded uppercase tracking-wider mb-2">
                     Advertisement
                 </span>
-                <span className="text-slate-600 text-xs">
-                    (AdSpace {format})
-                </span>
 
-                {/* ACTUAL ADSENSE CODE EXAMPLE (Commented out):
-        <ins className="adsbygoogle"
-             style={{ display: 'block' }}
-             data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-             data-ad-slot={slotId}
-             data-ad-format={format}
-             data-full-width-responsive="true"></ins>
-        */}
+                {/* 
+                  ADSENSE LIVE UNIT
+                  Replace client ID with your ca-pub-XXXXXX when approved.
+                */}
+                <ins className="adsbygoogle"
+                    style={{ display: 'block', minWidth: '120px', minHeight: '50px' }}
+                    data-ad-client="ca-pub-5581330887172926"
+                    data-ad-slot={slotId}
+                    data-ad-format={format}
+                    data-full-width-responsive="true"></ins>
             </div>
         </div>
     );
