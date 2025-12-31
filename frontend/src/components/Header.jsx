@@ -39,6 +39,24 @@ export default function Header({ categories }) {
             <Link to="/" className={`text-sm font-medium transition-colors hover:text-white ${isActive('/') ? 'text-white' : 'text-slate-400'}`}>
               Home
             </Link>
+
+            {/* Categories Dropdown (Simple CSS Hover) */}
+            <div className="relative group p-4 -m-4">
+              <button className={`text-sm font-medium transition-colors hover:text-white flex items-center ${location.pathname.includes('/category/') ? 'text-white' : 'text-slate-400'}`}>
+                Categories
+              </button>
+              {/* Dropdown Content */}
+              <div className="absolute top-10 left-0 w-56 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top pt-2">
+                <div className="p-2 space-y-1">
+                  <Link to="/category/ransomware" className="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg">Ransomware</Link>
+                  <Link to="/category/phishing" className="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg">Phishing & Email</Link>
+                  <Link to="/category/data-breach" className="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg">Data Breaches</Link>
+                  <Link to="/category/malware" className="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg">Malware & Viruses</Link>
+                  <Link to="/category/vulnerability" className="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg">Vulnerabilities</Link>
+                </div>
+              </div>
+            </div>
+
             <Link to="/all-threats" className={`text-sm font-medium transition-colors hover:text-white ${isActive('/all-threats') ? 'text-white' : 'text-slate-400'}`}>
               All Threats
             </Link>
