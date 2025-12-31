@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Search, Bell, Shield, Activity } from 'lucide-react';
+import { Menu, X, Search, Bell, Shield, Activity, ChevronRight } from 'lucide-react';
 import config from '../config';
 import QuickSearch from './QuickSearch';
 
@@ -63,8 +63,9 @@ export default function Header({ categories }) {
 
             {/* Categories Dropdown (Simple CSS Hover) */}
             <div className="relative group p-4 -m-4">
-              <button className={`text-sm font-medium transition-colors hover:text-white flex items-center ${location.pathname.includes('/category/') ? 'text-white' : 'text-slate-400'}`}>
+              <button className={`text-sm font-medium transition-colors hover:text-white flex items-center gap-1 ${location.pathname.includes('/category/') ? 'text-white' : 'text-slate-400'}`}>
                 Categories
+                <ChevronRight className="w-4 h-4 transition-transform group-hover:rotate-90" />
               </button>
               {/* Dropdown Content */}
               <div className="absolute top-10 left-0 w-56 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top pt-2">
