@@ -65,34 +65,34 @@ export default function SocialShare({ url, title, summary = '' }) {
                     </button>
                 )}
 
-                {/* Twitter/X - Desktop Only */}
+                {/* Twitter/X - All Devices */}
                 <a
                     href={shareLinks.twitter}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`${buttonBase} bg-slate-800/50 border-slate-700 hover:bg-[#1DA1F2]/20 hover:border-[#1DA1F2]/50 hover:text-[#1DA1F2] text-slate-400 shrink-0 hidden md:flex`}
+                    className={`${buttonBase} bg-slate-800/50 border-slate-700 hover:bg-[#1DA1F2]/20 hover:border-[#1DA1F2]/50 hover:text-[#1DA1F2] text-slate-400 shrink-0`}
                     title="Share on Twitter"
                 >
                     <Twitter className="w-4 h-4" />
                 </a>
 
-                {/* LinkedIn - Desktop Only */}
+                {/* LinkedIn - All Devices */}
                 <a
                     href={shareLinks.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`${buttonBase} bg-slate-800/50 border-slate-700 hover:bg-[#0A66C2]/20 hover:border-[#0A66C2]/50 hover:text-[#0A66C2] text-slate-400 shrink-0 hidden md:flex`}
+                    className={`${buttonBase} bg-slate-800/50 border-slate-700 hover:bg-[#0A66C2]/20 hover:border-[#0A66C2]/50 hover:text-[#0A66C2] text-slate-400 shrink-0`}
                     title="Share on LinkedIn"
                 >
                     <Linkedin className="w-4 h-4" />
                 </a>
 
-                {/* Facebook - Desktop Only */}
+                {/* Facebook - All Devices */}
                 <a
                     href={shareLinks.facebook}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`${buttonBase} bg-slate-800/50 border-slate-700 hover:bg-[#1877F2]/20 hover:border-[#1877F2]/50 hover:text-[#1877F2] text-slate-400 shrink-0 hidden md:flex`}
+                    className={`${buttonBase} bg-slate-800/50 border-slate-700 hover:bg-[#1877F2]/20 hover:border-[#1877F2]/50 hover:text-[#1877F2] text-slate-400 shrink-0`}
                     title="Share on Facebook"
                 >
                     <Facebook className="w-4 h-4" />

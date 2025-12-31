@@ -207,7 +207,7 @@ export default function ArticleDetail() {
                 <SocialShare
                   url={`${config.CANONICAL_BASE}/article/${article.slug}`}
                   title={article.title}
-                  summary={article.simplified?.friendly_summary}
+                  summary={stripHtml(article.simplified?.friendly_summary)}
                 />
               </div>
             </div>
