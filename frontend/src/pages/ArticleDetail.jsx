@@ -275,47 +275,67 @@ export default function ArticleDetail() {
 
               {/* Action Steps */}
               <section className="bg-slate-900/50 rounded-xl p-8 border border-slate-800 mb-8">
-                <h2 className="text-2xl font-bold text-white mb-6">
-                  What to Do RIGHT NOW to Protect Yourself and your business
-                </h2>
-                <div className="space-y-4">
-                  {actionSteps.map((step, index) => (
-                    <div
-                      key={index}
-                      className="flex items-start p-4 bg-emerald-900/10 rounded-lg border border-emerald-900/20 hover:border-emerald-500/30 transition-colors"
-                    >
-                      <CheckCircle2 className="w-6 h-6 text-emerald-500 mr-3 flex-shrink-0 mt-0.5" />
-                      <p className="text-slate-200 font-medium">{step}</p>
-                    </div>
-                  ))}
-                </div>
-              </section>
+                <section className="bg-slate-900/50 rounded-xl p-8 border border-slate-800 mb-8">
+                  <h2 className="text-2xl font-bold text-white mb-6">
+                    What to Do RIGHT NOW to Protect Yourself and your business
+                  </h2>
+                  <div className="space-y-4">
+                    {/* Handle if actionSteps is an Array of Strings (Old format) */}
+                    {Array.isArray(actionSteps) && actionSteps.every(s => typeof s === 'string') && actionSteps.map((step, index) => (
+                      <div
+                        key={index}
+                        className="flex items-start p-4 bg-emerald-900/10 rounded-lg border border-emerald-900/20 hover:border-emerald-500/30 transition-colors"
+                      >
+                        <CheckCircle2 className="w-6 h-6 text-emerald-500 mr-3 flex-shrink-0 mt-0.5" />
+                        <p className="text-slate-200 font-medium">{step}</p>
+                      </div>
+                    ))}
 
-              {/* SECONDARY MOBILE AD */}
-              <div className="xl:hidden">
-                <AdUnit format="fluid" />
-              </div>
+                    {/* Handle if actionSteps is an Object/Dict (New categorized format) */}
+                    {!Array.isArray(actionSteps) && typeof actionSteps === 'object' && Object.entries(actionSteps).map(([key, value], index) => (
+                      <div key={index} className="mb-6 last:mb-0">
+                        <h3 className="text-emerald-400 font-bold uppercase text-sm tracking-wider mb-2 flex items-center">
+                          <CheckCircle2 className="w-4 h-4 mr-2" />
+                          {key.replace(/_/g, ' ')}
+                        </h3>
+                        <div className="p-4 bg-emerald-900/10 rounded-lg border border-emerald-900/20">
+                          <p className="text-slate-200 font-medium">{value}</p>
+                        </div>
+                      </div>
+                    ))}
 
-              {/* Original Source CTA */}
-              {article.original_url && (
-                <div className="mt-8 mb-12 flex flex-col sm:flex-row items-center justify-between gap-4 p-6 bg-slate-800/50 rounded-xl border border-slate-700/50">
-                  <div>
-                    <h3 className="text-white font-bold mb-1">Need the raw technical report?</h3>
-                    <p className="text-slate-400 text-sm">
-                      Read the full original documentation at the source.
-                    </p>
+                    {/* Handle Empty State */}
+                    {(!actionSteps || (Array.isArray(actionSteps) && actionSteps.length === 0)) && (
+                      <p className="text-slate-500 italic">No specific action steps provided for this report.</p>
+                    )}
                   </div>
-                  <a
-                    href={article.original_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="shrink-0 inline-flex items-center px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-medium rounded-lg transition-colors border border-slate-600 group"
-                  >
-                    Open Original Source
-                    <ExternalLink className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </a>
+                </section>
+
+                {/* SECONDARY MOBILE AD */}
+                <div className="xl:hidden">
+                  <AdUnit format="fluid" />
                 </div>
-              )}
+
+                {/* Original Source CTA */}
+                {article.original_url && (
+                  <div className="mt-8 mb-12 flex flex-col sm:flex-row items-center justify-between gap-4 p-6 bg-slate-800/50 rounded-xl border border-slate-700/50">
+                    <div>
+                      <h3 className="text-white font-bold mb-1">Need the raw technical report?</h3>
+                      <p className="text-slate-400 text-sm">
+                        Read the full original documentation at the source.
+                      </p>
+                    </div>
+                    <a
+                      href={article.original_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="shrink-0 inline-flex items-center px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-medium rounded-lg transition-colors border border-slate-600 group"
+                    >
+                      Open Original Source
+                      <ExternalLink className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                    </a>
+                  </div>
+                )}
             </div>
 
             {/* CTA - Minimal & Non-Intrusive */}
