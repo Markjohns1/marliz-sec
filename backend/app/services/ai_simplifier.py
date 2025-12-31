@@ -120,7 +120,7 @@ class AISimplifier:
                 "stream": False
             }
             
-            async with httpx.AsyncClient(timeout=60.0) as client:
+            async with httpx.AsyncClient(timeout=120.0) as client:
                 response = await client.post(self.base_url, headers=headers, json=data)
             
             # Handle rate limiting with exponential backoff

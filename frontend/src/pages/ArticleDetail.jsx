@@ -14,9 +14,7 @@ import config from '../config';
 
 const stripHtml = (html) => {
   if (!html) return '';
-  const doc = new Image().ownerDocument.createElement('div');
-  doc.innerHTML = html;
-  return doc.textContent || doc.innerText || '';
+  return html.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ').trim();
 };
 
 export default function ArticleDetail() {
