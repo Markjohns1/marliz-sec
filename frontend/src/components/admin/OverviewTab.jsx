@@ -97,37 +97,78 @@ export default function OverviewTab({
                 </div>
             </div>
 
-            {/* Traffic Source Intelligence Table */}
-            <div className="mb-8">
-                <h3 className="font-black text-white uppercase tracking-widest text-[10px] mb-4 flex items-center gap-2">
-                    <Search className="w-3.5 h-3.5 text-blue-400" />
-                    Traffic Origins (Context-Aware Recognition)
-                </h3>
-                <div className="card overflow-hidden border-slate-800 bg-slate-900/20">
-                    <div className="grid grid-cols-2 bg-slate-900/60 p-3 border-b border-slate-800">
-                        <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Platform / Source</div>
-                        <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest text-right">Impact (Hits)</div>
+            {/* Traffic Source & Geographic Intelligence */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                {/* Traffic Source Intelligence */}
+                <div>
+                    <h3 className="font-black text-white uppercase tracking-widest text-[10px] mb-4 flex items-center gap-2">
+                        <Search className="w-3.5 h-3.5 text-blue-400" />
+                        Real Reader Origins (Bots Filtered)
+                    </h3>
+                    <div className="card overflow-hidden border-slate-800 bg-slate-900/20">
+                        <div className="grid grid-cols-2 bg-slate-900/60 p-3 border-b border-slate-800">
+                            <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Platform / Source</div>
+                            <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest text-right">Impact (Hits)</div>
+                        </div>
+                        <div className="divide-y divide-slate-800/50">
+                            {stats?.traffic_sources && stats.traffic_sources.length > 0 ? (
+                                stats.traffic_sources.map((source, idx) => (
+                                    <div key={idx} className="grid grid-cols-2 p-3 hover:bg-white/[0.02] transition-colors items-center">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-blue-500/40 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
+                                            <span className="text-xs font-bold text-slate-200">{source.platform}</span>
+                                        </div>
+                                        <div className="text-right">
+                                            <span className="text-sm font-black text-white px-2 py-0.5 bg-slate-950 rounded-lg border border-slate-800">
+                                                {source.hits.toLocaleString()}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="p-8 text-center text-slate-600 font-bold italic text-[9px] uppercase tracking-tighter">Waiting for intelligence signals...</div>
+                            )}
+                        </div>
                     </div>
-                    <div className="divide-y divide-slate-800/50">
-                        {stats?.traffic_sources && stats.traffic_sources.length > 0 ? (
-                            stats.traffic_sources.map((source, idx) => (
-                                <div key={idx} className="grid grid-cols-2 p-3 hover:bg-white/[0.02] transition-colors items-center">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500/40 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
-                                        <span className="text-xs font-bold text-slate-200">{source.platform}</span>
+                </div>
+
+                {/* Geographic Intelligence */}
+                <div>
+                    <h3 className="font-black text-white uppercase tracking-widest text-[10px] mb-4 flex items-center gap-2">
+                        <Globe className="w-3.5 h-3.5 text-emerald-400" />
+                        Geographic Distribution (Heatmap Data)
+                    </h3>
+                    <div className="card overflow-hidden border-slate-800 bg-slate-900/20">
+                        <div className="grid grid-cols-2 bg-slate-900/60 p-3 border-b border-slate-800">
+                            <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Region / Country</div>
+                            <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest text-right">Engagement</div>
+                        </div>
+                        <div className="divide-y divide-slate-800/50">
+                            {stats?.top_countries && stats.top_countries.length > 0 ? (
+                                stats.top_countries.map((country, idx) => (
+                                    <div key={idx} className="grid grid-cols-2 p-3 hover:bg-white/[0.02] transition-colors items-center">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-4 h-3 bg-slate-800 rounded-sm overflow-hidden border border-slate-700 flex items-center justify-center text-[7px] font-black text-slate-500">
+                                                {country.code}
+                                            </div>
+                                            <span className="text-xs font-bold text-slate-200">
+                                                {country.code === 'KE' ? 'Kenya' :
+                                                    country.code === 'US' ? 'United States' :
+                                                        country.code === 'IN' ? 'India' :
+                                                            country.code === '??' ? 'Unknown/Masked' : country.code}
+                                            </span>
+                                        </div>
+                                        <div className="text-right">
+                                            <span className="text-sm font-black text-white px-2 py-0.5 bg-slate-950 rounded-lg border border-slate-800">
+                                                {country.hits.toLocaleString()}
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div className="text-right">
-                                        <span className="text-sm font-black text-white px-2 py-0.5 bg-slate-950 rounded-lg border border-slate-800">
-                                            {source.hits.toLocaleString()}
-                                        </span>
-                                    </div>
-                                </div>
-                            ))
-                        ) : (
-                            <div className="p-8 text-center">
-                                <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">Waiting for incoming intelligence signals...</p>
-                            </div>
-                        )}
+                                ))
+                            ) : (
+                                <div className="p-8 text-center text-slate-600 font-bold italic text-[9px] uppercase tracking-tighter">Scanning for regional coordinates...</div>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>

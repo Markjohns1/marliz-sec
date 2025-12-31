@@ -172,8 +172,12 @@ if os.path.exists(FRONTEND_DIST):
         # BOT VIEW CAPTURE: If this is an article path and User-Agent is a bot, track it now.
         if full_path.startswith("article/"):
             ua = request.headers.get("user-agent", "").lower()
-            # Known Bots & Previews
-            bots = ["gpt", "gemini", "claude", "googlebot", "bingbot", "whatsapp", "facebookexternalhit", "linkedinbot", "twitterbot"]
+            # Known Bots & Previews (AI, Search, Social, Previews)
+            bots = [
+                "gpt", "gemini", "claude", "googlebot", "bingbot", "whatsapp", "facebookexternalhit", 
+                "linkedinbot", "twitterbot", "bot", "spider", "crawl", "headless", "lighthouse", 
+                "petalbot", "yandexbot", "baiduspider", "semrush", "ahrefs"
+            ]
             if any(b in ua for b in bots):
                 try:
                     slug = full_path.split("/")[-1]
