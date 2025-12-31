@@ -445,12 +445,7 @@ async def get_article(slug: str, request: Request, db: AsyncSession = Depends(ge
         raise HTTPException(status_code=404, detail="Article not found")
     
     # Track View Source (Integrated Helper)
-    try:
-        await track_view(article.id, request, db)
-    except Exception as e:
-        print(f"Analytics Error (Non-Critical): {e}")
-        # Continue serving article even if tracking fails
-
+    await track_view(article.id, request, db)
     # Re-fetch with relationships to ensure everything is loaded for Pydantic
     # We reuse the logic from the initial query or just execute a new simple one with options
     stmt = select(models.Article).filter_by(id=article.id).options(
