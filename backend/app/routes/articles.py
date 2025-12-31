@@ -23,16 +23,18 @@ def get_source_type(referer: str, user_agent: str = None, query_ref: str = None)
         if "whatsapp" in ua and not referer: return "WhatsApp Preview"
 
     # 1. Priority: Manual Parameter (The "Tattoo")
-    # This is the most reliable if the user shares with these tags
+    # Using 's' or 'ref' for platform identification. 
+    # Slim tags (s=f, s=w) are less likely to be flagged by social platform spam bots.
     if query_ref:
         qr = query_ref.lower()
-        if any(x in qr for x in ["wa", "whatsapp"]): return "WhatsApp"
-        if any(x in qr for x in ["fb", "facebook"]): return "Facebook"
-        if any(x in qr for x in ["li", "linkedin"]): return "LinkedIn"
-        if any(x in qr for x in ["tg", "telegram"]): return "Telegram"
-        if any(x in qr for x in ["dc", "discord"]): return "Discord"
-        if any(x in qr for x in ["tw", "x"]): return "X (Twitter)"
-        if "ig" in qr: return "Instagram"
+        # Full labels or slim aliases
+        if any(x in qr for x in ["wa", "whatsapp", "s=w"]): return "WhatsApp"
+        if any(x in qr for x in ["fb", "facebook", "s=f"]): return "Facebook"
+        if any(x in qr for x in ["li", "linkedin", "s=l"]): return "LinkedIn"
+        if any(x in qr for x in ["tg", "telegram", "s=t"]): return "Telegram"
+        if any(x in qr for x in ["dc", "discord", "s=d"]): return "Discord"
+        if any(x in qr for x in ["tw", "x", "s=x"]): return "X (Twitter)"
+        if "ig" in qr or "s=i" in qr: return "Instagram"
 
     # 2. THE BIG TRICK: Aggressive User-Agent Fingerprinting
     # Even if referer is missing (Direct Access), the User-Agent often betrays the source

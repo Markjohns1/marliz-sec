@@ -7,18 +7,17 @@ export default function ShareModal({ article, onClose }) {
     const articleUrl = `${domain}/article/${article.slug}`;
 
     const channels = [
-        { name: 'WhatsApp', icon: '📲', ref: 'wa', color: 'text-emerald-400' },
-        { name: 'Facebook', icon: '👤', ref: 'fb', color: 'text-blue-400' },
-        { name: 'LinkedIn', icon: '💼', ref: 'li', color: 'text-sky-400' },
-        { name: 'Discord', icon: '💬', ref: 'dc', color: 'text-indigo-400' },
-        { name: 'X (Twitter)', icon: '𝕏', ref: 'x', color: 'text-white' },
-        { name: 'Direct/UTM', icon: '🔗', ref: 'direct', color: 'text-slate-400' },
+        { name: 'WhatsApp', icon: '📲', s: 'w', color: 'text-emerald-400' },
+        { name: 'Facebook', icon: '👤', s: 'f', color: 'text-blue-400' },
+        { name: 'LinkedIn', icon: '💼', s: 'l', color: 'text-sky-400' },
+        { name: 'X (Twitter)', icon: '𝕏', s: 'x', color: 'text-white' },
+        { name: 'Telegram', icon: '✈️', s: 't', color: 'text-blue-500' },
     ];
 
-    const copyToClipboard = (ref) => {
-        const trackedUrl = `${articleUrl}?ref=${ref}`;
+    const copyToClipboard = (s) => {
+        const trackedUrl = `${articleUrl}?s=${s}`;
         navigator.clipboard.writeText(trackedUrl);
-        setCopied(ref);
+        setCopied(s);
         setTimeout(() => setCopied(null), 2000);
     };
 
@@ -39,8 +38,8 @@ export default function ShareModal({ article, onClose }) {
                     <div className="grid grid-cols-1 gap-2">
                         {channels.map((ch) => (
                             <button
-                                key={ch.ref}
-                                onClick={() => copyToClipboard(ch.ref)}
+                                key={ch.s}
+                                onClick={() => copyToClipboard(ch.s)}
                                 className="flex items-center justify-between p-3 rounded-xl bg-slate-950 border border-slate-800 hover:border-blue-500/50 transition-all group"
                             >
                                 <div className="flex items-center gap-3">
@@ -48,7 +47,7 @@ export default function ShareModal({ article, onClose }) {
                                     <span className="text-sm font-bold text-slate-300 group-hover:text-white">{ch.name}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    {copied === ch.ref ? (
+                                    {copied === ch.s ? (
                                         <span className="text-[10px] font-black text-emerald-500 uppercase">Copied!</span>
                                     ) : (
                                         <Copy className="w-3.5 h-3.5 text-slate-600 group-hover:text-blue-400" />
