@@ -247,7 +247,8 @@ async def get_dashboard_stats(
     q_sources = select(
         models.ViewLog.source_type,
         func.count(models.ViewLog.id).label("count")
-    ).filter(models.ViewLog.is_bot == False).group_by(models.ViewLog.source_type).order_by(desc("count"))
+    ).group_by(models.ViewLog.source_type).order_by(desc("count"))
+    # ).filter(models.ViewLog.is_bot == False).group_by(models.ViewLog.source_type).order_by(desc("count"))
     
     sources_res = await db.execute(q_sources)
     traffic_sources = [{"platform": row[0], "hits": row[1]} for row in sources_res.fetchall()]
@@ -256,7 +257,8 @@ async def get_dashboard_stats(
     q_countries = select(
         models.ViewLog.country_code,
         func.count(models.ViewLog.id).label("count")
-    ).filter(models.ViewLog.is_bot == False).group_by(models.ViewLog.country_code).order_by(desc("count")).limit(10)
+    ).group_by(models.ViewLog.country_code).order_by(desc("count")).limit(10)
+    # ).filter(models.ViewLog.is_bot == False).group_by(models.ViewLog.country_code).order_by(desc("count")).limit(10)
     
     countries_res = await db.execute(q_countries)
     top_countries = [{"code": row[0], "hits": row[1]} for row in countries_res.fetchall()]
