@@ -1,6 +1,6 @@
-import React from 'react';
+import QuickSearch from '../QuickSearch';
 import {
-    Search, Calendar, BarChart3, Share2,
+    Calendar, BarChart3, Share2,
     Edit3, ExternalLink
 } from 'lucide-react';
 
@@ -14,16 +14,12 @@ export default function ArticlesTab({
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <h2 className="text-2xl font-black text-white tracking-tight">Article Management</h2>
                 <div className="flex items-center gap-2 w-full sm:w-auto">
-                    <div className="relative flex-1 sm:w-64">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                        <input
-                            type="text"
-                            placeholder="Quick search..."
-                            value={artSearch}
-                            onChange={(e) => { setArtSearch(e.target.value); setArtPage(1); }}
-                            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 focus:ring-2 focus:ring-primary-500 outline-none text-sm transition-all text-white"
-                        />
-                    </div>
+                    <QuickSearch
+                        placeholder="Quick search..."
+                        className="flex-1 sm:w-64"
+                        initialValue={artSearch}
+                        onSearch={(val) => { setArtSearch(val); setArtPage(1); }}
+                    />
                     <select
                         value={artSort}
                         onChange={(e) => setArtSort(e.target.value)}

@@ -2,6 +2,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { getArticles } from '../services/api';
 import ArticleCard from '../components/ArticleCard';
+import QuickSearch from '../components/QuickSearch';
 import { Search, Loader2 } from 'lucide-react';
 import { useEffect } from 'react';
 
@@ -35,12 +36,19 @@ export default function SearchResults() {
         <div className="min-h-screen bg-slate-950 pb-20">
             <div className="bg-slate-900 border-b border-slate-800 py-12">
                 <div className="container-custom text-center">
-                    <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                    <h1 className="text-3xl md:text-4xl font-black text-white mb-4 uppercase tracking-tighter">
                         Search Results
                     </h1>
-                    <p className="text-slate-400 text-lg">
-                        Showing results for <span className="text-blue-400 font-semibold">"{query}"</span>
+                    <p className="text-slate-400 text-lg mb-8">
+                        Showing results for <span className="text-blue-400 font-bold">"{query}"</span>
                     </p>
+                    <div className="max-w-xl mx-auto">
+                        <QuickSearch
+                            placeholder="Search another threat..."
+                            initialValue={query}
+                            liveResults={true}
+                        />
+                    </div>
                 </div>
             </div>
 

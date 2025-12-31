@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { BookOpen, Search, Shield, Zap } from 'lucide-react';
+import { BookOpen, Shield, Zap } from 'lucide-react';
+import QuickSearch from '../components/QuickSearch';
 
 const terms = [
     { term: "Zero-Day", definition: "A vulnerability in software that is unknown to the vendor and for which no patch exists. It's called 'zero-day' because the developer has had zero days to fix it." },
@@ -16,6 +17,8 @@ const terms = [
 ];
 
 const Glossary = () => {
+    const [filteredTerms, setFilteredTerms] = useState(terms);
+
     return (
         <div className="min-h-screen bg-slate-950 text-slate-200 py-16 px-4">
             <Helmet>
@@ -30,33 +33,43 @@ const Glossary = () => {
                             <BookOpen className="w-8 h-8 text-blue-400" />
                         </div>
                         <div>
-                            <h1 className="text-4xl font-bold text-white tracking-tight">Intelligence Glossary</h1>
+                            <h1 className="text-4xl font-black text-white uppercase tracking-tighter">Intelligence Glossary</h1>
                             <p className="text-slate-400 mt-1">Master the terminology of modern cyber warfare.</p>
                         </div>
                     </div>
 
-                    <div className="relative group">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-blue-400 transition-colors" />
-                        <input
-                            type="text"
-                            placeholder="Search terms..."
-                            className="bg-slate-900 border border-slate-800 rounded-xl py-3 pl-10 pr-4 w-full md:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                    <div className="flex flex-col gap-2">
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">Quick Term Lookup</p>
+                        <QuickSearch
+                            placeholder="Search glossary..."
+                            className="w-full md:w-80"
+                            onSearch={(val) => {
+                                const filtered = terms.filter(t =>
+                                    t.term.toLowerCase().includes(val.toLowerCase()) ||
+                                    t.definition.toLowerCase().includes(val.toLowerCase())
+                                );
+                                setFilteredTerms(filtered);
+                            }}
                         />
                     </div>
                 </div>
 
                 <div className="grid gap-6">
-                    {terms.map((item, index) => (
-                        <div key={index} className="bg-slate-900/40 border border-slate-800/60 rounded-2xl p-6 hover:border-blue-500/30 transition-all group backdrop-blur-sm">
+                    {filteredTerms.length > 0 ? filteredTerms.map((item, index) => (
+                        <div key={index} className="bg-slate-900/40 border border-slate-800/60 rounded-2xl p-6 hover:border-blue-500/30 transition-all group backdrop-blur-sm animate-in fade-in slide-in-from-bottom-2 duration-300">
                             <div className="flex items-start gap-4">
                                 <span className="text-blue-500 font-mono text-sm pt-1 opacity-50 group-hover:opacity-100">{String(index + 1).padStart(2, '0')}</span>
                                 <div>
                                     <h3 className="text-xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">{item.term}</h3>
-                                    <p className="text-slate-400 leading-relaxed leading-relaxed">{item.definition}</p>
+                                    <p className="text-slate-400 leading-relaxed">{item.definition}</p>
                                 </div>
                             </div>
                         </div>
-                    ))}
+                    )) : (
+                        <div className="p-12 text-center bg-slate-900/40 border border-slate-800 rounded-2xl">
+                            <p className="text-slate-500 font-bold italic">No matching terms found in our database.</p>
+                        </div>
+                    )}
                 </div>
 
                 <div className="mt-16 bg-blue-600/5 border border-blue-500/10 rounded-2xl p-8 flex flex-col md:flex-row items-center gap-8">
