@@ -111,24 +111,17 @@ async def track_view(article_id: int, request: Request, db: AsyncSession):
     country = request.headers.get("cf-ipcountry", "??").upper()
     
     # 1. ALWAYS Log the hit in ViewLog (For granular analytics)
-    # Check if 'is_bot' is a valid attribute to prevent DB mismatch errors during migration
-    try:
-        view_log = models.ViewLog(
-            article_id=article_id,
-            referrer=referer,
-            source_type=source_type,
-            country_code=country,
-            is_bot="Bot" in source_type
-        )
-        db.add(view_log)
-    except Exception as e:
-        print(f"Skipping detailed view log due to DB mismatch: {e}")
-        # Even if logging fails, we proceed to update the simple counter
+    view_log = models.ViewLog(
+        article_id=article_id,
+        referrer=referer,
+        source_type=source_type,
+        country_code=country,
+        is_bot="Bot" in source_type
+    )
+    db.add(view_log)
     
     # 2. ONLY Increment the master counter if NOT a redundant refresh AND NOT a bot
-    # (If view_log failed, we assume it's valid traffic to be safe)
-    is_bot_safe = "Bot" in source_type
-    if not is_duplicate and not is_bot_safe:
+    if not is_duplicate and not view_log.is_bot:
         stmt = select(models.Article).filter_by(id=article_id)
         res = await db.execute(stmt)
         article = res.scalars().first()
