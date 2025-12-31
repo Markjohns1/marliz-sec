@@ -77,7 +77,7 @@ export default function QuickSearch({
                         setQuery(e.target.value);
                         if (onSearch && !liveResults) onSearch(e.target.value);
                     }}
-                    className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-slate-900 border border-slate-800 focus:ring-2 focus:ring-blue-500/50 outline-none text-sm transition-all text-white placeholder-slate-500 shadow-lg shadow-black/20"
+                    className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-slate-950/50 border border-slate-700/50 focus:border-blue-500 focus:bg-slate-950 outline-none text-sm transition-all text-white placeholder-slate-500"
                 />
                 {loading && (
                     <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400 animate-spin" />
