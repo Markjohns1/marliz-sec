@@ -18,16 +18,8 @@ def get_source_type(referer: str, user_agent: str = None, query_ref: str = None)
     # 0. Bot Identification (AI & Crawlers)
     if user_agent:
         ua = user_agent.lower()
-        # Widen the bot net
-        bot_list = [
-            "googlebot", "bingbot", "ahrefs", "semrush", "ia_archiver", "bot", "spider", "crawl", 
-            "headless", "chrome-lighthouse", "lighthouse", "petalbot", "yandexbot", "baiduspider"
-        ]
-        if any(bot in ua for bot in bot_list): return "Search Engine Bot"
-        
-        ai_list = ["gpt", "claude", "gemini", "perplex", "commoncrawl", "anthropic", "facebookexternalhit"]
-        if any(ai in ua for ai in ai_list): return "AI Intelligence Bot"
-        
+        if any(bot in ua for bot in ["googlebot", "bingbot", "ahrefs", "semrush", "ia_archiver"]): return "Search Engine Bot"
+        if any(ai in ua for ai in ["gpt", "claude", "gemini", "perplex", "commoncrawl"]): return "AI Intelligence Bot"
         if "whatsapp" in ua and not referer: return "WhatsApp Preview"
 
     # 1. Priority: Manual Parameter (The "Tattoo")
@@ -105,23 +97,19 @@ async def track_view(article_id: int, request: Request, db: AsyncSession):
     referer = request.headers.get("referer")
     user_agent = request.headers.get("user-agent")
     query_ref = request.query_params.get("ref") or request.query_params.get("s")
-    source_type = get_source_type(referer, user_agent, query_ref)
     
-    # Geo-Detection (Cloudflare or standard headers)
-    country = request.headers.get("cf-ipcountry", "??").upper()
+    source_type = get_source_type(referer, user_agent, query_ref)
     
     # 1. ALWAYS Log the hit in ViewLog (For granular analytics)
     view_log = models.ViewLog(
         article_id=article_id,
         referrer=referer,
-        source_type=source_type,
-        country_code=country,
-        is_bot="Bot" in source_type
+        source_type=source_type
     )
     db.add(view_log)
     
-    # 2. ONLY Increment the master counter if NOT a redundant refresh AND NOT a bot
-    if not is_duplicate and not view_log.is_bot:
+    # 2. ONLY Increment the master counter if NOT a redundant refresh
+    if not is_duplicate:
         stmt = select(models.Article).filter_by(id=article_id)
         res = await db.execute(stmt)
         article = res.scalars().first()
@@ -247,19 +235,10 @@ async def get_dashboard_stats(
     q_sources = select(
         models.ViewLog.source_type,
         func.count(models.ViewLog.id).label("count")
-    ).filter(models.ViewLog.is_bot == False).group_by(models.ViewLog.source_type).order_by(desc("count"))
+    ).group_by(models.ViewLog.source_type).order_by(desc("count"))
     
     sources_res = await db.execute(q_sources)
     traffic_sources = [{"platform": row[0], "hits": row[1]} for row in sources_res.fetchall()]
-
-    # === GEOGRAPHIC BREAKDOWN (NEW) ===
-    q_countries = select(
-        models.ViewLog.country_code,
-        func.count(models.ViewLog.id).label("count")
-    ).filter(models.ViewLog.is_bot == False).group_by(models.ViewLog.country_code).order_by(desc("count")).limit(10)
-    
-    countries_res = await db.execute(q_countries)
-    top_countries = [{"code": row[0], "hits": row[1]} for row in countries_res.fetchall()]
 
     return {
         "total_articles": total_articles,
@@ -273,7 +252,6 @@ async def get_dashboard_stats(
         "top_category": top_category,
         "global_avg_position": global_avg_position,
         "traffic_sources": traffic_sources,
-        "top_countries": top_countries,
         "top_articles": [{"id": a.id, "title": a.title, "views": a.views, "protected": a.protected_from_deletion} for a in top_articles],
         "trending_articles": [{"id": a.id, "title": a.title, "views": a.views, "protected": a.protected_from_deletion} for a in trending_articles],
         "categories_performance": categories_performance

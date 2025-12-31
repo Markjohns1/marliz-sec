@@ -133,12 +133,6 @@ class ViewLog(Base):
     article_id = Column(Integer, ForeignKey("articles.id"))
     referrer = Column(String(500))  # e.g., facebook.com, discord.com, google.com
     source_type = Column(String(50)) # 'social', 'search', 'direct', 'other'
-    
-    # NEW: Geographic & Quality Metrics
-    country_code = Column(String(10), default="??") 
-    region = Column(String(100))
-    is_bot = Column(Boolean, default=False)
-    
     viewed_at = Column(DateTime(timezone=True), server_default=func.now())
     
     article = relationship("Article")
