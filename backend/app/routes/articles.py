@@ -23,23 +23,33 @@ def get_source_type(referer: str, user_agent: str = None, query_ref: str = None)
         if "whatsapp" in ua and not referer: return "WhatsApp Preview"
 
     # 1. Priority: Manual Parameter (The "Tattoo")
+    # This is the most reliable if the user shares with these tags
     if query_ref:
         qr = query_ref.lower()
-        if "wa" in qr or "whatsapp" in qr: return "WhatsApp"
-        if "fb" in qr or "facebook" in qr: return "Facebook"
-        if "li" in qr or "linkedin" in qr: return "LinkedIn"
-        if "tg" in qr or "telegram" in qr: return "Telegram"
-        if "dc" in qr or "discord" in qr: return "Discord"
-        if "tw" in qr or "x" in qr: return "X (Twitter)"
+        if any(x in qr for x in ["wa", "whatsapp"]): return "WhatsApp"
+        if any(x in qr for x in ["fb", "facebook"]): return "Facebook"
+        if any(x in qr for x in ["li", "linkedin"]): return "LinkedIn"
+        if any(x in qr for x in ["tg", "telegram"]): return "Telegram"
+        if any(x in qr for x in ["dc", "discord"]): return "Discord"
+        if any(x in qr for x in ["tw", "x"]): return "X (Twitter)"
+        if "ig" in qr: return "Instagram"
 
-    # 2. Secondary: User-Agent Fingerprinting (For mobile apps that hide headers)
+    # 2. THE BIG TRICK: Aggressive User-Agent Fingerprinting
+    # Even if referer is missing (Direct Access), the User-Agent often betrays the source
     if user_agent:
         ua = user_agent.lower()
+        # Facebook & Instagram (Meta) often hide referer but send unique UA strings
+        if any(x in ua for x in ["fbav", "fban", "fb_iab", "fb4a", "fbios"]): return "Facebook App"
+        if "instagram" in ua: return "Instagram App"
+        
+        # WhatsApp (Very common for Direct Access)
         if "whatsapp" in ua: return "WhatsApp"
-        if "fbav" in ua or "fb_iab" in ua: return "Facebook" # Facebook In-App Browser
-        if "linkedin" in ua: return "LinkedIn"
-        if "telegram" in ua: return "Telegram"
-        if "discord" in ua: return "Discord"
+        
+        # LinkedIn In-App Browser
+        if "linkedinapp" in ua: return "LinkedIn App"
+        
+        # Twitter / X
+        if any(x in ua for x in ["twitter", "twttr"]): return "X (Twitter) App"
 
     # 3. Third: Referer Header (Standard web clicks)
     if not referer:
