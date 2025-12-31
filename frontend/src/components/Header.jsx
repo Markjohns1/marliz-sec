@@ -16,6 +16,27 @@ export default function Header({ categories }) {
     setMobileSearchOpen(false);
   }, [location.pathname]);
 
+  // Close menus on click outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // If menu is open, and click target is NOT inside the nav container
+      if (mobileMenuOpen || mobileSearchOpen) {
+        const nav = document.querySelector('nav');
+        if (nav && !nav.contains(event.target)) {
+          setMobileMenuOpen(false);
+          setMobileSearchOpen(false);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside); // Support mobile touch
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [mobileMenuOpen, mobileSearchOpen]);
+
   const isActive = (path) => location.pathname === path;
 
   return (
