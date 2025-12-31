@@ -115,7 +115,7 @@ class AISimplifier:
                 ],
                 "temperature": 0.7,
                 # Increased tokens for longer articles (500-700 words + JSON overhead)
-                "max_completion_tokens": 3000, 
+                "max_completion_tokens": 5000, 
                 "top_p": 1,
                 "stream": False
             }
@@ -241,19 +241,19 @@ Content excerpt: {content[:3500]}
 
 YOUR MISSION:
 1. TECHNICAL AUDIT: Analyze the mechanism (CVEs, tools, tactics).
-2. STRATEGIC REWRITE: Create a long-form Intel Report (500-800 words) for business leaders.
+2. STRATEGIC REWRITE: Create a long-form Intel Report (1200-1500 words) for business leaders.
 3. ADAPTIVE SEO: Generate a high-conversion Title and Meta Description.
 4. ACTIONABLE PROTOCOLS: Provide clear, prioritized mitigation steps.
 
 RESPOND WITH VALID JSON ONLY:
-{{
+{
   "is_relevant": true,
   "category": "ransomware|phishing|data-breach|malware|vulnerability|general",
   "seo_title": "[Entity] [Event]: [Impact/Discovery] – [Urgency/Action]",
   "meta_description": "Shocking fact/stat + Critical impact + Direct call-to-action (160 chars).",
-  "summary": "<p><strong>Executive Summary:</strong> High-impact narrative explaining the 'What' and 'Why' (150 words). Use text-primary styles mentally.</p>",
-  "attack_vector": "<h2>Technical Vector & Methodology</h2><p>Explain the 'How' using professional terminology but provide layperson translations in parentheses. Detail specific vulnerabilities (CVEs) if mentioned.</p>",
-  "impact": "<h2>Business & Operational Impact</h2><p>Analyze consequences for: 1. Financial stability, 2. Brand Reputation, 3. Legal/Compliance (150 words).</p>",
+  "summary": "<p><strong>Executive Summary:</strong> High-impact narrative explaining the 'What' and 'Why' (250 words minimum). Use text-primary styles mentally.</p>",
+  "attack_vector": "<h2>Technical Vector & Methodology</h2><p>Explain the 'How' using professional terminology but provide layperson translations in parentheses. Detail specific vulnerabilities (CVEs) if mentioned. (Keep extensive).</p>",
+  "impact": "<h2>Business & Operational Impact</h2><p>Analyze consequences for: 1. Financial stability, 2. Brand Reputation, 3. Legal/Compliance (250 words minimum).</p>",
   "who_is_at_risk": "Specific industries, regions, or software users affected.",
   "actions": ["IMMEDIATE: Priority patch/action", "SECONDARY: System audit/monitoring", "LONG-TERM: Policy/Training update"],
   "threat_level": "low|medium|high|critical",

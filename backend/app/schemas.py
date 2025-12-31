@@ -91,6 +91,7 @@ class Article(ArticleBase):
 class ArticleWithContent(Article):
     simplified: Optional[SimplifiedContent] = None
     category: Optional[Category] = None
+    raw_content: Optional[str] = None
 
 class ArticleList(BaseModel):
     articles: List[ArticleWithContent]
