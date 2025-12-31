@@ -241,23 +241,28 @@ Content excerpt: {content[:3500]}
 
 YOUR MISSION:
 1. TECHNICAL AUDIT: Analyze the mechanism (CVEs, tools, tactics).
-2. STRATEGIC REWRITE: Create a long-form Intel Report (1200-1500 words) for business leaders.
-3. ADAPTIVE SEO: Generate a high-conversion Title and Meta Description.
+2. STRATEGIC REWRITE: Create a long-form Intel Report (1200-1500 words).
+3. ADAPTIVE SEO: Generate a high-conversion Title and Meta Description (max 60 chars).
 4. ACTIONABLE PROTOCOLS: Provide clear, prioritized mitigation steps.
+
+CRITICAL LENGTH PROTOCOL:
+- You MUST produce between 1200 and 1500 words total content.
+- If the source is short, EXPAND by explaining the history of this threat type, defining all technical terms used, and providing a deep dive into the industry implications.
+- SHORTRIDGE IS FAILURE. I need depth for educational and AdSense compliance purposes.
 
 RESPOND WITH VALID JSON ONLY:
 {{
   "is_relevant": true,
   "category": "ransomware|phishing|data-breach|malware|vulnerability|general",
-  "seo_title": "[Entity] [Event]: [Impact/Discovery] – [Urgency/Action]",
-  "meta_description": "Shocking fact/stat + Critical impact + Direct call-to-action (160 chars).",
-  "summary": "<p><strong>Executive Summary:</strong> High-impact narrative explaining the 'What' and 'Why' (250 words minimum). Use text-primary styles mentally.</p>",
-  "attack_vector": "<h2>Technical Vector & Methodology</h2><p>Explain the 'How' using professional terminology but provide layperson translations in parentheses. Detail specific vulnerabilities (CVEs) if mentioned. (Keep extensive).</p>",
-  "impact": "<h2>Business & Operational Impact</h2><p>Analyze consequences for: 1. Financial stability, 2. Brand Reputation, 3. Legal/Compliance (250 words minimum).</p>",
-  "who_is_at_risk": "Specific industries, regions, or software users affected.",
+  "seo_title": "[Entity] [Event]: [Impact] – [Action]",
+  "meta_description": "Shocking fact + Critical impact + Command (160 chars).",
+  "summary": "<p><strong>Executive Summary:</strong> Deep, multi-paragraph narrative (350 words minimum). Explain the 'What', 'Why', and 'How' it fits into the current global threat landscape. Explain any jargon in parentheses.</p>",
+  "attack_vector": "<h2>Technical Vector & Methodology</h2><p>Extensive breakdown of the attack chain. If CVEs are missing, explain the class of vulnerability. If tools are mentioned, explain their history. (500 words minimum).</p>",
+  "impact": "<h2>Business & Operational Impact</h2><p>Deep analysis of financial, legal, and reputational risks. Include 'What if' scenarios for unprepared businesses. (400 words minimum).</p>",
+  "who_is_at_risk": "Detailed list of industries, regions, and specific software versions vulnerable.",
   "actions": ["IMMEDIATE: Priority patch/action", "SECONDARY: System audit/monitoring", "LONG-TERM: Policy/Training update"],
   "threat_level": "low|medium|high|critical",
-  "keywords": ["primary target", "malware name", "specific CVE", "cybersecurity news 2024", "intel report"]
+  "keywords": ["target", "malware", "CVE", "cybersecurity news 2024", "intel report"]
 }}
 
 === 🏆 THE MARLIZ SEO FORMULA ===
