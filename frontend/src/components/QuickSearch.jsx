@@ -37,9 +37,7 @@ export default function QuickSearch({
                 setLoading(true);
                 try {
                     const data = await getArticles({ search: query, limit: 5 });
-                    // Filter out any articles with missing/null slugs to prevent 404s
-                    const validArticles = (data.articles || []).filter(a => a.slug && a.slug !== 'undefined');
-                    setResults(validArticles);
+                    setResults(data.articles || []);
                     setShowResults(true);
                 } catch (error) {
                     console.error("Search error:", error);

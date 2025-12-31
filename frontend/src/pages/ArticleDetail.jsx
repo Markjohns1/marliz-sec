@@ -58,30 +58,11 @@ export default function ArticleDetail() {
 
   if (error || !article) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center p-4">
-        <div className="text-center max-w-md mx-auto">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-800 mb-6">
-            <AlertCircle className="w-8 h-8 text-slate-500" />
-          </div>
-          <h1 className="text-2xl font-bold text-white mb-2">Intel Report Not Found</h1>
-          <p className="text-slate-400 mb-8">
-            The requested intelligence briefing (ID: <span className="font-mono text-slate-500">{slug}</span>) could not be retrieved. It may have been retracted or moved.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              to="/"
-              className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all"
-            >
-              Latest Threats
-            </Link>
-            <Link
-              to="/all-threats"
-              className="inline-flex items-center justify-center px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white font-medium rounded-xl border border-slate-700 transition-all"
-            >
-              Browse Archive
-            </Link>
-          </div>
-        </div>
+      <div className="max-w-7xl mx-auto px-4 py-12 text-center">
+        <p className="text-red-600">Article not found.</p>
+        <Link to="/" className="text-primary-600 hover:text-primary-700 mt-4 inline-block">
+          ← Back to Home
+        </Link>
       </div>
     );
   }
