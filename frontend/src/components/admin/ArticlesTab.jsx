@@ -1,6 +1,6 @@
 import QuickSearch from '../QuickSearch';
 import {
-    Calendar, BarChart3, Share2,
+    Clock, FileText, BarChart3, Share2,
     Edit3, ExternalLink
 } from 'lucide-react';
 
@@ -51,15 +51,33 @@ export default function ArticlesTab({
                             ) : articleData?.articles.map((article) => (
                                 <tr key={article.id} className="hover:bg-white/5 transition-colors group">
                                     <td className="px-6 py-4 max-w-md">
-                                        <div className="font-bold text-slate-200 group-hover:text-primary-400 transition-colors line-clamp-1">{article.title}</div>
-                                        <div className="flex items-center gap-2 mt-1">
-                                            <span className="text-[9px] font-black px-1.5 py-0.5 bg-slate-800 text-slate-400 rounded uppercase tracking-tighter border border-slate-700">
-                                                {article.category?.name || 'General'}
-                                            </span>
-                                            <span className="text-[9px] text-slate-500 font-bold uppercase flex items-center gap-1">
-                                                <Calendar className="w-3 h-3" />
-                                                {new Date(article.published_at).toLocaleDateString()}
-                                            </span>
+                                        <div className="flex flex-col">
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-[13px] font-bold text-white group-hover:text-primary-400 transition-colors truncate max-w-[300px] lg:max-w-md">
+                                                    {article.title}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-3 mt-1.5">
+                                                <span className="px-1.5 py-0.5 rounded bg-slate-950 text-[9px] font-black text-slate-500 border border-slate-800 uppercase tracking-tighter">
+                                                    {article.category?.name || 'General'}
+                                                </span>
+                                                <span className="flex items-center gap-1 text-[10px] text-slate-500 font-bold">
+                                                    <Clock className="w-3 h-3" />
+                                                    {article.published_at ? new Date(article.published_at).toLocaleDateString() : 'Draft'}
+                                                </span>
+                                                {/* Word Count Indicator */}
+                                                {article.simplified?.reading_time_minutes ? (
+                                                    <span className="flex items-center gap-1 text-[10px] text-emerald-500/80 font-black uppercase tracking-tighter">
+                                                        <FileText className="w-3 h-3 text-emerald-500" />
+                                                        ~{article.simplified.reading_time_minutes * 200} words
+                                                    </span>
+                                                ) : (
+                                                    <span className="flex items-center gap-1 text-[10px] text-amber-500/50 font-black uppercase tracking-tighter">
+                                                        <FileText className="w-3 h-3" />
+                                                        Processing...
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
