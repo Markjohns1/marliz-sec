@@ -52,9 +52,8 @@ class NewsFetcher:
         total_fetched = 0
         total_new = 0
         
-        # Limit per batch (User requested 10-12)
-        # We set a hard limit to avoid spamming
-        limit = 12
+        # Limit per batch (User requested strictly 8 to ensure quality)
+        limit = 8
         
         async with httpx.AsyncClient(timeout=30.0) as client:
             # Pre-load categories

@@ -153,8 +153,15 @@ export default function OverviewTab({
                     <button
                         onClick={() => handleAction(triggerSimplify, 'Intel Processing')}
                         disabled={actionLoading}
-                        className="flex items-center gap-4 p-4 rounded-2xl bg-slate-950 border border-slate-800 hover:border-purple-500 transition-all group"
+                        className="relative flex items-center gap-4 p-4 rounded-2xl bg-slate-950 border border-slate-800 hover:border-purple-500 transition-all group overflow-hidden"
                     >
+                        {/* Queue Indicator Badge */}
+                        {stats?.pending > 0 && (
+                            <div className="absolute top-0 right-0 px-3 py-1 bg-purple-600 text-white text-[10px] font-black uppercase tracking-tighter rounded-bl-xl shadow-lg animate-pulse">
+                                {stats.pending} in queue
+                            </div>
+                        )}
+
                         <div className="p-2.5 bg-purple-900/40 rounded-xl text-purple-400 group-hover:bg-purple-500 group-hover:text-white transition-all">
                             <Zap className={`w-5 h-5 ${actionLoading === 'Intel Processing' ? 'animate-pulse' : ''}`} />
                         </div>

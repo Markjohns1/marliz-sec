@@ -37,7 +37,7 @@ class AISimplifier:
         """Process up to 10 RAW articles through AI simplification"""
         processed = 0
         failed = 0
-        BATCH_LIMIT = 10  # Only process 10 articles per button click
+        BATCH_LIMIT = 8  # Strictly 8 articles per batch to ensure high-quality, long-form processing
         
         # Use single async context manager
         async with get_db_context() as db:
