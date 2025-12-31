@@ -101,7 +101,7 @@ export default function OverviewTab({
             <div className="mb-8">
                 <h3 className="font-black text-white uppercase tracking-widest text-[10px] mb-4 flex items-center gap-2">
                     <Search className="w-3.5 h-3.5 text-blue-400" />
-                    Traffic Origins (Context-Aware Recognition)
+                    Traffic Origins
                 </h3>
                 <div className="card overflow-hidden border-slate-800 bg-slate-900/20">
                     <div className="grid grid-cols-2 bg-slate-900/60 p-3 border-b border-slate-800">
