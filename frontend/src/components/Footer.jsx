@@ -116,9 +116,6 @@ export default function Footer({ categories }) {
             <Link to="/terms" className="hover:text-primary-400 transition-colors">
               Terms of Service
             </Link>
-            <a href="mailto:johnmarkoguta@gmail.com" className="hover:text-primary-400 transition-colors">
-              Contact
-            </a>
           </div>
         </div>
       </div>
