@@ -1,7 +1,8 @@
 import React from 'react';
 import {
     FileText, Globe, Zap, BarChart3, Search,
-    Flame, RefreshCw, Shield, ShieldOff, Share2
+    Flame, RefreshCw, Shield, ShieldOff, Share2,
+    ChevronDown, ChevronUp
 } from 'lucide-react';
 import StatCard from './StatCard';
 import GrowthBadge from './GrowthBadge';
@@ -18,6 +19,8 @@ export default function OverviewTab({
     setSharingArticle,
     handleToggleProtection
 }) {
+    const [isTrafficExpanded, setIsTrafficExpanded] = React.useState(false);
+
     return (
         <div className="animate-in fade-in duration-500">
             {/* Welcome */}
@@ -110,19 +113,37 @@ export default function OverviewTab({
                     </div>
                     <div className="divide-y divide-slate-800/50">
                         {stats?.traffic_sources && stats.traffic_sources.length > 0 ? (
-                            stats.traffic_sources.map((source, idx) => (
-                                <div key={idx} className="grid grid-cols-2 p-3 hover:bg-white/[0.02] transition-colors items-center">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500/40 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
-                                        <span className="text-xs font-bold text-slate-200">{source.platform}</span>
+                            <>
+                                {stats.traffic_sources.slice(0, isTrafficExpanded ? undefined : 3).map((source, idx) => (
+                                    <div key={idx} className="grid grid-cols-2 p-3 hover:bg-white/[0.02] transition-colors items-center">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-blue-500/40 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
+                                            <span className="text-xs font-bold text-slate-200">{source.platform}</span>
+                                        </div>
+                                        <div className="text-right">
+                                            <span className="text-sm font-black text-white px-2 py-0.5 bg-slate-950 rounded-lg border border-slate-800">
+                                                {source.hits.toLocaleString()}
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div className="text-right">
-                                        <span className="text-sm font-black text-white px-2 py-0.5 bg-slate-950 rounded-lg border border-slate-800">
-                                            {source.hits.toLocaleString()}
-                                        </span>
-                                    </div>
-                                </div>
-                            ))
+                                ))}
+                                {stats.traffic_sources.length > 3 && (
+                                    <button
+                                        onClick={() => setIsTrafficExpanded(!isTrafficExpanded)}
+                                        className="w-full py-2 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-white hover:bg-white/5 transition-all"
+                                    >
+                                        {isTrafficExpanded ? (
+                                            <>
+                                                Show Less <ChevronUp className="w-3 h-3" />
+                                            </>
+                                        ) : (
+                                            <>
+                                                Show All ({stats.traffic_sources.length}) <ChevronDown className="w-3 h-3" />
+                                            </>
+                                        )}
+                                    </button>
+                                )}
+                            </>
                         ) : (
                             <div className="p-8 text-center">
                                 <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">Waiting for incoming intelligence signals...</p>
