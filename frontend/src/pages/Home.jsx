@@ -149,23 +149,23 @@ export default function Home() {
                     {/* Render first article as Hero */}
                     <div className="relative group cursor-pointer overflow-hidden rounded-2xl border border-slate-800 bg-slate-900">
                       <Link to={`/article/${allArticles[0].slug}`}>
-                        <div className="aspect-video w-full overflow-hidden">
+                        <div className="aspect-[4/5] md:aspect-video w-full overflow-hidden">
                           <img
                             src={allArticles[0].image_url}
                             alt={allArticles[0].title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                             loading="lazy"
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/60 to-transparent"></div>
+                          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 via-slate-900/40 to-transparent"></div>
                         </div>
-                        <div className="absolute bottom-0 p-8 w-full">
+                        <div className="absolute bottom-0 p-5 md:p-8 w-full">
                           <span className="inline-block px-3 py-1 mb-4 text-xs font-bold text-blue-400 bg-blue-900/30 border border-blue-500/30 rounded-full backdrop-blur-md">
                             {allArticles[0].category?.name || 'FEATURED'}
                           </span>
-                          <h2 className="text-2xl md:text-5xl font-bold text-white mb-4 leading-tight group-hover:text-blue-400 transition-colors">
+                          <h2 className="text-3xl md:text-5xl font-bold text-white mb-4 leading-tight group-hover:text-blue-400 transition-colors">
                             {allArticles[0].title}
                           </h2>
-                          <p className="text-slate-300 text-lg line-clamp-2 max-w-3xl">
+                          <p className="text-slate-300 text-base md:text-lg line-clamp-3 md:line-clamp-2 max-w-3xl">
                             {stripHtml(allArticles[0]?.simplified?.friendly_summary)}
                           </p>
                         </div>
