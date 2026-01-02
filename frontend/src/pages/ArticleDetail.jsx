@@ -26,8 +26,8 @@ export default function ArticleDetail() {
     enabled: !!slug && slug !== 'undefined'
   });
 
-  // Redirect if slug is 'undefined' or follows the broken pattern
-  if (slug === 'undefined' || slug.includes('undefined/article/')) {
+  // Redirect if slug is 'undefined' or follows the broken pattern (legacy SEO issue)
+  if (!slug || slug === 'undefined' || slug.includes('undefined')) {
     return <Navigate to="/" replace />;
   }
 

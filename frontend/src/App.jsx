@@ -79,7 +79,8 @@ function AppContent() {
               </ProtectedRoute>
             }
           />
-
+          {/* Catch-all route for broken/undefined links */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
       {!isAdminPath && (

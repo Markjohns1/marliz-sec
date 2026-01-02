@@ -159,6 +159,11 @@ if os.path.exists(FRONTEND_DIST):
     # Catch-all route for React Router (SPA)
     @app.api_route("/{full_path:path}", methods=["GET", "HEAD"])
     async def serve_react_app(full_path: str, request: Request):
+        # 0. Catch broken 'undefined' URLs (Common SEO issue)
+        if "undefined" in full_path:
+            from fastapi.responses import RedirectResponse
+            return RedirectResponse(url="/", status_code=301)
+
         # Explicitly ignore API paths so they don't get swallowed
         if full_path.startswith("api"):
             raise HTTPException(status_code=404, detail="Not Found")

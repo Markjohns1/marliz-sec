@@ -4,7 +4,9 @@ import { Share2, X, Copy } from 'lucide-react';
 export default function ShareModal({ article, onClose }) {
     const [copied, setCopied] = useState(null);
     const domain = window.location.origin;
-    const articleUrl = `${domain}/article/${article.slug}`;
+    const articleUrl = article?.slug
+        ? `${domain}/article/${article.slug}`
+        : domain;
 
     const channels = [
         { name: 'WhatsApp', icon: '📲', s: 'w', color: 'text-emerald-400' },
