@@ -130,4 +130,10 @@ export const getArticleStats = async (articleId) => {
   return data;
 };
 
+// Manual Article Creation (Quick Publish)
+export const createManualArticle = async (articleData) => {
+  const { data } = await api.post('/api/articles/manual', articleData);
+  return data;
+};
+
 export default api;
