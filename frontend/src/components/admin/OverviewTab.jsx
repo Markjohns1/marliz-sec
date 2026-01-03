@@ -107,27 +107,58 @@ export default function OverviewTab({
                     Traffic Origins
                 </h3>
                 <div className="card overflow-hidden border-slate-800 bg-slate-900/20">
-                    <div className="grid grid-cols-2 bg-slate-900/60 p-3 border-b border-slate-800">
-                        <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Platform / Source</div>
-                        <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest text-right">Impact (Hits)</div>
+                    <div className="grid grid-cols-12 bg-slate-900/60 p-3 border-b border-slate-800">
+                        <div className="col-span-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Platform</div>
+                        <div className="col-span-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">What This Means</div>
+                        <div className="col-span-3 text-[10px] font-black text-slate-500 uppercase tracking-widest text-right">Hits</div>
                     </div>
                     <div className="divide-y divide-slate-800/50">
                         {stats?.traffic_sources && stats.traffic_sources.length > 0 ? (
                             <>
-                                {stats.traffic_sources.slice(0, isTrafficExpanded ? undefined : 3).map((source, idx) => (
-                                    <div key={idx} className="grid grid-cols-2 p-3 hover:bg-white/[0.02] transition-colors items-center">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-blue-500/40 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
-                                            <span className="text-xs font-bold text-slate-200">{source.platform}</span>
+                                {stats.traffic_sources.slice(0, isTrafficExpanded ? undefined : 5).map((source, idx) => {
+                                    // Explanations for each traffic source
+                                    const explanations = {
+                                        'Direct Access': 'Typed URL directly or bookmarked your site',
+                                        'Google Search': 'Found you via Google search results',
+                                        'Bing Search': 'Found you via Bing search results',
+                                        'DuckDuckGo': 'Found you via DuckDuckGo search',
+                                        'Facebook': 'Clicked link from Facebook post or group',
+                                        'Facebook App': 'Clicked from Facebook mobile app',
+                                        'WhatsApp': 'Shared link opened from WhatsApp',
+                                        'WhatsApp Preview': 'WhatsApp generating link preview',
+                                        'LinkedIn': 'Clicked from LinkedIn post or message',
+                                        'LinkedIn App': 'Clicked from LinkedIn mobile app',
+                                        'X (Twitter)': 'Clicked from Twitter/X post',
+                                        'X (Twitter) App': 'Clicked from Twitter/X mobile app',
+                                        'Telegram': 'Clicked from Telegram group or channel',
+                                        'Discord': 'Clicked from Discord server',
+                                        'Instagram': 'Clicked from Instagram bio or story',
+                                        'Instagram App': 'Clicked from Instagram mobile app',
+                                        'Search Engine Bot': 'Google/Bing crawling your site (good for SEO!)',
+                                        'AI Intelligence Bot': 'ChatGPT/Perplexity reading your content',
+                                        'Other Referrals': 'Links from other websites, forums, or apps',
+                                        'other': 'Unidentified referral source'
+                                    };
+                                    const explanation = explanations[source.platform] || 'Traffic from this source';
+
+                                    return (
+                                        <div key={idx} className="grid grid-cols-12 p-3 hover:bg-white/[0.02] transition-colors items-center">
+                                            <div className="col-span-4 flex items-center gap-3">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-blue-500/40 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
+                                                <span className="text-xs font-bold text-slate-200">{source.platform}</span>
+                                            </div>
+                                            <div className="col-span-5">
+                                                <span className="text-[10px] text-slate-500 italic">{explanation}</span>
+                                            </div>
+                                            <div className="col-span-3 text-right">
+                                                <span className="text-sm font-black text-white px-2 py-0.5 bg-slate-950 rounded-lg border border-slate-800">
+                                                    {source.hits.toLocaleString()}
+                                                </span>
+                                            </div>
                                         </div>
-                                        <div className="text-right">
-                                            <span className="text-sm font-black text-white px-2 py-0.5 bg-slate-950 rounded-lg border border-slate-800">
-                                                {source.hits.toLocaleString()}
-                                            </span>
-                                        </div>
-                                    </div>
-                                ))}
-                                {stats.traffic_sources.length > 3 && (
+                                    );
+                                })}
+                                {stats.traffic_sources.length > 5 && (
                                     <button
                                         onClick={() => setIsTrafficExpanded(!isTrafficExpanded)}
                                         className="w-full py-2 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-white hover:bg-white/5 transition-all"
