@@ -3,11 +3,23 @@ import { useEffect, useRef } from 'react';
 export default function AdUnit({ format = 'auto', className = '', slotId = '1234567890' }) {
     const adRef = useRef(null);
 
+    useEffect(() => {
+        // Only attempt to push if the script is loaded and we are in production
+        // or if we want to see placeholders in dev
+        try {
+            if (window.adsbygoogle && typeof window.adsbygoogle === 'object') {
+                (window.adsbygoogle = window.adsbygoogle || []).push({});
+            }
+        } catch (err) {
+            console.error('AdSense push error:', err);
+        }
+    }, []);
+
     // Helper to determine dimensions for placeholders
     const getDimensions = () => {
         switch (format) {
-            case 'vertical': return 'min-h-[600px] w-[160px]';
-            case 'rectangle': return 'min-h-[250px] w-[300px]';
+            case 'vertical': return 'min-h-[600px] w-full max-w-[160px]';
+            case 'rectangle': return 'min-h-[250px] w-full max-w-[300px]';
             case 'fluid': return 'min-h-[100px] w-full';
             default: return 'min-h-[250px] w-full';
         }
@@ -20,12 +32,8 @@ export default function AdUnit({ format = 'auto', className = '', slotId = '1234
                     Advertisement
                 </span>
 
-                {/* 
-                  ADSENSE LIVE UNIT
-                  Replace client ID with your ca-pub-XXXXXX when approved.
-                */}
                 <ins className="adsbygoogle"
-                    style={{ display: 'block', minWidth: '120px', minHeight: '50px' }}
+                    style={{ display: 'block' }}
                     data-ad-client="ca-pub-5581330887172926"
                     data-ad-slot={slotId}
                     data-ad-format={format}
