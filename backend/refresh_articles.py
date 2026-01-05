@@ -27,8 +27,8 @@ async def refresh_all_articles():
         await ai_simplifier._load_categories(db)
         
         processed_count = 0
-        batch_size = 30
-        cooldown_pause = 900 # 15 minutes rest for total API reset
+        batch_size = 10
+        cooldown_pause = 600 # 10 minutes rest 
         
         for idx, article in enumerate(articles):
             # SMART RESUME: Skip anything already high-value
@@ -47,7 +47,7 @@ async def refresh_all_articles():
             print(f"[{idx+1}/{len(articles)}] UPGRADING: {article.title} (Current: {word_count} words)")
             
             success = False
-            retries = 12 # Increased retries
+            retries = 15 # Even more retries for total safety
             delay = 30 
             
             while not success and retries > 0:
@@ -55,16 +55,16 @@ async def refresh_all_articles():
                     success = await ai_simplifier._simplify_article(db, article)
                     if success:
                         processed_count += 1
-                        print(f"  - SUCCESS: Content upgraded to > 800 words. [Batch Progress: {processed_count}/{batch_size}]")
+                        print(f"  - SUCCESS: Content upgraded. [Batch Progress: {processed_count}/{batch_size}]")
                         
-                        # Batch Cooldown Logic
+                        # Batch Cooldown Logic (10 Articles then Rest)
                         if processed_count >= batch_size:
-                            print(f"\n[!!!] BATCH COMPLETE (30 Articles). Resting for 15 minutes to reset API limits...")
+                            print(f"\n[!!!] BATCH COMPLETE (10 Articles). Resting for 10 minutes... (Go breathe, I am safe)")
                             await asyncio.sleep(cooldown_pause)
                             processed_count = 0 # Reset batch counter
                             print("[!] Cooldown over. Resuming next batch...\n")
                         else:
-                            await asyncio.sleep(75) # Ultra-safe 75s cooldown between articles
+                            await asyncio.sleep(60) # Safe 60s cooldown between articles
                     else:
                         print(f"  - WARNING: Rate limited or API error. Waiting {delay}s...")
                         await asyncio.sleep(delay)
