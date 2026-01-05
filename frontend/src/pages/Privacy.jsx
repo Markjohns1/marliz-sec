@@ -30,17 +30,20 @@ const Privacy = () => {
 
                     <section>
                         <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                            <Lock className="w-5 h-5 text-blue-400" /> 2. Google AdSense & Cookies
+                            <Lock className="w-5 h-5 text-blue-400" /> 2. Google AdSense & Third-Party Cookies
                         </h2>
-                        <div className="space-y-4 text-slate-400">
+                        <div className="space-y-4 text-slate-400 text-sm md:text-base">
                             <p>
-                                Google is one of the third-party vendors on our site. It also uses cookies, known as DART cookies, to serve ads to our site visitors based upon their visit to marlizintel.com and other sites on the internet.
+                                Marliz Intel uses Google AdSense to serve advertisements. Google, as a third-party vendor, uses cookies to serve ads on our site. Google's use of the advertising cookies enables it and its partners to serve ads to our users based on their visit to our sites and/or other sites on the Internet.
                             </p>
                             <p>
-                                We use Google AdSense to serve advertisements on our website. Google uses cookies to serve ads based on a user's prior visits to your website or other websites. Google's use of advertising cookies enables it and its partners to serve ads to your users based on their visit to your sites and/or other sites on the Internet.
+                                We participate in the Google AdSense program, which utilizes cookies to track user behavior and interests across the web. This data is used by Google and its partners to display personalized advertisements that are more relevant to you.
                             </p>
-                            <p className="bg-blue-500/5 border-l-4 border-blue-500 p-4 italic">
-                                Users may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" className="text-blue-400 hover:underline">Google Ad Settings</a>.
+                            <p>
+                                You may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">Google Ad Settings</a>. Alternatively, you can opt out of a third-party vendor's use of cookies for personalized advertising by visiting <a href="https://www.aboutads.info" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">www.aboutads.info</a>.
+                            </p>
+                            <p>
+                                If you have not opted out of third-party ad serving, the cookies of other third-party vendors or ad networks may also be used to serve ads on our site.
                             </p>
                         </div>
                     </section>
