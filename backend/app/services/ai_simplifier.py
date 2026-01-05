@@ -65,7 +65,7 @@ class AISimplifier:
                     
                     if result:
                         processed += 1
-                        logger.info(f"✓ Processed: {article.title[:50]}...")
+                        logger.info(f"SUCCESS - Processed: {article.title[:50]}...")
                     else:
                         # Mark as RAW for retry if it failed (but not if it was just irrelevant)
                         if article.status == ArticleStatus.PROCESSING:
@@ -109,18 +109,22 @@ class AISimplifier:
                 "model": self.model,
                 "messages": [
                     {
+                        "role": "system",
+                        "content": "You are 'Marliz Intel', a Senior Cyber Threat Intelligence Analyst. Your goal is to provide deep, high-value, and original analytical reports for cybersecurity news. Google AdSense requires 'High Value Content', so your output MUST be substantial, insightful, and authoritative."
+                    },
+                    {
                         "role": "user",
                         "content": prompt
                     }
                 ],
-                "temperature": 0.7,
-                # Increased tokens for longer articles (500-700 words + JSON overhead)
-                "max_completion_tokens": 5000, 
+                "temperature": 0.3,
+                # Increased tokens for longer articles (1000-1500 words + JSON overhead)
+                "max_completion_tokens": 6000, 
                 "top_p": 1,
                 "stream": False
             }
             
-            async with httpx.AsyncClient(timeout=120.0) as client:
+            async with httpx.AsyncClient(timeout=180.0) as client:
                 response = await client.post(self.base_url, headers=headers, json=data)
             
             # Handle rate limiting with exponential backoff
@@ -147,31 +151,34 @@ class AISimplifier:
             
             # CHECK RELEVANCE
             if not result.get("is_relevant", True):
-                logger.info(f"Article {article.id} rejected by AI as irrelevant.")
-                # Delete any existing simplified content first (foreign key constraint)
-                stmt = select(SimplifiedContent).filter_by(article_id=article.id)
-                existing = await db.execute(stmt)
-                existing_simplified = existing.scalars().first()
-                if existing_simplified:
-                    await db.delete(existing_simplified)
-                await db.delete(article)
-                await db.commit()
-                return True # Handled successfully (by rejection)
+                # IMPORTANT: For REFRESH mode (already READY articles), we don't delete.
+                # However, this logic is shared. We'll keep the delete logic for RAW articles only
+                # but since this is called for existing articles too, we need to be careful.
+                # If it's a RAW article, we can delete. If it's already READY/PUBLISHED, maybe just skip?
+                if article.status == ArticleStatus.RAW or article.status == ArticleStatus.PROCESSING:
+                    logger.info(f"Article {article.id} rejected by AI as irrelevant. Deleting.")
+                    stmt = select(SimplifiedContent).filter_by(article_id=article.id)
+                    existing = await db.execute(stmt)
+                    existing_simplified = existing.scalars().first()
+                    if existing_simplified:
+                        await db.delete(existing_simplified)
+                    await db.delete(article)
+                    await db.commit()
+                else:
+                    logger.warning(f"Article {article.id} marked as irrelevant but it's already {article.status}. Skipping update.")
+                return True
             
             # Calculate reading time (200 words per minute)
-            word_count = len(result["summary"].split()) + len(result["impact"].split())
+            summary_words = result["summary"].split()
+            impact_words = result["impact"].split()
+            vector_words = result["attack_vector"].split()
+            word_count = len(summary_words) + len(impact_words) + len(vector_words)
             reading_time = max(2, (word_count // 200) + 1)
             
             # Check if simplified content already exists (for re-processing)
             stmt = select(SimplifiedContent).filter_by(article_id=article.id)
             existing = await db.execute(stmt)
             existing_simplified = existing.scalars().first()
-            
-            # Determine content type (Default to 'news', upgrade to 'evergreen' if deep analysis)
-            # This is a basic heuristic; Admin can override later
-            content_type = "news"
-            # If word count is high or threat level critical, could be candidate for evergreen
-            # But currently user logic is manual, so default to 'news'
             
             if existing_simplified:
                 # Update existing record
@@ -196,7 +203,10 @@ class AISimplifier:
                 db.add(simplified)
             
             # Update article status and SEO fields
-            article.status = ArticleStatus.READY
+            # Only move to READY if it's not already EDITED or PUBLISHED
+            if article.status not in [ArticleStatus.EDITED, ArticleStatus.PUBLISHED]:
+                article.status = ArticleStatus.READY
+            
             article.keywords = self._extract_keywords(result)
             
             # UPDATE TITLE with SEO-optimized version from AI
@@ -218,37 +228,38 @@ class AISimplifier:
             
             await db.commit()
             return True
-            
         except httpx.HTTPError as e:
             logger.error(f"Groq API request error: {str(e)}")
-            if hasattr(e, 'response') and e.response is not None:
-                logger.error(f"Response body: {e.response.text}")
             return False
         except Exception as e:
-            logger.error(f"Groq API error: {str(e)}")
+            logger.error(f"Groq API processing error: {str(e)}")
             return False
-    
+            
     def _build_prompt(self, article, content):
         """Build precise prompt for Groq AI with advanced SEO optimization and business-focused intelligence."""
         
         return f"""You are 'Marliz Intel', a Senior Cyber Threat Intelligence Analyst AND Strategic SEO Specialist.
-Your voice is AUTHORITY, URGENCY, and CLARITY. You translate complex chaos into boardroom-ready intelligence.
+Your report MUST be authoritative, deep, and provide proprietary-grade value.
 
 ARTICLE TO ANALYZE:
 Title: {article.title}
 Source: {article.source_name or 'Intelligence feed'}
-Content excerpt: {content[:3500]}
+Content: {content[:10000]}
 
 YOUR MISSION:
 1. TECHNICAL AUDIT: Analyze the mechanism (CVEs, tools, tactics).
-2. STRATEGIC REWRITE: Create a long-form Intel Report (1200-1500 words).
-3. ADAPTIVE SEO: Generate a high-conversion Title and Meta Description (max 60 chars).
+2. STRATEGIC REWRITE: Create a long-form Intel Report (Minimum 800 words, Target 1200-1600 words).
+3. ADAPTIVE SEO: Generate a high-conversion Title and Meta Description.
 4. ACTIONABLE PROTOCOLS: Provide clear, prioritized mitigation steps.
 
-CRITICAL LENGTH PROTOCOL:
-- You MUST produce between 1200 and 1500 words total content.
-- If the source is short, EXPAND by explaining the history of this threat type, defining all technical terms used, and providing a deep dive into the industry implications.
-- SHORTRIDGE IS FAILURE. I need depth for educational and AdSense compliance purposes.
+CRITICAL CONTENT DEPTH PROTOCOL (FAILURE TO COMPLY WILL BE REJECTED):
+- TOTAL WORD COUNT: Minimum 800 words. Target 1200-1600 words.
+- EXPANSION STRATEGY: If the source is short, you MUST expand by:
+    a) Explaining the history and evolution of this specific threat type.
+    b) Defining ALL technical terms and CVEs mentioned in deep detail.
+    c) Analyzing the attack's placement in the current global threat landscape.
+    d) Providing 'What-If' scenarios for different business sectors (Finance, Healthcare, SMBs).
+    e) Adding a 'Global Cybersecurity Trends' context section.
 
 RESPOND WITH VALID JSON ONLY:
 {{
@@ -256,37 +267,19 @@ RESPOND WITH VALID JSON ONLY:
   "category": "ransomware|phishing|data-breach|malware|vulnerability|general",
   "seo_title": "[Entity] [Event]: [Impact] – [Action]",
   "meta_description": "Shocking fact + Critical impact + Command (160 chars).",
-  "summary": "<p><strong>Executive Summary:</strong> Deep, multi-paragraph narrative (350 words minimum). Explain the 'What', 'Why', and 'How' it fits into the current global threat landscape. Explain any jargon in parentheses.</p>",
-  "attack_vector": "<h2>Technical Vector & Methodology</h2><p>Extensive breakdown of the attack chain. If CVEs are missing, explain the class of vulnerability. If tools are mentioned, explain their history. (500 words minimum).</p>",
-  "impact": "<h2>Business & Operational Impact</h2><p>Deep analysis of financial, legal, and reputational risks. Include 'What if' scenarios for unprepared businesses. (400 words minimum).</p>",
-  "who_is_at_risk": "Detailed list of industries, regions, and specific software versions vulnerable.",
-  "actions": ["IMMEDIATE: Priority patch/action", "SECONDARY: System audit/monitoring", "LONG-TERM: Policy/Training update"],
+  "summary": "<h1>Executive Summary</h1><p>Narrative of the event (Minimum 300 words). Discuss the context, the 'who', and the 'why' this matters right now. Explain technical concepts as you go.</p>",
+  "attack_vector": "<h2>Technical Vector & Methodology</h2><p>Exhaustive breakdown of the attack chain. Detail the vulnerabilities exploited, the persistence mechanisms, and the exfiltration tactics. Explain the tools used in historical context. (Minimum 400 words).</p>",
+  "impact": "<h2>Business & Operational Impact</h2><p>Deep analysis of financial, legal, and reputational risks. Discuss regulatory implications (GDPR, etc.) and the ripple effect on the supply chain. (Minimum 300 words).</p>",
+  "who_is_at_risk": "Exhaustive list of sectors, operating systems, and demographics targeted.",
+  "actions": ["IMMEDIATE: Priority patch/action", "SECONDARY: System audit/monitoring", "LONG-TERM: Policy/Training update", "ONGOING: Threat hunting protocol"],
   "threat_level": "low|medium|high|critical",
-  "keywords": ["target", "malware", "CVE", "cybersecurity news 2024", "intel report"]
+  "keywords": ["target", "malware", "CVE", "cybersecurity news", "intel report"]
 }}
 
-=== 🏆 THE MARLIZ SEO FORMULA ===
-TITLE PROTOCOL:
-- Rule: [Company/Softare] [Hacked/Leaked/Exposed]: [Scale of Impact] – [Immediate Action]
-- Example: "Microsoft Exchange Zero-Day: 60k Servers Exposed – Patch Required Immediately"
-- Constraint: Max 60 characters. No fluff.
+=== SENSITIVE CONTENT AND ADSENSE COMPLIANCE ===
+- If the article even slightly touches on PROHIBITED SENSITIVE SUBJECTS (War in Ukraine, Israel/Gaza, Political Propaganda), you MUST mark it as 'is_relevant': false.
 
-META PROTOCOL:
-- Rule: Lead with the most dangerous fact. End with a command.
-- Example: "33 million customer records were leaked in the Coupang data breach. Your private credentials may be on the dark web. Check the security protocol now."
-
-=== 🛑 SENSITIVE CONTENT & ADSENSE COMPLIANCE ===
-PROHIBITED SUBJECTS:
-- War in Ukraine, Russia, Israel, Hamas, Gaza, or any civilian casualties.
-- Political propaganda or content condoning/exploiting sensitive geopolitical events.
-- Rule: If the article even slightly touches on these sensitive war topics, you MUST mark it as "is_relevant": false to protect AdSense approval.
-
-=== INTELLIGENCE GUIDELINES ===
-1. RELEVANCE: If this is NOT about a digital threat (e.g., physical crime, general tech marketing, lifestyle) OR if it involves PROHIBITED SENSITIVE SUBJECTS (War/Conflict), RETURN "is_relevant": false.
-2. TONE: Serious and analytical. Avoid "Stay safe" or "Be careful". Use "Implement mitigation" or "Execute protocol".
-3. KENYAN & GLOBAL CONTEXT: If the source mentions generic targets, frame it globally. If it mentions African entities, highlight regional significance.
-
-RETURN ONLY THE JSON OBJECT. NO MARKDOWN."""
+RETURN ONLY THE JSON OBJECT. NO MARKDOWN INTRO OR OUTRO."""
     
     def _parse_response(self, response_text: str) -> dict:
         """Parse Groq's JSON response"""
