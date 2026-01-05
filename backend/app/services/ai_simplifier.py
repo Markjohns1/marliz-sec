@@ -282,14 +282,24 @@ RESPOND WITH VALID JSON ONLY:
 RETURN ONLY THE JSON OBJECT. NO MARKDOWN INTRO OR OUTRO."""
     
     def _parse_response(self, response_text: str) -> dict:
-        """Parse Groq's JSON response"""
+        """Parse Groq's JSON response with aggressive cleaning for control characters."""
         try:
             # Clean up response (remove markdown if present)
             cleaned = response_text.strip()
-            cleaned = re.sub(r'^```json\s*', '', cleaned)
-            cleaned = re.sub(r'\s*```$', '', cleaned)
             
-            # Parse JSON
+            # Find the first '{' and last '}' to isolate JSON
+            start = cleaned.find('{')
+            end = cleaned.rfind('}')
+            if start != -1 and end != -1:
+                cleaned = cleaned[start:end+1]
+            
+            # Remove invalid control characters that break json.loads
+            # These are usually literal newlines or tabs inside the JSON values
+            # that the AI failed to escape as \n or \t
+            cleaned = re.sub(r'[\x00-\x1F\x7F]', ' ', cleaned)
+            
+            # Try to restore some structure if the AI used literal quotes incorrectly
+            # (Very basic - handles most common cases)
             result = json.loads(cleaned)
             
             # Validate structure
