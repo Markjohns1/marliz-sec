@@ -27,8 +27,8 @@ async def refresh_all_articles():
         await ai_simplifier._load_categories(db)
         
         processed_count = 0
-        batch_size = 50
-        cooldown_pause = 600 # 10 minutes rest
+        batch_size = 30
+        cooldown_pause = 900 # 15 minutes rest for total API reset
         
         for idx, article in enumerate(articles):
             # SMART RESUME: Skip anything already high-value
@@ -47,7 +47,7 @@ async def refresh_all_articles():
             print(f"[{idx+1}/{len(articles)}] UPGRADING: {article.title} (Current: {word_count} words)")
             
             success = False
-            retries = 10 
+            retries = 12 # Increased retries
             delay = 30 
             
             while not success and retries > 0:
@@ -59,12 +59,12 @@ async def refresh_all_articles():
                         
                         # Batch Cooldown Logic
                         if processed_count >= batch_size:
-                            print(f"\n[!!!] BATCH COMPLETE (50 Articles). Resting for 10 minutes to reset API limits...")
+                            print(f"\n[!!!] BATCH COMPLETE (30 Articles). Resting for 15 minutes to reset API limits...")
                             await asyncio.sleep(cooldown_pause)
                             processed_count = 0 # Reset batch counter
                             print("[!] Cooldown over. Resuming next batch...\n")
                         else:
-                            await asyncio.sleep(45) # Normal cooldown between articles
+                            await asyncio.sleep(75) # Ultra-safe 75s cooldown between articles
                     else:
                         print(f"  - WARNING: Rate limited or API error. Waiting {delay}s...")
                         await asyncio.sleep(delay)
