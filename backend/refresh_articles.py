@@ -24,23 +24,34 @@ async def refresh_all_articles():
         await ai_simplifier._load_categories(db)
         
         for idx, article in enumerate(articles):
-            print(f"[{idx+1}/{len(articles)}] Upgrading depth for: {article.title}")
+            # SMART RESUME: Check if article already has deep content
+            word_count = 0
+            if article.simplified:
+                word_count = len((article.simplified.friendly_summary or "").split()) + \
+                             len((article.simplified.attack_vector or "").split()) + \
+                             len((article.simplified.business_impact or "").split())
+            
+            if word_count > 800:
+                print(f"[{idx+1}/{len(articles)}] SKIP: '{article.title[:50]}...' already high-value ({word_count} words).")
+                continue
+
+            print(f"[{idx+1}/{len(articles)}] UPGRADING: {article.title}")
             
             success = False
-            retries = 10 # More retries for 70b
-            delay = 30 # Start with 30s delay
+            retries = 10 
+            delay = 30 
             
             while not success and retries > 0:
                 try:
                     success = await ai_simplifier._simplify_article(db, article)
                     if success:
                         print(f"  - SUCCESS: Content upgraded.")
-                        await asyncio.sleep(45) # 45s cooldown between successful long-form requests
+                        await asyncio.sleep(45) 
                     else:
                         print(f"  - WARNING: Rate limited or API error. Waiting {delay}s...")
                         await asyncio.sleep(delay)
                         retries -= 1
-                        delay += 30 # Progressive backoff
+                        delay += 30 
                 except Exception as e:
                     print(f"  - ERROR: {e}. Retrying...")
                     await asyncio.sleep(delay)
