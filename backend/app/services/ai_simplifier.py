@@ -252,14 +252,15 @@ YOUR MISSION:
 3. ADAPTIVE SEO: Generate a high-conversion Title and Meta Description.
 4. ACTIONABLE PROTOCOLS: Provide clear, prioritized mitigation steps.
 
-CRITICAL CONTENT DEPTH PROTOCOL (FAILURE TO COMPLY WILL BE REJECTED):
-- TOTAL WORD COUNT: Minimum 800 words. Target 1200-1600 words.
+CRITICAL CONTENT DEPTH PROTOCOL (STRICT REQUIREMENT):
+- TOTAL WORD COUNT: YOU MUST STRICTLY EXCEED 800 WORDS. TARGET 1200-1600 WORDS.
+- FAILURE POLICY: Any response under 800 words will be rejected.
 - EXPANSION STRATEGY: If the source is short, you MUST expand by:
-    a) Explaining the history and evolution of this specific threat type.
-    b) Defining ALL technical terms and CVEs mentioned in deep detail.
+    a) Explaining the technical history and evolution of this threat type (e.g., if it's Ransomware, discuss the shift from locker to leak-site tactics).
+    b) Defining ALL technical terms, CVEs, and protocols (e.g., DNS, SMTP, Zero-Day) in extreme detail.
     c) Analyzing the attack's placement in the current global threat landscape.
-    d) Providing 'What-If' scenarios for different business sectors (Finance, Healthcare, SMBs).
-    e) Adding a 'Global Cybersecurity Trends' context section.
+    d) Providing detailed 'What-If' scenarios for Finance, Healthcare, and SMBs.
+    e) Adding a 2-paragraph 'Global Cybersecurity Trends' context section.
 
 RESPOND WITH VALID JSON ONLY:
 {{

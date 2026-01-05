@@ -26,26 +26,25 @@ async def refresh_all_articles():
         # Load categories for the simplifier
         await ai_simplifier._load_categories(db)
         
+        processed_count = 0
+        batch_size = 50
+        cooldown_pause = 600 # 10 minutes rest
+        
         for idx, article in enumerate(articles):
-            # SMART RESUME: Check for signatures of the NEW high-value prompt
+            # SMART RESUME: Skip anything already high-value
             word_count = 0
-            has_new_format = False
-            
             if article.simplified:
                 summary = article.simplified.friendly_summary or ""
                 word_count = len(summary.split()) + \
                              len((article.simplified.attack_vector or "").split()) + \
                              len((article.simplified.business_impact or "").split())
-                
-                # The new prompt strictly uses <h1> tags for sections
-                has_new_format = "<h1>" in summary or "<h2>" in summary
-
-            # Skip if it's long enough OR already in the new visual format
-            if word_count > 500 or has_new_format:
-                print(f"[{idx+1}/{len(articles)}] SKIP: '{article.title[:40]}...' (Found {word_count} words + New Format).")
+            
+            # Threshold set to 800 as per user request
+            if word_count >= 800:
+                print(f"[{idx+1}/{len(articles)}] SKIP: '{article.title[:40]}...' already high-value ({word_count} words).")
                 continue
 
-            print(f"[{idx+1}/{len(articles)}] UPGRADING: {article.title}")
+            print(f"[{idx+1}/{len(articles)}] UPGRADING: {article.title} (Current: {word_count} words)")
             
             success = False
             retries = 10 
@@ -55,8 +54,17 @@ async def refresh_all_articles():
                 try:
                     success = await ai_simplifier._simplify_article(db, article)
                     if success:
-                        print(f"  - SUCCESS: Content upgraded.")
-                        await asyncio.sleep(45) 
+                        processed_count += 1
+                        print(f"  - SUCCESS: Content upgraded to > 800 words. [Batch Progress: {processed_count}/{batch_size}]")
+                        
+                        # Batch Cooldown Logic
+                        if processed_count >= batch_size:
+                            print(f"\n[!!!] BATCH COMPLETE (50 Articles). Resting for 10 minutes to reset API limits...")
+                            await asyncio.sleep(cooldown_pause)
+                            processed_count = 0 # Reset batch counter
+                            print("[!] Cooldown over. Resuming next batch...\n")
+                        else:
+                            await asyncio.sleep(45) # Normal cooldown between articles
                     else:
                         print(f"  - WARNING: Rate limited or API error. Waiting {delay}s...")
                         await asyncio.sleep(delay)
