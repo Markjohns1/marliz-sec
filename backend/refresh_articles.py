@@ -26,12 +26,14 @@ async def refresh_all_articles():
         # Load categories for the simplifier
         await ai_simplifier._load_categories(db)
         
-        processed_count = 0
-        batch_size = 10
-        cooldown_pause = 300 # 5 minutes rest 
+        # ULTRA-STEADY FLOW PROTOCOL: 
+        # Goal: Complete 285 articles by 8:00 AM (approx 10 hours)
+        # 120 seconds (2 mins) x 285 = 9.5 Hours. Perfect timing.
+        
+        delay_between_articles = 120 # Steady 2 minute breath
         
         for idx, article in enumerate(articles):
-            # SMART RESUME: Skip anything already high-value
+            # 1. SMART RESUME: Skip anything already high-value
             word_count = 0
             if article.simplified:
                 summary = article.simplified.friendly_summary or ""
@@ -39,7 +41,6 @@ async def refresh_all_articles():
                              len((article.simplified.attack_vector or "").split()) + \
                              len((article.simplified.business_impact or "").split())
             
-            # Threshold set to 800 as per user request
             if word_count >= 800:
                 print(f"[{idx+1}/{len(articles)}] SKIP: '{article.title[:40]}...' already high-value ({word_count} words).")
                 continue
@@ -47,32 +48,23 @@ async def refresh_all_articles():
             print(f"[{idx+1}/{len(articles)}] UPGRADING: {article.title} (Current: {word_count} words)")
             
             success = False
-            retries = 15 # Even more retries for total safety
-            delay = 30 
+            retries = 20 # Extreme resilience
+            retry_delay = 45 
             
             while not success and retries > 0:
                 try:
                     success = await ai_simplifier._simplify_article(db, article)
                     if success:
-                        processed_count += 1
-                        print(f"  - SUCCESS: Content upgraded. [Batch Progress: {processed_count}/{batch_size}]")
-                        
-                        # Batch Cooldown Logic (10 Articles then Rest)
-                        if processed_count >= batch_size:
-                            print(f"\n[!!!] BATCH COMPLETE (10 Articles). Resting for 10 minutes... (Go breathe, I am safe)")
-                            await asyncio.sleep(cooldown_pause)
-                            processed_count = 0 # Reset batch counter
-                            print("[!] Cooldown over. Resuming next batch...\n")
-                        else:
-                            await asyncio.sleep(60) # Safe 60s cooldown between articles
+                        print(f"  - SUCCESS: Content upgraded. Waiting {delay_between_articles}s for steady flow...")
+                        await asyncio.sleep(delay_between_articles)
                     else:
-                        print(f"  - WARNING: Rate limited or API error. Waiting {delay}s...")
-                        await asyncio.sleep(delay)
+                        print(f"  - WARNING: Rate limited. Waiting {retry_delay}s before retry...")
+                        await asyncio.sleep(retry_delay)
                         retries -= 1
-                        delay += 30 
+                        retry_delay += 30 
                 except Exception as e:
-                    print(f"  - ERROR: {e}. Retrying...")
-                    await asyncio.sleep(delay)
+                    print(f"  - ERROR: {e}. Retrying in {retry_delay}s...")
+                    await asyncio.sleep(retry_delay)
                     retries -= 1
             
             if not success:
