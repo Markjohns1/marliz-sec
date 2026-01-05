@@ -1,4 +1,4 @@
-import { Shield, Target, Users, Zap } from 'lucide-react';
+import { Shield, Target, Users, Zap, Bell } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 
