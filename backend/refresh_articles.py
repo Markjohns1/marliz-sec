@@ -3,6 +3,7 @@ import asyncio
 import os
 import sys
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 
 # Add the current directory to sys.path to allow importing 'app'
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), ".")))
@@ -13,8 +14,10 @@ from app.services.ai_simplifier import ai_simplifier
 
 async def refresh_all_articles():
     async with AsyncSessionLocal() as db:
-        # Fetch all articles that are in READY, EDITED, or PUBLISHED status
-        stmt = select(Article).where(Article.status.in_([ArticleStatus.READY, ArticleStatus.EDITED, ArticleStatus.PUBLISHED]))
+        # Fetch all articles with their simplified content eagerly loaded
+        stmt = select(Article).options(selectinload(Article.simplified)).where(
+            Article.status.in_([ArticleStatus.READY, ArticleStatus.EDITED, ArticleStatus.PUBLISHED])
+        )
         result = await db.execute(stmt)
         articles = result.scalars().all()
         
