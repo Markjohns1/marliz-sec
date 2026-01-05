@@ -96,26 +96,62 @@ export default function ArticleDetail() {
         {article.image_url && <meta property="og:image" content={article.image_url} />}
         <meta property="og:type" content="article" />
         <link rel="canonical" href={`${config.CANONICAL_BASE}/article/${article.slug}`} />
+        
+        {/* News Article Schema */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "NewsArticle",
+            "mainEntityOfPage": {
+              "@type": "WebPage",
+              "@id": `${config.CANONICAL_BASE}/article/${article.slug}`
+            },
             "headline": article.title,
-            "image": article.image_url,
+            "description": stripHtml(article.simplified?.friendly_summary || article.meta_description),
+            "image": article.image_url || `${config.CANONICAL_BASE}/logo192.png`,
             "datePublished": article.published_at,
             "dateModified": article.updated_at || article.published_at,
             "author": {
               "@type": "Organization",
-              "name": "Marliz Sec News"
+              "name": "Marliz Intel Bureau",
+              "url": config.CANONICAL_BASE
             },
             "publisher": {
               "@type": "Organization",
-              "name": "Marliz Sec News",
+              "name": "Marliz Intel",
               "logo": {
                 "@type": "ImageObject",
-                "url": "https://yourdomain.com/logo.jpg"
+                "url": `${config.CANONICAL_BASE}/logo.png`
               }
             }
+          })}
+        </script>
+
+        {/* Breadcrumb Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": config.CANONICAL_BASE
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": article.category?.name || "Intelligence",
+                "item": `${config.CANONICAL_BASE}/category/${article.category?.slug}`
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": article.title,
+                "item": `${config.CANONICAL_BASE}/article/${article.slug}`
+              }
+            ]
           })}
         </script>
       </Helmet>
