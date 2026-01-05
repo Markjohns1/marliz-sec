@@ -27,15 +27,22 @@ async def refresh_all_articles():
         await ai_simplifier._load_categories(db)
         
         for idx, article in enumerate(articles):
-            # SMART RESUME: Check if article already has deep content
+            # SMART RESUME: Check for signatures of the NEW high-value prompt
             word_count = 0
+            has_new_format = False
+            
             if article.simplified:
-                word_count = len((article.simplified.friendly_summary or "").split()) + \
+                summary = article.simplified.friendly_summary or ""
+                word_count = len(summary.split()) + \
                              len((article.simplified.attack_vector or "").split()) + \
                              len((article.simplified.business_impact or "").split())
-            
-            if word_count > 800:
-                print(f"[{idx+1}/{len(articles)}] SKIP: '{article.title[:50]}...' already high-value ({word_count} words).")
+                
+                # The new prompt strictly uses <h1> tags for sections
+                has_new_format = "<h1>" in summary or "<h2>" in summary
+
+            # Skip if it's long enough OR already in the new visual format
+            if word_count > 500 or has_new_format:
+                print(f"[{idx+1}/{len(articles)}] SKIP: '{article.title[:40]}...' (Found {word_count} words + New Format).")
                 continue
 
             print(f"[{idx+1}/{len(articles)}] UPGRADING: {article.title}")
