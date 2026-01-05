@@ -225,6 +225,10 @@ class AISimplifier:
             if ai_category in self.category_map:
                 article.category_id = self.category_map[ai_category]
                 logger.info(f"Article {article.id} classified as: {ai_category}")
+
+            # Force updated_at refresh so sitemap.xml indicates the content is new to Google
+            from datetime import datetime
+            article.updated_at = datetime.utcnow()
             
             await db.commit()
             return True
