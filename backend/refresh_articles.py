@@ -28,7 +28,7 @@ async def refresh_all_articles():
         
         processed_count = 0
         batch_size = 10
-        cooldown_pause = 600 # 10 minutes rest 
+        cooldown_pause = 300 # 5 minutes rest 
         
         for idx, article in enumerate(articles):
             # SMART RESUME: Skip anything already high-value
