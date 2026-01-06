@@ -419,22 +419,29 @@ async def get_article(slug: str, request: Request, db: AsyncSession = Depends(ge
     result = await db.execute(stmt)
     article = result.scalars().first()
     
+    # SMART FALLBACK: If exact slug not found, try fuzzy matching (Fixes 404s for broken shared links)
+    if not article:
+        # Search for any article where the new slug 'contains' the requested old slug
+        fallback_stmt = select(models.Article).filter(
+            or_(
+                models.Article.slug.ilike(f"%{slug}%"),
+                models.Article.title.ilike(f"%{slug.replace('-', ' ')}%")
+            ),
+            models.Article.status.in_([ArticleStatus.READY, ArticleStatus.EDITED, ArticleStatus.PUBLISHED])
+        ).order_by(desc(models.Article.published_at)).options(
+            selectinload(models.Article.simplified), 
+            selectinload(models.Article.category)
+        ).limit(1)
+        
+        fallback_result = await db.execute(fallback_stmt)
+        article = fallback_result.scalars().first()
+
     if not article:
         raise HTTPException(status_code=404, detail="Article not found")
     
-    # Track View Source (Integrated Helper)
+    # Track View Source
     await track_view(article.id, request, db)
-    # Re-fetch with relationships to ensure everything is loaded for Pydantic
-    # We reuse the logic from the initial query or just execute a new simple one with options
-    stmt = select(models.Article).filter_by(id=article.id).options(
-        selectinload(models.Article.simplified), 
-        selectinload(models.Article.category)
-    )
-    result = await db.execute(stmt)
-    article = result.scalars().first()
     
-    # We explicitly convert to Pydantic model here to ensure all data is eagerly loaded 
-    # before the session closes, preventing 'MissingGreenlet' errors in the response serialization.
     return schemas.ArticleWithContent.model_validate(article)
 
 @router.get("/related/{article_id}", response_model=List[schemas.Article])
