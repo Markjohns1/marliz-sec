@@ -210,9 +210,13 @@ class AISimplifier:
             article.keywords = self._extract_keywords(result)
             
             # UPDATE TITLE with SEO-optimized version from AI
-            if result.get("seo_title"):
+            # BUT: If it's already PUBLISHED or EDITED, do NOT change the title further
+            # to protect shared links and existing indexing.
+            if result.get("seo_title") and article.status not in [ArticleStatus.EDITED, ArticleStatus.PUBLISHED]:
                 article.title = result["seo_title"]
                 logger.info(f"Article {article.id} title updated: {result['seo_title'][:50]}...")
+            else:
+                logger.info(f"Article {article.id} keeping current title to protect links.")
             
             # UPDATE META DESCRIPTION with AI version
             if result.get("meta_description"):

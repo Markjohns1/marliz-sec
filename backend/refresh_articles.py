@@ -14,10 +14,10 @@ from app.services.ai_simplifier import ai_simplifier
 
 async def refresh_all_articles():
     async with AsyncSessionLocal() as db:
-        # Fetch all articles with their simplified content eagerly loaded
+        # Fetch all articles with their simplified content eagerly loaded (Ordered by ID for stability)
         stmt = select(Article).options(selectinload(Article.simplified)).where(
             Article.status.in_([ArticleStatus.READY, ArticleStatus.EDITED, ArticleStatus.PUBLISHED])
-        )
+        ).order_by(Article.id)
         result = await db.execute(stmt)
         articles = result.scalars().all()
         
