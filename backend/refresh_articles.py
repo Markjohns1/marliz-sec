@@ -8,6 +8,15 @@ from sqlalchemy.orm import selectinload
 # Add the current directory to sys.path to allow importing 'app'
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), ".")))
 
+# FORCE LOGGING TO CONTAINER STDOUT for detached mode monitoring
+# This allows usage of `docker compose logs -f web` to see progress of this script
+try:
+    if os.path.exists('/proc/1/fd/1'):
+        sys.stdout = open('/proc/1/fd/1', 'w', buffering=1)
+        sys.stderr = open('/proc/1/fd/2', 'w', buffering=1)
+except Exception:
+    pass
+
 from app.database import AsyncSessionLocal
 from app.models import Article, ArticleStatus
 from app.services.ai_simplifier import ai_simplifier
