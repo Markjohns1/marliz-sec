@@ -73,13 +73,13 @@ const Glossary = () => {
 
             <div className="max-w-5xl mx-auto">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
-                    <div className="flex items-center gap-4">
+                    <div className="flex flex-col md:flex-row items-center gap-4">
                         <div className="p-3 bg-blue-500/10 rounded-xl border border-blue-500/20">
                             <BookOpen className="w-8 h-8 text-blue-400" />
                         </div>
-                        <div>
-                            <h1 className="text-4xl font-black text-white uppercase tracking-tighter">Intelligence Glossary</h1>
-                            <p className="text-slate-400 mt-1">Master the terminology of modern cyber warfare.</p>
+                        <div className="text-center md:text-left">
+                            <h1 className="text-3xl md:text-4xl font-black text-white uppercase tracking-tighter">Intelligence Glossary</h1>
+                            <p className="text-slate-400 mt-1">Master the language of modern cyber warfare.</p>
                         </div>
                     </div>
 
