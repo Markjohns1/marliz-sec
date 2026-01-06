@@ -75,20 +75,22 @@ export default function ArticleCard({ article }) {
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-90"></div>
 
-        {/* Top Badges */}
-        <div className="absolute top-4 left-4 right-4 flex justify-between items-start z-10">
-          <span className="bg-slate-900/90 backdrop-blur-md text-slate-200 text-[10px] font-bold px-2.5 py-1.5 rounded border border-slate-700 uppercase tracking-wider shadow-sm">
+      </div>
+
+      {/* Content Section */}
+      <div className="p-5 flex-1 flex flex-col pt-2 relative z-10">
+
+        {/* Badges Row - Moved back to content area */}
+        <div className="flex items-center justify-between mb-3 mt-2">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest border border-slate-700 px-2 py-1 rounded bg-slate-800/50">
             {article.category?.name || 'INTEL'}
           </span>
-          <span className={`${getLevelColor(article.simplified?.threat_level?.toLowerCase())} text-white text-[10px] font-black px-2.5 py-1.5 rounded shadow-lg uppercase tracking-wider flex items-center gap-2`}>
+          <span className={`${getLevelColor(article.simplified?.threat_level?.toLowerCase())} text-white text-[10px] font-black px-2.5 py-1 rounded shadow-md uppercase tracking-wider flex items-center gap-1.5`}>
             {config.icon}
             <span>{config.text}</span>
           </span>
         </div>
-      </div>
 
-      {/* Content Section */}
-      <div className="p-5 flex-1 flex flex-col pt-2 relative z-10 -mt-8">
         <Link to={`/article/${article.slug}`}>
           <h3 className="text-lg font-bold text-white mb-3 group-hover:text-blue-400 transition-colors leading-tight line-clamp-3 filter drop-shadow-lg">
             {article.title}
