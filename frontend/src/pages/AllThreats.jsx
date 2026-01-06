@@ -19,21 +19,20 @@ export default function AllThreats() {
 
             <div className="bg-slate-950 min-h-screen">
                 {/* Header */}
-                <div className="bg-slate-900 border-b border-slate-800">
-                    <div className="max-w-7xl mx-auto px-4 py-12">
-                        <div className="flex items-center mb-4">
-                            <span className="p-3 bg-red-900/30 border border-red-500/30 rounded-lg mr-4">
-                                <Shield className="w-8 h-8 text-red-500" />
-                            </span>
-                            <div>
-                                <h1 className="text-4xl font-bold text-white">
-                                    Global Threat Index
-                                </h1>
-                                <p className="text-lg text-slate-400 mt-2">
-                                    Comprehensive list of all analyzed cybersecurity threats.
-                                </p>
-                            </div>
-                        </div>
+                {/* Header */}
+                <div className="bg-slate-900 border-b border-slate-800 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
+
+                    <div className="max-w-7xl mx-auto px-4 py-12 md:py-16 relative z-10">
+                        <span className="text-blue-500 font-bold tracking-widest text-xs uppercase mb-3 block">
+                            Intelligence Archive
+                        </span>
+                        <h1 className="text-4xl md:text-6xl font-black text-white mb-4 tracking-tight">
+                            Global Threat Index
+                        </h1>
+                        <p className="text-lg text-slate-400 max-w-2xl leading-relaxed border-l-2 border-slate-700 pl-4">
+                            Comprehensive list of all analyzed cybersecurity threats affecting the global landscape.
+                        </p>
                     </div>
                 </div>
 
