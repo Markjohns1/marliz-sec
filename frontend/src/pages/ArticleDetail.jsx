@@ -23,65 +23,57 @@ const stripHtml = (html) => {
 const formatAIContent = (text) => {
   if (!text) return '';
 
-  const toRoman = (num) => {
-    const map = { M: 1000, CM: 900, D: 500, CD: 400, C: 100, XC: 90, L: 50, XL: 40, X: 10, IX: 9, V: 5, IV: 4, I: 1 };
-    let res = '';
-    for (const i in map) { while (num >= map[i]) { res += i; num -= map[i]; } }
-    return res;
-  };
-
-  let romanCount = 0;
-
-  // 1. STAGE 1: Standardize delimiters and break walls.
-  let cleaned = text
+  // 1. ARCHITECTURAL CLEANING: Convert raw text into structured layout blocks
+  let blocks = text
     .replace(/([.!?])\s*([\*•\d+\.])\s+/g, '$1\n\n* ') // Break buried points
     .replace(/(\w)\s+([\*•\d+\.])\s+/g, '$1\n\n* ')   // Break buried points
-    .replace(/^[•\d+\.]\s+/gm, '* ')                 // Standardize leading bullets
+    .replace(/^[•\d+\.]\s+/gm, '* ')                 // Standardize all bullets to '*'
+    .replace(/\|\|\|/g, '')                          // Remove old separators
     .split('\n');
 
-  // 2. STAGE 2: Process line-by-line with Explicit Section Resets
-  return cleaned.map(line => {
+  // 2. PREMIUM RENDERING: Hierarchy, Scannability, and Contrast
+  return blocks.map(line => {
     const trimmed = line.trim();
     if (!trimmed) return '';
 
-    // HEADER DETECTION (THE RESET TRIGGER)
-    // If it's a markdown header OR a short title-case line, reset.
-    // We add EXPLICIT words that we know are headers in your reports.
-    const lower = trimmed.toLowerCase();
-    const isKnownHeader = lower.includes('sector') ||
-      lower.includes('impact') ||
-      lower.includes('actions') ||
-      lower.includes('risk') ||
-      lower.includes('keywords') ||
-      lower.includes('vector') ||
-      lower.includes('summary') ||
-      lower.includes('level');
+    // Logic: If it looks like a header (Short, Capitalized, No Period)
+    const isHeader = (trimmed.length > 2 && trimmed.length < 65 &&
+      /^[A-Z0-9]/.test(trimmed) &&
+      !trimmed.endsWith('.') &&
+      !trimmed.includes('*'));
 
-    const isStructureHeader = trimmed.startsWith('#') ||
-      (trimmed.length > 2 && trimmed.length < 65 &&
-        /^[A-Z0-9]/.test(trimmed) &&
-        !trimmed.endsWith('.'));
-
-    if (isStructureHeader || (trimmed.length < 50 && isKnownHeader)) {
-      romanCount = 0;
-      return trimmed.startsWith('#') ? line : `\n\n### ${trimmed.replace(/\*/g, '')}\n`;
+    if (isHeader) {
+      const cleanHeader = trimmed.replace(/\*/g, '').trim();
+      // Design: Use H3 with extra vertical breathing room
+      return `\n\n### ${cleanHeader}\n`;
     }
 
-    // ROMAN NUMERAL LISTS
-    // We catch anything starting with a star (*) OR those "Action" keywords
-    const isListPoint = trimmed.startsWith('*') ||
-      /^(IMMEDIATE|SECONDARY|LONG-TERM|ONGOING):/i.test(trimmed);
-
-    if (isListPoint) {
-      romanCount++;
+    // Logic: Bullet Points with "Key-Value" emphasis for scannability
+    if (trimmed.startsWith('*')) {
       let content = trimmed.replace(/^\*\s*/, '').trim();
-      return `\n\n**${toRoman(romanCount)}.** ${content}`;
+
+      // If the bullet has a colon, bold the Label (Key-Value design)
+      if (content.includes(': ')) {
+        const parts = content.split(': ');
+        const key = parts[0].trim();
+        const value = parts.slice(1).join(': ').trim();
+        return `\n* **${key}:** ${value}`;
+      }
+
+      // If no colon, bold the first 3-4 words for "F-Pattern" scannability
+      const words = content.split(' ');
+      if (words.length > 5) {
+        const lead = words.slice(0, 3).join(' ');
+        const rest = words.slice(3).join(' ');
+        return `\n* **${lead}** ${rest}`;
+      }
+
+      return `\n* ${content}`;
     }
 
     return line;
   }).join('\n')
-    .replace(/\|\|\|/g, '')
-    .replace(/\n\s*\n\s*\n+/g, '\n\n')
+    .replace(/\n\s*\n\s*\n+/g, '\n\n') // Normalize spacing
     .trim();
 };
 
