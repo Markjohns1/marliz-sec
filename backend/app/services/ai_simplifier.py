@@ -117,11 +117,11 @@ class AISimplifier:
                         "content": prompt
                     }
                 ],
-                "temperature": 0.3,
-                # Increased tokens for longer articles (1000-1500 words + JSON overhead)
+                "temperature": 0.2, # Lower temperature for strictly valid JSON
                 "max_completion_tokens": 6000, 
                 "top_p": 1,
-                "stream": False
+                "stream": False,
+                "response_format": { "type": "json_object" }
             }
             
             async with httpx.AsyncClient(timeout=180.0) as client:
@@ -270,20 +270,25 @@ CRITICAL CONTENT DEPTH PROTOCOL (STRICT REQUIREMENT):
     d) Providing detailed 'What-If' scenarios for Finance, Healthcare, and SMBs.
     e) Adding a 2-paragraph 'Global Cybersecurity Trends' context section.
 
-RESPOND WITH VALID JSON ONLY:
-{{
+RESPOND WITH A SINGLE, VALID JSON OBJECT ONLY.
+STRICT JSON RULES:
+1. INTERNAL DOUBLE QUOTES (") MUST BE ESCAPED WITH BACKSLASH (\").
+2. NEWLINES (\n) MUST BE ESCAPED AS \\n.
+3. DO NOT USE ANY MARKDOWN WRAPPERS.
+
+{
   "is_relevant": true,
   "category": "ransomware|phishing|data-breach|malware|vulnerability|general",
   "seo_title": "[Entity] [Event]: [Impact] – [Action]",
   "meta_description": "Shocking fact + Critical impact + Command (160 chars).",
-  "summary": "# Executive Summary\n\nNarrative of the event (Minimum 300 words). Use Roman Numerals for sub-points.\n\nI. CONTEXT: Historical background.\nII. INCIDENT: What happened.\nIII. RELEVANCE: Why it matters.\n\n(IMPORTANT: ALWAYS restart counting at I. for every section. NEVER continue numbering from previous sections.)",
-  "attack_vector": "## Technical Vector & Methodology\n\nExhaustive breakdown.\n\nI. PERSISTENCE: How they stay.\nII. EXFILTRATION: How they steal.\nIII. EVOLUTION: History.\n\n(IMPORTANT: START AT I. EVERY TIME)",
-  "impact": "## Business & Operational Impact\n\nDeep analysis of risks.\n\nI. FINANCIAL: Revenue loss.\nII. REPUTATIONAL: Trust damage.\nIII. REGULATORY: Legal fines.\n\n(IMPORTANT: START AT I. EVERY TIME)",
-  "who_is_at_risk": "Exhaustive list of sectors, operating systems, and demographics targeted.",
-  "actions": ["IMMEDIATE: Priority patch/action", "SECONDARY: System audit/monitoring", "LONG-TERM: Policy/Training update", "ONGOING: Threat hunting protocol"],
+  "summary": "# Executive Summary\n\nNARRATIVE (800+ words).",
+  "attack_vector": "## Technical Vector\n\nEXHAUSTIVE DETAILS.",
+  "impact": "## Business Impact\n\nDEEP RISK ANALYSIS.",
+  "who_is_at_risk": "SECTORS AND SYSTEMS.",
+  "actions": ["IMMEDIATE: ...", "SECONDARY: ...", "LONG-TERM: ...", "ONGOING: ..."],
   "threat_level": "low|medium|high|critical",
-  "keywords": ["target", "malware", "CVE", "cybersecurity news", "intel report"]
-}}
+  "keywords": ["tag1", "tag2"]
+}
 
 === SENSITIVE CONTENT AND ADSENSE COMPLIANCE ===
 - If the article even slightly touches on PROHIBITED SENSITIVE SUBJECTS (War in Ukraine, Israel/Gaza, Political Propaganda), you MUST mark it as 'is_relevant': false.
@@ -293,33 +298,35 @@ RETURN ONLY THE JSON OBJECT. NO MARKDOWN INTRO OR OUTRO."""
     def _parse_response(self, response_text: str) -> dict:
         """Parse Groq's JSON response with aggressive cleaning for control characters."""
         try:
-            # Clean up response (remove markdown if present)
+            # 1. Strip whitespace
             cleaned = response_text.strip()
             
-            # Find the first '{' and last '}' to isolate JSON
+            # 2. Extract JSON if wrapped in markdown
             start = cleaned.find('{')
             end = cleaned.rfind('}')
             if start != -1 and end != -1:
                 cleaned = cleaned[start:end+1]
             
-            # Remove invalid control characters that break json.loads
-            # These are usually literal newlines or tabs inside the JSON values
-            # that the AI failed to escape as \n or \t
-            cleaned = re.sub(r'[\x00-\x1F\x7F]', ' ', cleaned)
+            # 3. HEALER: If the JSON is broken, it's usually literal newlines
+            result = None
+            try:
+                result = json.loads(cleaned)
+            except json.JSONDecodeError:
+                # If it still fails, try the "Control Char Removal" as last resort
+                cleaned = re.sub(r'[\x00-\x1F\x7F]', ' ', cleaned)
+                result = json.loads(cleaned)
             
-            # Try to restore some structure if the AI used literal quotes incorrectly
-            # (Very basic - handles most common cases)
-            result = json.loads(cleaned)
-            
-            # Validate structure
-            # is_relevant is optional, default to True if missing (legacy support) but usually strictly required by prompt
+            if not result:
+                return None
+
+            # 4. VALIDATION
             is_relevant = result.get("is_relevant", True)
-            
             if not is_relevant:
                  return {"is_relevant": False}
 
             required = ["summary", "attack_vector", "impact", "actions", "threat_level"]
             if not all(key in result for key in required):
+                logger.error(f"Missing required keys in AI response: {[k for k in required if k not in result]}")
                 return None
             
             # Validate threat level
@@ -328,21 +335,16 @@ RETURN ONLY THE JSON OBJECT. NO MARKDOWN INTRO OR OUTRO."""
             
             # Validate actions (must be list with 2-5 items)
             if not isinstance(result["actions"], list) or len(result["actions"]) < 2:
+                logger.error(f"Invalid actions format: {type(result['actions'])}")
                 return None
             
             result["actions"] = result["actions"][:5]  # Max 5 actions
-            
             return result
-            
-        except json.JSONDecodeError as e:
-            logger.error(f"JSON parse error: {str(e)}")
-            # Show more of the response to help debug (800 chars instead of 200)
-            logger.error(f"Truncated Response was: {response_text[:800]}...")
-            return None
+
         except Exception as e:
             logger.error(f"Parse error: {str(e)}")
             return None
-    
+            
     def _extract_keywords(self, result: dict) -> str:
         """Extract SEO keywords from simplified content"""
         text = f"{result['summary']} {result['impact']}"
