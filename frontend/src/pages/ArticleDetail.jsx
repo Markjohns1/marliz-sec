@@ -2,8 +2,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { getArticle, getRelatedArticles } from '../services/api';
 import {
-  Clock, CheckCircle2, AlertCircle,
-  ExternalLink, ChevronLeft, Shield, AlertTriangle, CheckCircle, Info, Zap
+  Clock, CheckCircle2, AlertCircle, Calendar, Timer,
+  ExternalLink, ChevronLeft, Shield, AlertTriangle, CheckCircle, Info, Zap, Eye
 } from 'lucide-react';
 import { formatDistanceToNow, format } from 'date-fns';
 import ReactMarkdown from 'react-markdown';
@@ -277,24 +277,34 @@ export default function ArticleDetail() {
               </h1>
 
               {/* Meta Row */}
-              <div className="flex flex-wrap items-center gap-6 text-xs text-slate-400 pb-6 border-b border-slate-800/50">
+              {/* Meta Row */}
+              <div className="flex flex-wrap items-center gap-6 text-sm text-slate-400 mb-6">
                 <div className="flex items-center">
-                  <Clock className="w-3.5 h-3.5 mr-2" />
+                  <Calendar className="w-4 h-4 mr-2 text-slate-500" />
                   {publishedDate}
                 </div>
+
+                <div className="flex items-center">
+                  <Eye className="w-4 h-4 mr-2 text-slate-500" />
+                  {article.views?.toLocaleString() || '1'} views
+                </div>
+
                 {article.simplified?.reading_time_minutes && (
                   <div className="flex items-center">
-                    <Clock className="w-3.5 h-3.5 mr-2" />
+                    <Timer className="w-4 h-4 mr-2 text-slate-500" />
                     {article.simplified.reading_time_minutes} min read
                   </div>
                 )}
-                <div className="ml-auto">
-                  <SocialShare
-                    url={`${config.CANONICAL_BASE}/article/${article.slug}`}
-                    title={article.title}
-                    summary={stripHtml(article.simplified?.friendly_summary)}
-                  />
-                </div>
+              </div>
+
+              {/* Social Share Row */}
+              <div className="mb-8">
+                <SocialShare
+                  url={`${config.CANONICAL_BASE}/article/${article.slug}`}
+                  title={article.title}
+                  summary={stripHtml(article.simplified?.friendly_summary)}
+                  showLabel={false}
+                />
               </div>
             </div>
 

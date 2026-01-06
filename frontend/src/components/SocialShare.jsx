@@ -9,7 +9,7 @@ import { useState } from 'react';
  * @param {string} title - The title of the content
  * @param {string} summary - Optional summary/description
  */
-export default function SocialShare({ url, title, summary = '' }) {
+export default function SocialShare({ url, title, summary = '', showLabel = true }) {
     const [copied, setCopied] = useState(false);
 
     const encodedUrl = encodeURIComponent(url);
@@ -51,7 +51,7 @@ export default function SocialShare({ url, title, summary = '' }) {
 
     return (
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-            <span className="text-xs text-slate-500 uppercase tracking-wide font-semibold">Share</span>
+            {showLabel && <span className="text-xs text-slate-500 uppercase tracking-wide font-semibold">Share</span>}
 
             <div className="flex flex-wrap items-center gap-2">
                 {/* Native Share (Mobile Only) */}
