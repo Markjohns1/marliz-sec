@@ -26,14 +26,13 @@ async def refresh_all_articles():
         # Load categories for the simplifier
         await ai_simplifier._load_categories(db)
         
-        # ULTRA-STEADY FLOW PROTOCOL: 
-        # Goal: Complete 285 articles by 8:00 AM (approx 10 hours)
-        # 120 seconds (2 mins) x 285 = 9.5 Hours. Perfect timing.
-        
-        delay_between_articles = 120 # Steady 2 minute breath
+        processed_count = 0
+        batch_size = 10
+        batch_cooldown = 600 # 10 minutes rest after 10 articles
+        per_article_delay = 60 # 1 minute breath between articles
         
         for idx, article in enumerate(articles):
-            # 1. SMART RESUME: Skip anything already high-value
+            # 1. SMART RESUME: Skip anything already high-value (>800 words)
             word_count = 0
             if article.simplified:
                 summary = article.simplified.friendly_summary or ""
@@ -48,18 +47,26 @@ async def refresh_all_articles():
             print(f"[{idx+1}/{len(articles)}] UPGRADING: {article.title} (Current: {word_count} words)")
             
             success = False
-            retries = 20 # Extreme resilience
-            retry_delay = 45 
+            retries = 15 
             
             while not success and retries > 0:
                 try:
                     success = await ai_simplifier._simplify_article(db, article)
                     if success:
-                        print(f"  - SUCCESS: Content upgraded. Waiting {delay_between_articles}s for steady flow...")
-                        await asyncio.sleep(delay_between_articles)
+                        processed_count += 1
+                        print(f"  - SUCCESS: Content upgraded. [Batch Progress: {processed_count}/{batch_size}]")
+                        
+                        # Batch Cooldown Logic
+                        if processed_count >= batch_size:
+                            print(f"\n[!!!] BATCH COMPLETE (10 Articles). Resting for 10 minutes for total safety...")
+                            await asyncio.sleep(batch_cooldown)
+                            processed_count = 0 # Reset batch counter
+                            print("[!] Cooldown over. Resuming next batch...\n")
+                        else:
+                            await asyncio.sleep(per_article_delay)
                     else:
                         print(f"  - WARNING: Rate limited. ENTERING HEAVY COOLDOWN (5 MINUTES)...")
-                        await asyncio.sleep(300) # 5 minute sleep to clear tokens
+                        await asyncio.sleep(300) 
                         retries -= 1
                 except Exception as e:
                     print(f"  - ERROR: {e}. Retrying in 60s...")
