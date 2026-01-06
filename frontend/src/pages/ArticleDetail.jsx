@@ -20,6 +20,33 @@ const stripHtml = (html) => {
   return html.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ').trim();
 };
 
+const formatAIContent = (text) => {
+  if (!text) return '';
+
+  let formatted = text
+    // 1. Force a newline before any bullet point (*) that is not at the start of a line
+    .replace(/([^\n])\s*\*\s+/g, '$1\n\n* ')
+
+    // 2. Fix 'Inline Bullets' where AI puts them after a period without a newline
+    .replace(/([.!?])\s*\*\s+/g, '$1\n\n* ')
+
+    // 3. Identify and format "Lazy Headers" (Standalone lines of text that are Title Case)
+    .replace(/^([A-Z][\w\s&]{3,40})$/gm, '\n\n### $1\n')
+
+    // 4. Clean up the '|||' separators
+    .replace(/\|\|\|/g, '')
+
+    // 5. Ensure at least two newlines between paragraphs for clear Markdown separation
+    .replace(/\n\s*\n/g, '\n\n')
+
+    // 6. Final cleanup of any HTML leftovers
+    .replace(/<[^>]*>?/gm, (match) => {
+      return match.match(/<\/?h[1-6]>/i) ? match : '';
+    });
+
+  return formatted.trim();
+};
+
 export default function ArticleDetail() {
   const { slug } = useParams();
 
@@ -273,7 +300,7 @@ export default function ArticleDetail() {
                 </h2>
                 <div className="prose prose-invert prose-blue max-w-none text-lg text-slate-300 leading-relaxed">
                   <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
-                    {article.simplified?.friendly_summary?.replace(/\|\|\|/g, '')}
+                    {formatAIContent(article.simplified?.friendly_summary)}
                   </ReactMarkdown>
                 </div>
               </section>
@@ -287,9 +314,7 @@ export default function ArticleDetail() {
                   </h2>
                   <div className="prose prose-invert prose-blue max-w-none text-lg text-slate-300 leading-relaxed">
                     <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
-                      {article.simplified?.attack_vector
-                        ?.replace(/\|\|\|/g, '')
-                        .replace(/<h2>.*?<\/h2>/gi, '')}
+                      {formatAIContent(article.simplified?.attack_vector)}
                     </ReactMarkdown>
                   </div>
                 </section>
@@ -307,7 +332,7 @@ export default function ArticleDetail() {
                 </h2>
                 <div className="prose prose-invert prose-blue max-w-none text-lg text-blue-200 leading-relaxed">
                   <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
-                    {article.simplified?.business_impact?.replace(/\|\|\|/g, '')}
+                    {formatAIContent(article.simplified?.business_impact)}
                   </ReactMarkdown>
                 </div>
               </section>
