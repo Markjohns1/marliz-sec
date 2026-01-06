@@ -121,55 +121,33 @@ const AudioBrief = ({ article }) => {
 
     if (!synth) return null;
 
+    // Simplified AudioBrief: Just a sleek button
     return (
-        <div className="bg-slate-900/50 backdrop-blur border border-slate-800 rounded-xl p-4 flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-400 shrink-0">
-                    <Volume2 className="w-4 h-4" />
-                </div>
-                <h3 className="text-white font-bold text-sm md:text-base">Listen to Briefing</h3>
-            </div>
-
-            <div className="flex items-center gap-2">
-                {isLoading ? (
-                    <button disabled className="px-4 py-2 bg-slate-800 text-slate-400 rounded-lg flex items-center gap-2 text-xs font-bold">
-                        <Loader2 className="w-3 h-3 animate-spin" />
-                        Loading...
-                    </button>
-                ) : !isPlaying && !isPaused ? (
-                    <button
-                        onClick={handlePlay}
-                        className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-bold flex items-center gap-2 transition-colors"
-                    >
-                        <Play className="w-3 h-3 fill-current" />
-                        Play Briefing
-                    </button>
-                ) : (
-                    <div className="flex items-center gap-2">
-                        {isPlaying ? (
-                            <button
-                                onClick={handlePause}
-                                className="w-9 h-9 bg-slate-800 hover:bg-slate-700 text-white rounded-lg flex items-center justify-center transition-all border border-slate-700"
-                            >
-                                <Pause className="w-4 h-4 fill-current" />
-                            </button>
-                        ) : (
-                            <button
-                                onClick={handlePlay}
-                                className="w-9 h-9 bg-blue-600 hover:bg-blue-500 text-white rounded-lg flex items-center justify-center transition-all"
-                            >
-                                <Play className="w-4 h-4 fill-current" />
-                            </button>
-                        )}
-                        <button
-                            onClick={handleStop}
-                            className="w-9 h-9 bg-slate-800 hover:bg-slate-700 text-slate-400 rounded-lg flex items-center justify-center transition-all border border-slate-700"
-                        >
-                            <Square className="w-3 h-3 fill-current" />
-                        </button>
+        <div className="mb-8">
+            {isLoading ? (
+                <button disabled className="w-full md:w-auto bg-slate-800 text-slate-400 font-bold py-3 px-6 rounded-lg flex items-center justify-center gap-2 transition-all cursor-wait border border-slate-700">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Preparing Briefing...
+                </button>
+            ) : isPlaying ? (
+                <button
+                    onClick={handlePause}
+                    className="w-full md:w-auto bg-slate-800 text-white hover:bg-slate-700 font-bold py-3 px-6 rounded-lg flex items-center justify-center gap-2 transition-all border border-slate-600 shadow-lg"
+                >
+                    <Pause className="w-4 h-4 fill-current" />
+                    Pause Briefing
+                </button>
+            ) : (
+                <button
+                    onClick={handlePlay}
+                    className="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-6 rounded-lg flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-600/20 active:scale-95"
+                >
+                    <div className="flex items-center justify-center bg-white/20 rounded-full w-6 h-6 mr-1">
+                        <Play className="w-3 h-3 fill-current ml-0.5" />
                     </div>
-                )}
-            </div>
+                    Play Audio Briefing
+                </button>
+            )}
         </div>
     );
 };

@@ -389,17 +389,19 @@ export default function ArticleDetail() {
                   {Array.isArray(actionSteps) && actionSteps.every(s => typeof s === 'string') && actionSteps.map((step, index) => (
                     <div
                       key={index}
-                      className="flex items-start p-4 bg-slate-800/40 rounded-lg border border-slate-700/50 hover:border-emerald-500/30 transition-colors"
+                      className="p-5 bg-slate-800/40 rounded-xl border border-slate-700/50 hover:border-emerald-500/30 transition-colors mb-4"
                     >
-                      <div className="mt-0.5 mr-4 p-1 bg-emerald-500/10 rounded-full">
-                        <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                      </div>
-                      <div>
-                        <div className="inline-block px-1.5 py-0.5 bg-emerald-900/30 text-emerald-400 text-[10px] font-bold rounded mb-1 uppercase tracking-wider">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="p-1.5 bg-emerald-500/10 rounded-full text-emerald-500 border border-emerald-500/10">
+                          <CheckCircle2 className="w-4 h-4" />
+                        </div>
+                        <div className="px-2 py-0.5 bg-emerald-900/30 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold rounded uppercase tracking-widest">
                           Recommended
                         </div>
-                        <p className="text-slate-200 font-medium leading-relaxed">{step}</p>
                       </div>
+                      <p className="text-slate-200 font-medium leading-relaxed pl-1">
+                        {step}
+                      </p>
                     </div>
                   ))}
 
