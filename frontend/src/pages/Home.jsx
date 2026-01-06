@@ -2,7 +2,6 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { getArticles } from '../services/api';
 import ArticleCard from '../components/ArticleCard';
-import ThreatDashboard from '../components/ThreatDashboard';
 import { Shield, TrendingUp, Bell, ChevronRight, Database, FileWarning, Mail, Filter, ArrowDownWideNarrow, AlertCircle } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -44,14 +43,6 @@ export default function Home() {
   // Flatten all pages into one list of articles
   const allArticles = data?.pages.flatMap(page => page.articles) || [];
 
-  // Calculate dynamic threat level from recent articles
-  const currentThreatLevel = (() => {
-    if (!allArticles.length) return 'medium';
-    const levels = allArticles.slice(0, 10).map(a => a.simplified?.threat_level?.toLowerCase() || 'low');
-    if (levels.includes('critical')) return 'critical';
-    if (levels.includes('high')) return 'high';
-    return 'medium';
-  })();
 
   if (error) {
     return (
@@ -73,8 +64,6 @@ export default function Home() {
         <link rel="canonical" href={config.CANONICAL_BASE} />
       </Helmet>
 
-      {/* Live Threat Dashboard */}
-      <ThreatDashboard stats={{ threatLevel: currentThreatLevel }} />
 
       {/* Hero Section - NOW FULL WIDTH */}
       <section className="bg-slate-900 text-white w-full border-b border-slate-800">
