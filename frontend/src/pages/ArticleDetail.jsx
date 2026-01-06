@@ -26,21 +26,28 @@ const formatAIContent = (text) => {
   const toRoman = (num) => {
     const map = { M: 1000, CM: 900, D: 500, CD: 400, C: 100, XC: 90, L: 50, XL: 40, X: 10, IX: 9, V: 5, IV: 4, I: 1 };
     let res = '';
-    for (let i in map) { while (num >= map[i]) { res += i; num -= map[i]; } }
+    for (const i in map) { while (num >= map[i]) { res += i; num -= map[i]; } }
     return res;
   };
 
   let romanCount = 0;
   return text.split('\n').map(line => {
     const trimmed = line.trim();
+    if (!trimmed) return '';
 
-    // 1. Reset Counter on Headers
-    if (trimmed.startsWith('#') || (trimmed.length > 5 && trimmed.length < 50 && trimmed === trimmed.toUpperCase())) {
+    // Advanced Header Detection (Resets the I, II, III counter)
+    const isHeader = trimmed.startsWith('#') ||
+      trimmed.startsWith('<h') ||
+      (trimmed.length > 3 && trimmed.length < 60 &&
+        /^[A-Z0-9][\w\s&:-]+$/.test(trimmed) &&
+        !trimmed.includes('*'));
+
+    if (isHeader) {
       romanCount = 0;
-      return line;
+      return trimmed.startsWith('#') || trimmed.startsWith('<') ? line : `### ${trimmed}`;
     }
 
-    // 2. Only convert stars if they lead the line
+    // Bullet Point Detection
     if (trimmed.startsWith('*')) {
       romanCount++;
       return `\n\n**${toRoman(romanCount)}.** ${trimmed.substring(1).trim()}`;
@@ -49,7 +56,7 @@ const formatAIContent = (text) => {
     return line;
   }).join('\n')
     .replace(/\|\|\|/g, '')
-    .replace(/\n\s*\n\s*\n/g, '\n\n')
+    .replace(/\n\s*\n\s*\n+/g, '\n\n')
     .trim();
 };
 
