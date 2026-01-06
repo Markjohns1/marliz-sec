@@ -46,12 +46,12 @@ const formatAIContent = (text) => {
     if (!trimmed) return '';
 
     // Advanced Header Detection - Resets the I, II, III counter
-    // Catches # Headers or short Title Case lines (typical of sections like "Finance Sector")
+    const cleanForCheck = trimmed.replace(/\*/g, '');
     const isHeader = trimmed.startsWith('#') ||
-      (trimmed.length > 3 && trimmed.length < 60 &&
-        /^[A-Z][\w\s&:-]+$/.test(trimmed) &&
-        !trimmed.endsWith('.') &&
-        !trimmed.includes('*'));
+      trimmed.startsWith('<h') ||
+      (cleanForCheck.length > 2 && cleanForCheck.length < 60 &&
+        /^[A-Z0-9][\w\s&:-]+$/.test(cleanForCheck) &&
+        !cleanForCheck.endsWith('.'));
 
     if (isHeader) {
       romanCount = 0;
@@ -67,7 +67,7 @@ const formatAIContent = (text) => {
     return line;
   }).join('\n')
     .replace(/\|\|\|/g, '')
-    .replace(/\s+\*\s+/g, ' ') // Final safety: remove any leftover internal stars
+    .replace(/\s+\*\s+/g, ' ')
     .replace(/\n\s*\n\s*\n+/g, '\n\n')
     .trim();
 };
