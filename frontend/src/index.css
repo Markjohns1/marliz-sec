@@ -47,4 +47,18 @@
   .threat-badge-critical {
     @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-wider bg-red-500/10 text-red-500 border border-red-500/20 shadow-glow-critical animate-pulse;
   }
+
+  /* Markdown Safety Styles */
+  .prose ul {
+    @apply list-disc list-inside space-y-2 my-4;
+  }
+  .prose li {
+    @apply text-slate-300;
+  }
+  .prose h1, .prose h2, .prose h3 {
+    @apply font-bold text-white mt-8 mb-4;
+  }
+  .prose p {
+    @apply mb-4 leading-relaxed;
+  }
 }
