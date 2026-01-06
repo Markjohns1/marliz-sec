@@ -26,28 +26,37 @@ const formatAIContent = (text) => {
   const toRoman = (num) => {
     const map = { M: 1000, CM: 900, D: 500, CD: 400, C: 100, XC: 90, L: 50, XL: 40, X: 10, IX: 9, V: 5, IV: 4, I: 1 };
     let res = '';
-    for (const i in map) { while (num >= map[i]) { res += i; num -= map[i]; } }
+    for (const i in map) {
+      while (num >= map[i]) { res += i; num -= map[i]; }
+    }
     return res;
   };
 
   let romanCount = 0;
-  return text.split('\n').map(line => {
+
+  // 1. FIRST PASS: Normalize the text. 
+  // Force every '*' onto a new line if it's currently buried in a sentence.
+  let healedText = text
+    .replace(/([.!?])\s*\*\s+/g, '$1\n* ') // Fixes "period * text"
+    .replace(/(\w)\s*\* /g, '$1\n* ');    // Fixes "word * text"
+
+  // 2. SECOND PASS: Process lines and apply Roman Numerals
+  return healedText.split('\n').map(line => {
     const trimmed = line.trim();
     if (!trimmed) return '';
 
-    // Advanced Header Detection (Resets the I, II, III counter)
+    // Header Detection - Reset the Roman count
     const isHeader = trimmed.startsWith('#') ||
-      trimmed.startsWith('<h') ||
       (trimmed.length > 3 && trimmed.length < 60 &&
-        /^[A-Z0-9][\w\s&:-]+$/.test(trimmed) &&
-        !trimmed.includes('*'));
+        /^[A-Z0-9]/.test(trimmed) &&
+        trimmed === trimmed.toUpperCase());
 
     if (isHeader) {
       romanCount = 0;
-      return trimmed.startsWith('#') || trimmed.startsWith('<') ? line : `### ${trimmed}`;
+      return trimmed.startsWith('#') ? line : `\n\n### ${trimmed}\n`;
     }
 
-    // Bullet Point Detection
+    // Bullet Point Detection - Now robust because of Pass 1
     if (trimmed.startsWith('*')) {
       romanCount++;
       return `\n\n**${toRoman(romanCount)}.** ${trimmed.substring(1).trim()}`;
@@ -56,6 +65,7 @@ const formatAIContent = (text) => {
     return line;
   }).join('\n')
     .replace(/\|\|\|/g, '')
+    .replace(/\s+\*\s+/g, ' ') // Final safety: remove any leftover internal stars
     .replace(/\n\s*\n\s*\n+/g, '\n\n')
     .trim();
 };
