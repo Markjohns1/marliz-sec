@@ -25,10 +25,10 @@ const formatAIContent = (text) => {
 
   let formatted = text
     // 1. Force a newline before any bullet point (*) that is not at the start of a line
-    .replace(/([^\n])\s*\*\s+/g, '$1\n\n* ')
+    .replace(/([^\n])\s*\*\s+/g, '$1\n* ')
 
     // 2. Fix 'Inline Bullets' where AI puts them after a period without a newline
-    .replace(/([.!?])\s*\*\s+/g, '$1\n\n* ')
+    .replace(/([.!?])\s*\*\s+/g, '$1\n* ')
 
     // 3. Identify and format "Lazy Headers" (Standalone lines of text that are Title Case)
     .replace(/^([A-Z][\w\s&]{3,40})$/gm, '\n\n### $1\n')
@@ -40,9 +40,7 @@ const formatAIContent = (text) => {
     .replace(/\n\s*\n/g, '\n\n')
 
     // 6. Final cleanup of any HTML leftovers
-    .replace(/<[^>]*>?/gm, (match) => {
-      return match.match(/<\/?h[1-6]>/i) ? match : '';
-    });
+    .replace(/<[^>]*>?/gm, (m) => (m.match(/<\/?h[1-6]>/i) ? m : ''));
 
   return formatted.trim();
 };

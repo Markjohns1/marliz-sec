@@ -50,14 +50,19 @@
 
   /* Markdown Safety Styles */
   .prose ul {
-    @apply list-disc list-inside space-y-2 my-4;
+    @apply list-disc list-outside ml-6 space-y-2 my-4;
   }
+
   .prose li {
     @apply text-slate-300;
   }
-  .prose h1, .prose h2, .prose h3 {
+
+  .prose h1,
+  .prose h2,
+  .prose h3 {
     @apply font-bold text-white mt-8 mb-4;
   }
+
   .prose p {
     @apply mb-4 leading-relaxed;
   }
