@@ -58,13 +58,12 @@ async def refresh_all_articles():
                         print(f"  - SUCCESS: Content upgraded. Waiting {delay_between_articles}s for steady flow...")
                         await asyncio.sleep(delay_between_articles)
                     else:
-                        print(f"  - WARNING: Rate limited. Waiting {retry_delay}s before retry...")
-                        await asyncio.sleep(retry_delay)
+                        print(f"  - WARNING: Rate limited. ENTERING HEAVY COOLDOWN (5 MINUTES)...")
+                        await asyncio.sleep(300) # 5 minute sleep to clear tokens
                         retries -= 1
-                        retry_delay += 30 
                 except Exception as e:
-                    print(f"  - ERROR: {e}. Retrying in {retry_delay}s...")
-                    await asyncio.sleep(retry_delay)
+                    print(f"  - ERROR: {e}. Retrying in 60s...")
+                    await asyncio.sleep(60)
                     retries -= 1
             
             if not success:
