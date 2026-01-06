@@ -23,13 +23,33 @@ const stripHtml = (html) => {
 const formatAIContent = (text) => {
   if (!text) return '';
 
+  const toRoman = (num) => {
+    const map = { M: 1000, CM: 900, D: 500, CD: 400, C: 100, XC: 90, L: 50, XL: 40, X: 10, IX: 9, V: 5, IV: 4, I: 1 };
+    let res = '';
+    for (let i in map) {
+      while (num >= map[i]) { res += i; num -= map[i]; }
+    }
+    return res;
+  };
+
+  let romanCount = 0;
   let formatted = text
-    .replace(/([.!?])\s*\*\s+/g, '$1\n\nI. ')
-    .replace(/([^\n])\s*\*\s+/g, '$1\n\nI. ')
+    // 1. Identify headers to reset counter
+    .split('\n').map(line => {
+      if (line.match(/^#/) || line.match(/^[A-Z][A-Z\s&]{3,40}$/)) {
+        romanCount = 0;
+        return line;
+      }
+      // 2. Replace stars with incrementing Romans
+      return line.replace(/\*/g, () => {
+        romanCount++;
+        return `\n\n**${toRoman(romanCount)}.**`;
+      });
+    }).join('\n')
 
+    // 3. Clean up Roman formatting and spacing
     .replace(/^([IVXLC]+\.)\s+/gm, '\n\n**$1** ')
-    .replace(/^([A-Z][\w\s&]{3,40})$/gm, '\n\n## $1\n')
-
+    .replace(/\|\|\|/g, '')
     .replace(/\n\s*\n\s*\n/g, '\n\n');
 
   return formatted.trim();
