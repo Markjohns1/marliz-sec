@@ -94,10 +94,10 @@ export default function ArticleCard({ article }) {
 
         {/* Badges Row */}
         <div className="flex items-center justify-between mb-4">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest border border-slate-700 px-2.5 py-1 rounded bg-slate-800/50">
+          <span className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest border border-slate-700 px-2 py-1 rounded bg-slate-800/50">
             {article.category?.name || 'INTEL'}
           </span>
-          <span className={`${getLevelColor(article.simplified?.threat_level?.toLowerCase())} text-white text-[10px] font-black px-3 py-1.5 rounded shadow-lg uppercase tracking-wider flex items-center gap-2 transform hover:scale-105 transition-transform`}>
+          <span className={`${getLevelColor(article.simplified?.threat_level?.toLowerCase())} text-white text-[9px] md:text-[10px] font-black px-2 py-1 md:px-3 md:py-1.5 rounded shadow-lg uppercase tracking-wider flex items-center gap-1.5 md:gap-2 transform hover:scale-105 transition-transform`}>
             {config.icon}
             <span>{config.text}</span>
           </span>
@@ -122,7 +122,7 @@ export default function ArticleCard({ article }) {
         )}
 
         {/* Minimal Footer Link */}
-        <div className="mt-auto border-t border-slate-800/50 pt-4">
+        <div className="mt-auto border-t border-slate-800/50 pt-4 flex justify-end">
           <Link
             to={`/article/${article.slug}`}
             className="text-blue-400 hover:text-white text-xs font-bold uppercase tracking-widest flex items-center transition-colors group/link"

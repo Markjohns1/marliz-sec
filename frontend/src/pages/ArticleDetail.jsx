@@ -431,21 +431,12 @@ export default function ArticleDetail() {
               </div>
 
               {/* Original Source CTA */}
-              <div className="mt-8 mb-12 bg-slate-800/50 rounded-xl border border-slate-700 p-8 text-center">
-                <div className="flex justify-center mb-4">
-                  <div className="p-3 bg-slate-700/50 rounded-full">
-                    <ExternalLink className="w-6 h-6 text-slate-300" />
-                  </div>
-                </div>
-                <h3 className="text-xl font-bold text-white mb-2">Need the full technical report?</h3>
-                <p className="text-slate-400 text-sm mb-6 max-w-md mx-auto">
-                  Read the full original documentation regarding this breach with technical assets and indicators of compromise.
-                </p>
+              <div className="mt-8 mb-12 flex justify-center">
                 <a
                   href={article.original_url || '#'}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-colors shadow-lg shadow-blue-900/20"
+                  className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-colors shadow-lg shadow-blue-900/20"
                 >
                   Open Original Source
                   <ExternalLink className="w-4 h-4 ml-2" />

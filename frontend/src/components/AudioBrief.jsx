@@ -122,29 +122,26 @@ const AudioBrief = ({ article }) => {
     if (!synth) return null;
 
     return (
-        <div className="bg-slate-900/80 backdrop-blur-md border border-slate-800 rounded-2xl p-4 md:p-6 mb-8 flex flex-col md:flex-row items-center justify-between gap-4 shadow-xl">
-            <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-blue-500/10 rounded-full flex items-center justify-center text-blue-400">
-                    <Volume2 className="w-6 h-6" />
+        <div className="bg-slate-900/50 backdrop-blur border border-slate-800 rounded-xl p-4 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-400 shrink-0">
+                    <Volume2 className="w-4 h-4" />
                 </div>
-                <div>
-                    <h3 className="text-white font-bold text-lg">Listen to Briefing</h3>
-                    <p className="text-slate-400 text-sm">Audio intelligence briefing for this report</p>
-                </div>
+                <h3 className="text-white font-bold text-sm md:text-base">Listen to Briefing</h3>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
                 {isLoading ? (
-                    <button disabled className="px-6 py-2.5 bg-slate-800 text-slate-400 rounded-xl flex items-center gap-2">
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        Preparing...
+                    <button disabled className="px-4 py-2 bg-slate-800 text-slate-400 rounded-lg flex items-center gap-2 text-xs font-bold">
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                        Loading...
                     </button>
                 ) : !isPlaying && !isPaused ? (
                     <button
                         onClick={handlePlay}
-                        className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-blue-500/20 active:scale-95"
+                        className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-bold flex items-center gap-2 transition-colors"
                     >
-                        <Play className="w-4 h-4 fill-current" />
+                        <Play className="w-3 h-3 fill-current" />
                         Play Briefing
                     </button>
                 ) : (
@@ -152,30 +149,24 @@ const AudioBrief = ({ article }) => {
                         {isPlaying ? (
                             <button
                                 onClick={handlePause}
-                                className="w-12 h-12 bg-slate-800 hover:bg-slate-700 text-white rounded-full flex items-center justify-center transition-all border border-slate-700"
+                                className="w-9 h-9 bg-slate-800 hover:bg-slate-700 text-white rounded-lg flex items-center justify-center transition-all border border-slate-700"
                             >
-                                <Pause className="w-5 h-5 fill-current" />
+                                <Pause className="w-4 h-4 fill-current" />
                             </button>
                         ) : (
                             <button
                                 onClick={handlePlay}
-                                className="w-12 h-12 bg-blue-600 hover:bg-blue-500 text-white rounded-full flex items-center justify-center transition-all shadow-lg shadow-blue-500/20"
+                                className="w-9 h-9 bg-blue-600 hover:bg-blue-500 text-white rounded-lg flex items-center justify-center transition-all"
                             >
-                                <Play className="w-5 h-5 fill-current" />
+                                <Play className="w-4 h-4 fill-current" />
                             </button>
                         )}
                         <button
                             onClick={handleStop}
-                            className="w-12 h-12 bg-slate-800 hover:bg-red-900/20 hover:text-red-400 text-slate-400 rounded-full flex items-center justify-center transition-all border border-slate-700 hover:border-red-500/30"
+                            className="w-9 h-9 bg-slate-800 hover:bg-slate-700 text-slate-400 rounded-lg flex items-center justify-center transition-all border border-slate-700"
                         >
-                            <Square className="w-5 h-5 fill-current" />
+                            <Square className="w-3 h-3 fill-current" />
                         </button>
-                        <div className="hidden md:flex flex-col ml-2">
-                            <span className="text-[10px] text-blue-400 font-bold uppercase tracking-widest leading-none mb-1">Status</span>
-                            <span className="text-xs text-white font-medium animate-pulse">
-                                {isPlaying ? 'Speaking...' : 'Paused'}
-                            </span>
-                        </div>
                     </div>
                 )}
             </div>
