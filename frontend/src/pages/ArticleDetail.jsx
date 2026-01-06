@@ -3,9 +3,11 @@ import { useParams, Link, Navigate } from 'react-router-dom';
 import { getArticle, getRelatedArticles } from '../services/api';
 import {
   Clock, CheckCircle2, AlertCircle,
-  ExternalLink, ChevronLeft, Shield, AlertTriangle, CheckCircle, Info
+  ExternalLink, ChevronLeft, Shield, AlertTriangle, CheckCircle, Info, Zap
 } from 'lucide-react';
 import { formatDistanceToNow, format } from 'date-fns';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { Helmet } from 'react-helmet-async';
 import AdUnit from '../components/AdUnit';
 import SocialShare from '../components/SocialShare';
@@ -96,7 +98,7 @@ export default function ArticleDetail() {
         {article.image_url && <meta property="og:image" content={article.image_url} />}
         <meta property="og:type" content="article" />
         <link rel="canonical" href={`${config.CANONICAL_BASE}/article/${article.slug}`} />
-        
+
         {/* News Article Schema */}
         <script type="application/ld+json">
           {JSON.stringify({
@@ -264,32 +266,31 @@ export default function ArticleDetail() {
             {/* Main Content */}
             <div className="prose prose-lg max-w-none">
               {/* Summary */}
-              <section className="bg-slate-900/50 rounded-xl p-8 border border-slate-800 mb-8">
-                <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
-                  <AlertCircle className="w-6 h-6 mr-2 text-blue-500" />
-                  Now, Let's Talk About What Happened
+              <section className="mb-12">
+                <h2 className="text-2xl font-bold text-white mb-4">
+                  The Lowdown: Friendly Expert Summary
                 </h2>
-                <div
-                  className="text-lg text-slate-300 leading-relaxed space-y-4"
-                  dangerouslySetInnerHTML={{ __html: article.simplified?.friendly_summary }}
-                />
+                <div className="prose prose-invert prose-blue max-w-none text-lg text-slate-300 leading-relaxed">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {article.simplified?.friendly_summary?.replace(/\|\|\|/g, '')}
+                  </ReactMarkdown>
+                </div>
               </section>
 
               {/* Technical Details - Attack Vector */}
               {article.simplified?.attack_vector && (
-                <section className="bg-red-900/10 border-l-4 border-red-500 rounded-r-xl p-8 mb-8">
-                  <h2 className="text-2xl font-bold text-red-100 mb-4 flex items-center">
-                    <Shield className="w-6 h-6 mr-2 text-red-500" />
-                    Technically: How It Happened
+                <section className="mb-12 bg-slate-900/30 p-8 rounded-xl border border-blue-500/10 shadow-[0_0_20px_rgba(59,130,246,0.05)]">
+                  <h2 className="text-2xl font-bold text-blue-400 mb-4 flex items-center">
+                    <Zap className="w-6 h-6 mr-3" />
+                    Technically: How The Attack Happened
                   </h2>
-                  <div
-                    className="text-lg text-red-100/90 leading-relaxed font-mono text-sm md:text-base space-y-4"
-                    dangerouslySetInnerHTML={{
-                      __html: article.simplified.attack_vector
-                        .replace(/\|\|\|/g, '')
-                        .replace(/<h2>.*?<\/h2>/gi, '')
-                    }}
-                  />
+                  <div className="prose prose-invert prose-blue max-w-none text-lg text-slate-300 leading-relaxed">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {article.simplified?.attack_vector
+                        ?.replace(/\|\|\|/g, '')
+                        .replace(/<h2>.*?<\/h2>/gi, '')}
+                    </ReactMarkdown>
+                  </div>
                 </section>
               )}
 
@@ -303,10 +304,11 @@ export default function ArticleDetail() {
                 <h2 className="text-2xl font-bold text-blue-100 mb-4">
                   Why This Matters to You (Personal & Business)
                 </h2>
-                <div
-                  className="text-lg text-blue-200 leading-relaxed space-y-4"
-                  dangerouslySetInnerHTML={{ __html: article.simplified?.business_impact?.replace(/\|\|\|/g, '') }}
-                />
+                <div className="prose prose-invert prose-blue max-w-none text-lg text-blue-200 leading-relaxed">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {article.simplified?.business_impact?.replace(/\|\|\|/g, '')}
+                  </ReactMarkdown>
+                </div>
               </section>
 
               {/* Action Steps */}
