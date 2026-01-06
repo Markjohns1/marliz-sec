@@ -77,48 +77,61 @@ export default function ArticleCard({ article }) {
 
       </div>
 
-      {/* Content Section */}
-      <div className="p-5 flex-1 flex flex-col pt-2 relative z-10">
+      {/* Meta Bar - Dark Strip */}
+      <div className="flex items-center justify-between px-5 py-2.5 bg-slate-950/80 border-b border-slate-800 backdrop-blur-md">
+        <div className="flex items-center text-[11px] text-slate-400 font-medium">
+          <Eye className="w-3.5 h-3.5 mr-1.5 text-slate-500" />
+          {viewText}
+        </div>
+        <div className="flex items-center text-[11px] text-slate-400 font-medium">
+          <Clock className="w-3.5 h-3.5 mr-1.5 text-slate-500" />
+          {timeAgo}
+        </div>
+      </div>
 
-        {/* Badges Row - Moved back to content area */}
-        <div className="flex items-center justify-between mb-3 mt-2">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest border border-slate-700 px-2 py-1 rounded bg-slate-800/50">
+      {/* Content Section */}
+      <div className="p-5 flex-1 flex flex-col pt-4 relative z-10 bg-slate-900">
+
+        {/* Badges Row */}
+        <div className="flex items-center justify-between mb-4">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest border border-slate-700 px-2.5 py-1 rounded bg-slate-800/50">
             {article.category?.name || 'INTEL'}
           </span>
-          <span className={`${getLevelColor(article.simplified?.threat_level?.toLowerCase())} text-white text-[10px] font-black px-2.5 py-1 rounded shadow-md uppercase tracking-wider flex items-center gap-1.5`}>
+          <span className={`${getLevelColor(article.simplified?.threat_level?.toLowerCase())} text-white text-[10px] font-black px-3 py-1.5 rounded shadow-lg uppercase tracking-wider flex items-center gap-2 transform hover:scale-105 transition-transform`}>
             {config.icon}
             <span>{config.text}</span>
           </span>
         </div>
 
         <Link to={`/article/${article.slug}`}>
-          <h3 className="text-lg font-bold text-white mb-3 group-hover:text-blue-400 transition-colors leading-tight line-clamp-3 filter drop-shadow-lg">
+          <h3 className="text-xl font-bold text-white mb-4 group-hover:text-blue-400 transition-colors leading-tight filter drop-shadow-sm">
             {article.title}
           </h3>
         </Link>
 
+        {/* Executive Summary Section */}
         {article.simplified?.friendly_summary && (
-          <p className="text-slate-400 mb-6 line-clamp-3 text-sm leading-relaxed flex-1 font-light border-l-2 border-slate-800 pl-3">
-            {stripHtml(article.simplified.friendly_summary)}
-          </p>
+          <div className="flex-1">
+            <div className="inline-block px-2 py-0.5 rounded-md bg-blue-900/20 border border-blue-500/20 text-blue-400 text-[10px] font-bold uppercase tracking-widest mb-3">
+              Executive Summary
+            </div>
+            <p className="text-slate-400 mb-6 line-clamp-3 text-sm leading-relaxed font-light">
+              {stripHtml(article.simplified.friendly_summary)}
+            </p>
+          </div>
         )}
 
-        {/* Minimal Footer */}
-        <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-800/50">
-          <div className="flex items-center text-xs text-slate-500 font-mono">
-            <Clock className="w-3 h-3 mr-1.5" />
-            {timeAgo}
-          </div>
-
+        {/* Minimal Footer Link */}
+        <div className="mt-auto border-t border-slate-800/50 pt-4">
           <Link
             to={`/article/${article.slug}`}
-            className="text-blue-400 hover:text-white text-xs font-bold uppercase tracking-widest flex items-center transition-colors"
+            className="text-blue-400 hover:text-white text-xs font-bold uppercase tracking-widest flex items-center transition-colors group/link"
           >
-            Details
-            <ChevronRight className="w-3 h-3 ml-1" />
+            Read More
+            <ChevronRight className="w-3.5 h-3.5 ml-1 group-hover/link:translate-x-1 transition-transform" />
           </Link>
         </div>
       </div>
-    </article>
+    </article >
   );
 }
