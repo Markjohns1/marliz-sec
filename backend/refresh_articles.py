@@ -29,7 +29,7 @@ async def refresh_all_articles():
         processed_count = 0
         batch_size = 10
         batch_cooldown = 600 # 10 minutes rest after 10 articles
-        per_article_delay = 60 # 1 minute breath between articles
+        per_article_delay = 120 # 2 minute breath between articles (Increased for 2200-word support)
         
         for idx, article in enumerate(articles):
             # 1. SMART RESUME: Skip anything already high-value (>800 words)
