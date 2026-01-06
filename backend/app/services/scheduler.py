@@ -122,20 +122,15 @@ def start_scheduler():
         id="startup_fetch",
         name="Initial news fetch"
     )
-    # scheduler.add_job(
-    #      simplify_articles_job,
-    #      id="startup_simplify",
-    #      name="Initial simplification"
-    #  )
+
     scheduler.add_job(
         cleanup_job,
         id="startup_cleanup",
         name="Initial cleanup"
     )
     
-    scheduler.start()
-    logger.info("✓ Scheduler started: News fetch at 7 AM and 7 PM UTC")
-    logger.info("✓ Jobs: fetch_news_morning, fetch_news_evening, cleanup, simplify_articles")
+    # scheduler.start()
+    logger.info("✓ Scheduler DISABLED for overnight bulk upgrade.")
 
 def stop_scheduler():
     """Stop scheduler gracefully"""
