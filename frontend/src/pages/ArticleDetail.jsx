@@ -26,33 +26,31 @@ const formatAIContent = (text) => {
   const toRoman = (num) => {
     const map = { M: 1000, CM: 900, D: 500, CD: 400, C: 100, XC: 90, L: 50, XL: 40, X: 10, IX: 9, V: 5, IV: 4, I: 1 };
     let res = '';
-    for (let i in map) {
-      while (num >= map[i]) { res += i; num -= map[i]; }
-    }
+    for (let i in map) { while (num >= map[i]) { res += i; num -= map[i]; } }
     return res;
   };
 
   let romanCount = 0;
-  let formatted = text
-    // 1. Identify headers to reset counter
-    .split('\n').map(line => {
-      if (line.match(/^#/) || line.match(/^[A-Z][A-Z\s&]{3,40}$/)) {
-        romanCount = 0;
-        return line;
-      }
-      // 2. Replace stars with incrementing Romans
-      return line.replace(/\*/g, () => {
-        romanCount++;
-        return `\n\n**${toRoman(romanCount)}.**`;
-      });
-    }).join('\n')
+  return text.split('\n').map(line => {
+    const trimmed = line.trim();
 
-    // 3. Clean up Roman formatting and spacing
-    .replace(/^([IVXLC]+\.)\s+/gm, '\n\n**$1** ')
+    // 1. Reset Counter on Headers
+    if (trimmed.startsWith('#') || (trimmed.length > 5 && trimmed.length < 50 && trimmed === trimmed.toUpperCase())) {
+      romanCount = 0;
+      return line;
+    }
+
+    // 2. Only convert stars if they lead the line
+    if (trimmed.startsWith('*')) {
+      romanCount++;
+      return `\n\n**${toRoman(romanCount)}.** ${trimmed.substring(1).trim()}`;
+    }
+
+    return line;
+  }).join('\n')
     .replace(/\|\|\|/g, '')
-    .replace(/\n\s*\n\s*\n/g, '\n\n');
-
-  return formatted.trim();
+    .replace(/\n\s*\n\s*\n/g, '\n\n')
+    .trim();
 };
 
 export default function ArticleDetail() {
