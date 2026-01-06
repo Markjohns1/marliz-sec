@@ -104,8 +104,9 @@ const AudioBrief = ({ article }) => {
     };
 
     const handlePause = () => {
-        if (synth && isPlaying) {
-            synth.pause();
+        if (synth) {
+            // Force stop immediately as 'pause' can be unreliable on mobile
+            synth.cancel();
             setIsPlaying(false);
             setIsPaused(true);
         }
