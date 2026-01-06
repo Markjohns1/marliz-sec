@@ -32,34 +32,44 @@ const formatAIContent = (text) => {
 
   let romanCount = 0;
 
-  // 1. PASS 1: Force new lines for ANY bullet or action keyword that is clumped
+  // 1. NUCLEAR HEALER: Force new lines for EVERY known pattern
   let healedText = text
-    .replace(/([.!?])\s*([\*•])\s+/g, '$1\n\n* ') // Break at punctuation
-    .replace(/(\w)\s+([\*•])\s+/g, '$1\n\n* ')    // Break at words
-    .replace(/([\*•])\s+/g, '\n\n* ')              // Standardize all to stars for loop
-    .replace(/([.!?])\s*(IMMEDIATE|SECONDARY|LONG-TERM|ONGOING):/g, '$1\n\n* $2:'); // Break clumped actions
+    // A. Split numeric lists buried in sentences (1. 2. 3.)
+    .replace(/([.!?])\s*(\d+\.)\s+/g, '$1\n\n* ')
+    .replace(/(\w)\s+(\d+\.)\s+/g, '$1\n\n* ')
+    // B. Split dots and stars (•, *)
+    .replace(/([.!?])\s*([\*•])\s+/g, '$1\n\n* ')
+    .replace(/(\w)\s*([\*•])\s+/g, '$1\n\n* ')
+    // C. Split action keywords
+    .replace(/([.!?])\s*(IMMEDIATE|SECONDARY|LONG-TERM|ONGOING|ACTION|STEP|PHASE):/gi, '$1\n\n* $2:')
+    .replace(/(\w)\s+(IMMEDIATE|SECONDARY|LONG-TERM|ONGOING|ACTION|STEP|PHASE):/gi, '$1\n\n* $2:')
+    // D. Standardize everything to star bullets for processing
+    .replace(/^[•\d+\.]\s+/gm, '* ');
 
-  // 2. PASS 2: Process lines and apply Roman Numerals
+  // 2. ROMAN PROCESSING: Line by line with Master Reset
   return healedText.split('\n').map(line => {
     const trimmed = line.trim();
     if (!trimmed) return '';
 
-    // Advanced Header Detection
+    // HEADER DETECTION (RESET)
+    // Detects anything that looks like a title: # Header, or a short line with no period
     const cleanForCheck = trimmed.replace(/\*/g, '').trim();
     const isHeader = trimmed.startsWith('#') ||
-      (cleanForCheck.length > 2 && cleanForCheck.length < 60 &&
-        /^[A-Z][\w\s&:-]+$/.test(cleanForCheck) &&
-        !cleanForCheck.endsWith('.'));
+      (cleanForCheck.length > 2 && cleanForCheck.length < 70 &&
+        /^[A-Z0-9]/.test(cleanForCheck) &&
+        !cleanForCheck.endsWith('.') &&
+        !cleanForCheck.includes(': '));
 
     if (isHeader) {
       romanCount = 0;
       return trimmed.startsWith('#') ? line : `\n\n### ${cleanForCheck}\n`;
     }
 
-    // LIST POINT DETECTION
+    // ROMAN SEQUENCING
     if (trimmed.startsWith('*')) {
       romanCount++;
-      return `\n\n**${toRoman(romanCount)}.** ${trimmed.substring(1).trim()}`;
+      const content = trimmed.substring(1).trim();
+      return `\n\n**${toRoman(romanCount)}.** ${content}`;
     }
 
     return line;
