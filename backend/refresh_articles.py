@@ -46,34 +46,44 @@ async def refresh_all_articles():
 
             print(f"[{idx+1}/{len(articles)}] UPGRADING: {article.title} (Current: {word_count} words)")
             
-            success = False
+            status = "idle"
             retries = 15 
             
-            while not success and retries > 0:
+            while status != "success" and retries > 0:
                 try:
-                    success = await ai_simplifier._simplify_article(db, article)
-                    if success:
+                    status = await ai_simplifier._simplify_article(db, article)
+                    if status == "success":
                         processed_count += 1
                         print(f"  - SUCCESS: Content upgraded. [Batch Progress: {processed_count}/{batch_size}]")
                         
                         # Batch Cooldown Logic
                         if processed_count >= batch_size:
-                            print(f"\n[!!!] BATCH COMPLETE (10 Articles). Resting for 10 minutes for total safety...")
+                            print(f"\n[!!!] BATCH COMPLETE ({batch_size} Articles). Resting for 10 minutes for safety...")
                             await asyncio.sleep(batch_cooldown)
-                            processed_count = 0 # Reset batch counter
+                            processed_count = 0 
                             print("[!] Cooldown over. Resuming next batch...\n")
                         else:
                             await asyncio.sleep(per_article_delay)
-                    else:
+                    elif status == "rate_limited":
                         print(f"  - WARNING: Rate limited. ENTERING HEAVY COOLDOWN (5 MINUTES)...")
                         await asyncio.sleep(300) 
                         retries -= 1
+                    elif status == "parse_error":
+                        print(f"  - ERROR: AI Output was malformed. Retrying once (10s delay)...")
+                        await asyncio.sleep(10)
+                        retries -= 1
+                        if retries == 0:
+                            print(f"  - SKIPPING: AI failed to produce valid JSON 15 times.")
+                    else:
+                        print(f"  - API ERROR: {status}. Retrying in 30s...")
+                        await asyncio.sleep(30)
+                        retries -= 1
                 except Exception as e:
-                    print(f"  - ERROR: {e}. Retrying in 60s...")
-                    await asyncio.sleep(60)
+                    print(f"  - SYSTEM ERROR: {e}. Retrying in 30s...")
+                    await asyncio.sleep(30)
                     retries -= 1
             
-            if not success:
+            if status != "success":
                 print(f"  - FAILED PERMANENTLY for: {article.title}")
                 
     print("\nContent Refresh Process Complete.")

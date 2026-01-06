@@ -130,7 +130,7 @@ class AISimplifier:
             # Handle rate limiting with exponential backoff
             if response.status_code == 429:
                 logger.warning(f"Rate limited on article {article.id}, will retry later")
-                return False
+                return "rate_limited"
             
             # Enhanced error logging
             if response.status_code != 200:
@@ -147,7 +147,7 @@ class AISimplifier:
             
             if not result:
                 logger.error(f"Failed to parse response for article {article.id}")
-                return False
+                return "parse_error"
             
             # CHECK RELEVANCE
             if not result.get("is_relevant", True):
@@ -235,13 +235,13 @@ class AISimplifier:
             article.updated_at = datetime.utcnow()
             
             await db.commit()
-            return True
+            return "success"
         except httpx.HTTPError as e:
             logger.error(f"Groq API request error: {str(e)}")
-            return False
+            return "api_error"
         except Exception as e:
             logger.error(f"Groq API processing error: {str(e)}")
-            return False
+            return "api_error"
             
     def _build_prompt(self, article, content):
         """Build precise prompt for Groq AI with advanced SEO optimization and business-focused intelligence."""
@@ -336,7 +336,8 @@ RETURN ONLY THE JSON OBJECT. NO MARKDOWN INTRO OR OUTRO."""
             
         except json.JSONDecodeError as e:
             logger.error(f"JSON parse error: {str(e)}")
-            logger.error(f"Response was: {response_text[:200]}")
+            # Show more of the response to help debug (800 chars instead of 200)
+            logger.error(f"Truncated Response was: {response_text[:800]}...")
             return None
         except Exception as e:
             logger.error(f"Parse error: {str(e)}")
