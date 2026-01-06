@@ -34,18 +34,17 @@ const formatAIContent = (text) => {
 
   let romanCount = 0;
 
-  // 1. FIRST PASS: Normalize the text. 
-  // Force every '*' onto a new line if it's currently buried in a sentence.
+  // 1. Pass 1: Heal buried stars but turn them into DOTS so they don't steal the Roman count
   let healedText = text
-    .replace(/([.!?])\s*\*\s+/g, '$1\n* ') // Fixes "period * text"
-    .replace(/(\w)\s*\* /g, '$1\n* ');    // Fixes "word * text"
+    .replace(/([.!?])\s*\*\s+/g, '$1\n • ')
+    .replace(/(\w)\s*\* /g, '$1\n • ');
 
-  // 2. SECOND PASS: Process lines and apply Roman Numerals
+  // 2. Pass 2: Process lines and apply Roman Numerals ONLY to leading stars
   return healedText.split('\n').map(line => {
     const trimmed = line.trim();
     if (!trimmed) return '';
 
-    // Advanced Header Detection - Resets the I, II, III counter
+    // Advanced Header Detection - Master Reset
     const cleanForCheck = trimmed.replace(/\*/g, '');
     const isHeader = trimmed.startsWith('#') ||
       trimmed.startsWith('<h') ||
@@ -55,10 +54,10 @@ const formatAIContent = (text) => {
 
     if (isHeader) {
       romanCount = 0;
-      return trimmed.startsWith('#') ? line : `\n\n### ${trimmed}\n`;
+      return trimmed.startsWith('#') ? line : `\n\n### ${cleanForCheck}\n`;
     }
 
-    // Bullet Point Detection - Now robust because of Pass 1
+    // LIST POINT DETECTION (Roman Numerals for leading stars only)
     if (trimmed.startsWith('*')) {
       romanCount++;
       return `\n\n**${toRoman(romanCount)}.** ${trimmed.substring(1).trim()}`;
