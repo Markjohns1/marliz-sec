@@ -3,7 +3,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { getArticles } from '../services/api';
 import ArticleCard from '../components/ArticleCard';
 import ThreatDashboard from '../components/ThreatDashboard';
-import { Shield, TrendingUp, Bell, ChevronRight, Database, FileWarning, Mail, Filter, ArrowDownWideNarrow } from 'lucide-react';
+import { Shield, TrendingUp, Bell, ChevronRight, Database, FileWarning, Mail, Filter, ArrowDownWideNarrow, AlertCircle } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';

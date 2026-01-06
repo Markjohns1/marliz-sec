@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Clock, TrendingUp, AlertCircle, Shield, AlertTriangle, CheckCircle, Info, Eye, Users } from 'lucide-react';
+import { Clock, TrendingUp, AlertCircle, Shield, AlertTriangle, CheckCircle, Info, Eye, Users, ChevronRight } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 const stripHtml = (html) => {
