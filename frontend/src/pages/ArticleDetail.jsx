@@ -259,59 +259,53 @@ export default function ArticleDetail() {
               Back to Latest Threats
             </Link>
 
-            {/* Threat Level Badge */}
-            <div className="mb-6">
-              <span className={`${activeThreatConfig.badge} text-base`}>
-                {activeThreatConfig.icon} {activeThreatConfig.text}
-              </span>
-            </div>
-
-            {/* Title */}
-            <h1 className="text-2xl md:text-5xl font-bold text-white mb-6 leading-tight">
-              {article.title}
-            </h1>
-
-            {/* Meta Info */}
-            <div className="flex flex-wrap items-center gap-6 text-sm text-slate-400 mb-8 pb-8 border-b border-slate-800">
-              <div className="flex items-center">
-                <Clock className="w-4 h-4 mr-2" />
-                {publishedDate} ({timeAgo})
+            {/* HEADER SECTION (Above Image) */}
+            <div className="mb-8">
+              {/* Badges */}
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest border border-slate-700 px-2.5 py-1 rounded bg-slate-800/50">
+                  {article.category?.name || 'INTEL'}
+                </span>
+                <span className={`${activeThreatConfig.badge} text-[10px] uppercase font-black px-2.5 py-1 flex items-center gap-2`}>
+                  {activeThreatConfig.icon} {activeThreatConfig.text}
+                </span>
               </div>
 
-              <div className="flex items-center bg-blue-950/40 px-3 py-1 rounded-full border border-blue-500/20 shadow-[0_0_10px_rgba(59,130,246,0.1)]">
-                <Shield className="w-3.5 h-3.5 mr-2 text-blue-400" />
-                <span className="font-semibold text-blue-100">{article.source_name || 'Marliz Sec Staff'}</span>
-                <CheckCircle2 className="w-4 h-4 ml-1.5 text-blue-500" fill="currentColor" />
-                <span className="hidden sm:inline text-[10px] text-blue-400/80 ml-2 border-l border-blue-500/20 pl-2 uppercase tracking-widest font-bold">Trusted Source</span>
-              </div>
+              {/* Title */}
+              <h1 className="text-3xl md:text-5xl font-black text-white mb-6 leading-tight tracking-tight">
+                {article.title}
+              </h1>
 
-              {article.simplified?.reading_time_minutes && (
-                <div>
-                  {article.simplified.reading_time_minutes} min read
+              {/* Meta Row */}
+              <div className="flex flex-wrap items-center gap-6 text-xs text-slate-400 pb-6 border-b border-slate-800/50">
+                <div className="flex items-center">
+                  <Clock className="w-3.5 h-3.5 mr-2" />
+                  {publishedDate}
                 </div>
-              )}
-
-              {article.is_edited && (
-                <div className="text-slate-500 italic">
-                  Last edited {article.edited_at ? formatDistanceToNow(new Date(article.edited_at), { addSuffix: true }) : 'recently'}
+                {article.simplified?.reading_time_minutes && (
+                  <div className="flex items-center">
+                    <Clock className="w-3.5 h-3.5 mr-2" />
+                    {article.simplified.reading_time_minutes} min read
+                  </div>
+                )}
+                <div className="ml-auto">
+                  <SocialShare
+                    url={`${config.CANONICAL_BASE}/article/${article.slug}`}
+                    title={article.title}
+                    summary={stripHtml(article.simplified?.friendly_summary)}
+                  />
                 </div>
-              )}
-
-              <div className="ml-auto">
-                <SocialShare
-                  url={`${config.CANONICAL_BASE}/article/${article.slug}`}
-                  title={article.title}
-                  summary={stripHtml(article.simplified?.friendly_summary)}
-                />
               </div>
             </div>
 
-            {/* Audio Briefing Content */}
-            <AudioBrief article={article} />
+            {/* Audio Briefing */}
+            <div className="mb-8">
+              <AudioBrief article={article} />
+            </div>
 
             {/* Featured Image */}
             {article.image_url && (
-              <div className="mb-12 rounded-xl overflow-hidden shadow-lg">
+              <div className="mb-12 rounded-xl overflow-hidden shadow-2xl border border-slate-800">
                 <img
                   src={article.image_url}
                   alt={article.title}
@@ -325,10 +319,13 @@ export default function ArticleDetail() {
             <div className="prose prose-lg max-w-none">
               {/* Summary */}
               <section className="mb-12">
+                <div className="inline-block px-2 py-0.5 rounded-md bg-blue-900/20 border border-blue-500/20 text-blue-400 text-[10px] font-bold uppercase tracking-widest mb-4">
+                  Executive Summary
+                </div>
                 <h2 className="text-2xl font-bold text-white mb-4">
-                  The Lowdown: Friendly Expert Summary
+                  What You Need to Know Right Now
                 </h2>
-                <div className="prose prose-invert prose-blue max-w-none text-lg text-slate-300 leading-relaxed">
+                <div className="prose prose-invert prose-blue max-w-none text-lg text-slate-300 leading-relaxed font-light">
                   <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
                     {formatAIContent(article.simplified?.friendly_summary)}
                   </ReactMarkdown>
@@ -337,12 +334,14 @@ export default function ArticleDetail() {
 
               {/* Technical Details - Attack Vector */}
               {article.simplified?.attack_vector && (
-                <section className="mb-12 bg-slate-900/30 p-8 rounded-xl border border-blue-500/10 shadow-[0_0_20px_rgba(59,130,246,0.05)]">
-                  <h2 className="text-2xl font-bold text-blue-400 mb-4 flex items-center">
-                    <Zap className="w-6 h-6 mr-3" />
-                    Technically: How The Attack Happened
+                <section className="mb-12 p-6 rounded-xl border border-slate-800 bg-slate-900/50">
+                  <h2 className="text-xl font-bold text-slate-100 mb-6 flex items-center">
+                    <div className="p-2 bg-slate-800 rounded-lg mr-3 border border-slate-700">
+                      <Zap className="w-5 h-5 text-blue-400" />
+                    </div>
+                    How The Attack Happened
                   </h2>
-                  <div className="prose prose-invert prose-blue max-w-none text-lg text-slate-300 leading-relaxed">
+                  <div className="prose prose-invert prose-blue max-w-none text-slate-300 leading-relaxed text-base">
                     <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
                       {formatAIContent(article.simplified?.attack_vector)}
                     </ReactMarkdown>
@@ -356,11 +355,14 @@ export default function ArticleDetail() {
               </div>
 
               {/* Business Impact */}
-              <section className="bg-blue-900/10 border-l-4 border-blue-500 rounded-r-xl p-8 mb-8">
-                <h2 className="text-2xl font-bold text-blue-100 mb-4">
-                  Why This Matters to You (Personal & Business)
+              <section className="mb-12 p-6 rounded-xl border border-slate-800 bg-slate-900/50">
+                <h2 className="text-xl font-bold text-slate-100 mb-6 flex items-center">
+                  <div className="p-2 bg-slate-800 rounded-lg mr-3 border border-slate-700">
+                    <Shield className="w-5 h-5 text-red-400" />
+                  </div>
+                  Business & Operational Impact
                 </h2>
-                <div className="prose prose-invert prose-blue max-w-none text-lg text-blue-200 leading-relaxed">
+                <div className="prose prose-invert prose-blue max-w-none text-slate-300 leading-relaxed text-base">
                   <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
                     {formatAIContent(article.simplified?.business_impact)}
                   </ReactMarkdown>
@@ -377,22 +379,31 @@ export default function ArticleDetail() {
                   {Array.isArray(actionSteps) && actionSteps.every(s => typeof s === 'string') && actionSteps.map((step, index) => (
                     <div
                       key={index}
-                      className="flex items-start p-4 bg-emerald-900/10 rounded-lg border border-emerald-900/20 hover:border-emerald-500/30 transition-colors"
+                      className="flex items-start p-4 bg-slate-800/40 rounded-lg border border-slate-700/50 hover:border-emerald-500/30 transition-colors"
                     >
-                      <CheckCircle2 className="w-6 h-6 text-emerald-500 mr-3 flex-shrink-0 mt-0.5" />
-                      <p className="text-slate-200 font-medium">{step}</p>
+                      <div className="mt-0.5 mr-4 p-1 bg-emerald-500/10 rounded-full">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                      </div>
+                      <div>
+                        <div className="inline-block px-1.5 py-0.5 bg-emerald-900/30 text-emerald-400 text-[10px] font-bold rounded mb-1 uppercase tracking-wider">
+                          Recommended
+                        </div>
+                        <p className="text-slate-200 font-medium leading-relaxed">{step}</p>
+                      </div>
                     </div>
                   ))}
 
                   {/* Handle if actionSteps is an Object/Dict (New categorized format) */}
                   {!Array.isArray(actionSteps) && typeof actionSteps === 'object' && Object.entries(actionSteps).map(([key, value], index) => (
-                    <div key={index} className="mb-6 last:mb-0">
-                      <h3 className="text-emerald-400 font-bold uppercase text-sm tracking-wider mb-2 flex items-center">
-                        <CheckCircle2 className="w-4 h-4 mr-2" />
-                        {key.replace(/_/g, ' ')}
-                      </h3>
-                      <div className="p-4 bg-emerald-900/10 rounded-lg border border-emerald-900/20">
-                        <p className="text-slate-200 font-medium">{value}</p>
+                    <div key={index} className="flex items-start p-4 bg-slate-800/40 rounded-lg border border-slate-700/50 hover:border-emerald-500/30 transition-colors mb-4 last:mb-0">
+                      <div className="mt-0.5 mr-4 p-1 bg-emerald-500/10 rounded-full">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                      </div>
+                      <div>
+                        <h3 className="text-emerald-400 font-bold uppercase text-xs tracking-wider mb-1">
+                          {key.replace(/_/g, ' ')}
+                        </h3>
+                        <p className="text-slate-200 font-medium leading-relaxed">{value}</p>
                       </div>
                     </div>
                   ))}
@@ -410,25 +421,26 @@ export default function ArticleDetail() {
               </div>
 
               {/* Original Source CTA */}
-              {article.original_url && (
-                <div className="mt-8 mb-12 flex flex-col sm:flex-row items-center justify-between gap-4 p-6 bg-slate-800/50 rounded-xl border border-slate-700/50">
-                  <div>
-                    <h3 className="text-white font-bold mb-1">Need the raw technical report?</h3>
-                    <p className="text-slate-400 text-sm">
-                      Read the full original documentation at the source.
-                    </p>
+              <div className="mt-8 mb-12 bg-slate-800/50 rounded-xl border border-slate-700 p-8 text-center">
+                <div className="flex justify-center mb-4">
+                  <div className="p-3 bg-slate-700/50 rounded-full">
+                    <ExternalLink className="w-6 h-6 text-slate-300" />
                   </div>
-                  <a
-                    href={article.original_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="shrink-0 inline-flex items-center px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-medium rounded-lg transition-colors border border-slate-600 group"
-                  >
-                    Open Original Source
-                    <ExternalLink className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </a>
                 </div>
-              )}
+                <h3 className="text-xl font-bold text-white mb-2">Need the full technical report?</h3>
+                <p className="text-slate-400 text-sm mb-6 max-w-md mx-auto">
+                  Read the full original documentation regarding this breach with technical assets and indicators of compromise.
+                </p>
+                <a
+                  href={article.original_url || '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-colors shadow-lg shadow-blue-900/20"
+                >
+                  Open Original Source
+                  <ExternalLink className="w-4 h-4 ml-2" />
+                </a>
+              </div>
             </div>
 
             {/* CTA - Minimal & Non-Intrusive */}
