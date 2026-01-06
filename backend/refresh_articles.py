@@ -27,9 +27,9 @@ async def refresh_all_articles():
         await ai_simplifier._load_categories(db)
         
         processed_count = 0
-        batch_size = 10
-        batch_cooldown = 600 # 10 minutes rest after 10 articles
-        per_article_delay = 120 # 2 minute breath between articles (Increased for 2200-word support)
+        batch_size = 5
+        batch_cooldown = 900 # 15 minutes rest after 5 articles (Deep breath for 2800-word articles)
+        per_article_delay = 120 # 2 minute breath between articles
         
         for idx, article in enumerate(articles):
             # 1. SMART RESUME: Skip anything already high-value (>800 words)
