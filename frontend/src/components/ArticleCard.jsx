@@ -20,7 +20,7 @@ export default function ArticleCard({ article }) {
   const threatLevelConfig = {
     low: {
       badge: 'threat-badge-low',
-      icon: <CheckCircle className="w-3.5 h-3.5" />,
+      icon: <Info className="w-3.5 h-3.5" />,
       text: 'LOW RISK',
       grad: 'from-blue-950 to-slate-900 border-blue-900/30'
     },
