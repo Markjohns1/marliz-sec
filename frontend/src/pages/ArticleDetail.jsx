@@ -32,43 +32,49 @@ const formatAIContent = (text) => {
 
   let romanCount = 0;
 
-  // 1. NUCLEAR HEALER: Force new lines for EVERY known pattern
-  let healedText = text
-    // A. Split numeric lists buried in sentences (1. 2. 3.)
-    .replace(/([.!?])\s*(\d+\.)\s+/g, '$1\n\n* ')
-    .replace(/(\w)\s+(\d+\.)\s+/g, '$1\n\n* ')
-    // B. Split dots and stars (•, *)
-    .replace(/([.!?])\s*([\*•])\s+/g, '$1\n\n* ')
-    .replace(/(\w)\s*([\*•])\s+/g, '$1\n\n* ')
-    // C. Split action keywords
-    .replace(/([.!?])\s*(IMMEDIATE|SECONDARY|LONG-TERM|ONGOING|ACTION|STEP|PHASE):/gi, '$1\n\n* $2:')
-    .replace(/(\w)\s+(IMMEDIATE|SECONDARY|LONG-TERM|ONGOING|ACTION|STEP|PHASE):/gi, '$1\n\n* $2:')
-    // D. Standardize everything (Roman, Digit, Star, Dot) at start of line to stars
-    .replace(/^([•\d+\.]|[IVXLC]+\.)\s+/gim, '* ');
+  // 1. STAGE 1: Standardize delimiters and break walls.
+  let cleaned = text
+    .replace(/([.!?])\s*([\*•\d+\.])\s+/g, '$1\n\n* ') // Break buried points
+    .replace(/(\w)\s+([\*•\d+\.])\s+/g, '$1\n\n* ')   // Break buried points
+    .replace(/^[•\d+\.]\s+/gm, '* ')                 // Standardize leading bullets
+    .split('\n');
 
-  // 2. ROMAN PROCESSING: Line by line with Master Reset
-  return healedText.split('\n').map(line => {
+  // 2. STAGE 2: Process line-by-line with Explicit Section Resets
+  return cleaned.map(line => {
     const trimmed = line.trim();
     if (!trimmed) return '';
 
-    // HEADER DETECTION (RESET)
-    // Detects anything that looks like a title: # Header, or a short line with no period
-    const cleanForCheck = trimmed.replace(/\*/g, '').trim();
-    const isHeader = trimmed.startsWith('#') ||
-      (cleanForCheck.length > 2 && cleanForCheck.length < 70 &&
-        /^[A-Z0-9]/.test(cleanForCheck) &&
-        !cleanForCheck.endsWith('.') &&
-        !cleanForCheck.includes(': '));
+    // HEADER DETECTION (THE RESET TRIGGER)
+    // If it's a markdown header OR a short title-case line, reset.
+    // We add EXPLICIT words that we know are headers in your reports.
+    const lower = trimmed.toLowerCase();
+    const isKnownHeader = lower.includes('sector') ||
+      lower.includes('impact') ||
+      lower.includes('actions') ||
+      lower.includes('risk') ||
+      lower.includes('keywords') ||
+      lower.includes('vector') ||
+      lower.includes('summary') ||
+      lower.includes('level');
 
-    if (isHeader) {
+    const isStructureHeader = trimmed.startsWith('#') ||
+      (trimmed.length > 2 && trimmed.length < 65 &&
+        /^[A-Z0-9]/.test(trimmed) &&
+        !trimmed.endsWith('.'));
+
+    if (isStructureHeader || (trimmed.length < 50 && isKnownHeader)) {
       romanCount = 0;
-      return trimmed.startsWith('#') ? line : `\n\n### ${cleanForCheck}\n`;
+      return trimmed.startsWith('#') ? line : `\n\n### ${trimmed.replace(/\*/g, '')}\n`;
     }
 
-    // ROMAN SEQUENCING
-    if (trimmed.startsWith('*')) {
+    // ROMAN NUMERAL LISTS
+    // We catch anything starting with a star (*) OR those "Action" keywords
+    const isListPoint = trimmed.startsWith('*') ||
+      /^(IMMEDIATE|SECONDARY|LONG-TERM|ONGOING):/i.test(trimmed);
+
+    if (isListPoint) {
       romanCount++;
-      const content = trimmed.substring(1).trim();
+      let content = trimmed.replace(/^\*\s*/, '').trim();
       return `\n\n**${toRoman(romanCount)}.** ${content}`;
     }
 
