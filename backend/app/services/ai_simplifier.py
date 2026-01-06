@@ -260,40 +260,48 @@ YOUR MISSION:
 3. ADAPTIVE SEO: Generate a high-conversion Title and Meta Description.
 4. ACTIONABLE PROTOCOLS: Provide clear, prioritized mitigation steps.
 
-CRITICAL CONTENT DEPTH PROTOCOL (STRICT REQUIREMENT):
-- TOTAL WORD COUNT: YOU MUST STRICTLY EXCEED 800 WORDS. TARGET 1200-1600 WORDS.
-- FAILURE POLICY: Any response under 800 words will be rejected.
-- EXPANSION STRATEGY: If the source is short, you MUST expand by:
-    a) Explaining the technical history and evolution of this threat type (e.g., if it's Ransomware, discuss the shift from locker to leak-site tactics).
-    b) Defining ALL technical terms, CVEs, and protocols (e.g., DNS, SMTP, Zero-Day) in extreme detail.
-    c) Analyzing the attack's placement in the current global threat landscape.
-    d) Providing detailed 'What-If' scenarios for Finance, Healthcare, and SMBs.
-    e) Adding a 2-paragraph 'Global Cybersecurity Trends' context section.
+FIELD INSTRUCTIONS:
+- "is_relevant": Set to true if cybersecurity related, false if political/war content.
+- "category": Choose ONE from: ransomware, phishing, data-breach, malware, vulnerability, general
+- "seo_title": Create a compelling headline like "Microsoft Breach: 30M Users Exposed – Update Now"
+- "meta_description": Write exactly 150-160 characters with a hook and call-to-action.
+- "summary": Write 800-1600 words of deep analysis. Use markdown headers (##) and paragraphs.
+- "attack_vector": Explain the technical mechanism in detail (CVEs, exploits, tools used).
+- "impact": Explain business/financial/reputational consequences for organizations.
+- "who_is_at_risk": List specific sectors, systems, or user types affected.
+- "actions": Provide 3-5 specific actionable steps as an array of strings.
+- "threat_level": Choose ONE from: low, medium, high, critical
+- "keywords": Provide 3-5 SEO keywords as an array of strings.
 
-RESPOND WITH A SINGLE, VALID JSON OBJECT ONLY.
-STRICT JSON RULES:
-1. INTERNAL DOUBLE QUOTES (") MUST BE ESCAPED WITH BACKSLASH (\").
-2. NEWLINES (\n) MUST BE ESCAPED AS \\n.
-3. DO NOT USE ANY MARKDOWN WRAPPERS.
+CONTENT DEPTH REQUIREMENT:
+- MINIMUM 800 WORDS TOTAL across summary, attack_vector, and impact.
+- If source is short, EXPAND by explaining threat history, defining technical terms, and adding industry context.
 
-{
+CRITICAL OUTPUT RULES:
+1. Return ONLY a valid JSON object. No markdown wrappers like ```json.
+2. Escape internal double quotes as \\"
+3. Use \\n for newlines inside string values.
+4. Fill in REAL content - do not copy these instructions.
+
+EXAMPLE OUTPUT (fill in with REAL analysis, not these placeholders):
+{{
   "is_relevant": true,
-  "category": "ransomware|phishing|data-breach|malware|vulnerability|general",
-  "seo_title": "[Entity] [Event]: [Impact] – [Action]",
-  "meta_description": "Shocking fact + Critical impact + Command (160 chars).",
-  "summary": "# Executive Summary\n\nNARRATIVE (800+ words).",
-  "attack_vector": "## Technical Vector\n\nEXHAUSTIVE DETAILS.",
-  "impact": "## Business Impact\n\nDEEP RISK ANALYSIS.",
-  "who_is_at_risk": "SECTORS AND SYSTEMS.",
-  "actions": ["IMMEDIATE: ...", "SECONDARY: ...", "LONG-TERM: ...", "ONGOING: ..."],
-  "threat_level": "low|medium|high|critical",
-  "keywords": ["tag1", "tag2"]
-}
+  "category": "data-breach",
+  "seo_title": "Company Name Breach: X Million Records Exposed – Take Action",
+  "meta_description": "A critical data breach at Company exposed X million records. Learn what happened and how to protect yourself now.",
+  "summary": "## Executive Summary\\n\\nYour detailed 800+ word analysis goes here...",
+  "attack_vector": "## Technical Analysis\\n\\nDetailed technical breakdown...",
+  "impact": "## Business Impact\\n\\nFinancial and operational consequences...",
+  "who_is_at_risk": "Healthcare organizations, financial institutions, and SMBs using affected software.",
+  "actions": ["Immediately rotate all credentials", "Apply security patch version X.X", "Enable MFA on all accounts", "Monitor logs for suspicious activity"],
+  "threat_level": "high",
+  "keywords": ["data breach", "cybersecurity", "credential theft"]
+}}
 
-=== SENSITIVE CONTENT AND ADSENSE COMPLIANCE ===
-- If the article even slightly touches on PROHIBITED SENSITIVE SUBJECTS (War in Ukraine, Israel/Gaza, Political Propaganda), you MUST mark it as 'is_relevant': false.
+ADSENSE COMPLIANCE:
+- If the article discusses war (Ukraine, Gaza, Israel), political propaganda, or violence, set "is_relevant": false.
 
-RETURN ONLY THE JSON OBJECT. NO MARKDOWN INTRO OR OUTRO."""
+NOW ANALYZE THE ARTICLE AND RETURN YOUR JSON RESPONSE:"""
     
     def _parse_response(self, response_text: str) -> dict:
         """Parse Groq's JSON response with aggressive cleaning for control characters."""
