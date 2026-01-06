@@ -8,10 +8,10 @@ const stripHtml = (html) => {
 
 const getLevelColor = (level) => {
   switch (level) {
-    case 'critical': return 'bg-red-500 shadow-glow-critical';
+    case 'critical': return 'bg-red-600 shadow-glow-critical';
     case 'high': return 'bg-orange-500';
-    case 'medium': return 'bg-blue-500';
-    case 'low': return 'bg-emerald-500';
+    case 'medium': return 'bg-emerald-600';
+    case 'low': return 'bg-blue-500';
     default: return 'bg-slate-500';
   }
 };
@@ -20,25 +20,25 @@ export default function ArticleCard({ article }) {
   const threatLevelConfig = {
     low: {
       badge: 'threat-badge-low',
-      icon: <CheckCircle className="w-4 h-4" />,
+      icon: <CheckCircle className="w-3.5 h-3.5" />,
       text: 'LOW RISK',
-      grad: 'from-emerald-950 to-slate-900 border-emerald-900/30'
+      grad: 'from-blue-950 to-slate-900 border-blue-900/30'
     },
     medium: {
       badge: 'threat-badge-medium',
-      icon: <Info className="w-4 h-4" />,
+      icon: <Shield className="w-3.5 h-3.5" />,
       text: 'MEDIUM RISK',
-      grad: 'from-blue-950 to-slate-900 border-blue-900/30'
+      grad: 'from-emerald-950 to-slate-900 border-emerald-900/30'
     },
     high: {
       badge: 'threat-badge-high',
-      icon: <AlertTriangle className="w-4 h-4" />,
+      icon: <AlertTriangle className="w-3.5 h-3.5" />,
       text: 'HIGH RISK',
       grad: 'from-orange-950 to-slate-900 border-orange-900/30'
     },
     critical: {
       badge: 'threat-badge-critical',
-      icon: <Shield className="w-4 h-4" />,
+      icon: <AlertCircle className="w-3.5 h-3.5" />,
       text: 'CRITICAL',
       grad: 'from-red-950 to-red-900 border-red-900/30'
     }
@@ -76,12 +76,13 @@ export default function ArticleCard({ article }) {
         <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-90"></div>
 
         {/* Top Badges */}
-        <div className="absolute top-3 left-3 right-3 flex justify-between items-start z-10">
-          <span className="bg-slate-900/80 backdrop-blur-md text-slate-200 text-[10px] font-bold px-2 py-1 rounded border border-slate-700 uppercase tracking-wider">
+        <div className="absolute top-4 left-4 right-4 flex justify-between items-start z-10">
+          <span className="bg-slate-900/90 backdrop-blur-md text-slate-200 text-[10px] font-bold px-2.5 py-1.5 rounded border border-slate-700 uppercase tracking-wider shadow-sm">
             {article.category?.name || 'INTEL'}
           </span>
-          <span className={`${getLevelColor(article.simplified?.threat_level?.toLowerCase())} text-white text-[10px] font-black px-2 py-1 rounded shadow-lg uppercase tracking-wider flex items-center gap-1`}>
-            {config.icon} {config.text}
+          <span className={`${getLevelColor(article.simplified?.threat_level?.toLowerCase())} text-white text-[10px] font-black px-2.5 py-1.5 rounded shadow-lg uppercase tracking-wider flex items-center gap-2`}>
+            {config.icon}
+            <span>{config.text}</span>
           </span>
         </div>
       </div>
