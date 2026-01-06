@@ -21,49 +21,67 @@ const Privacy = () => {
                 <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-8 space-y-8 backdrop-blur-sm">
                     <section>
                         <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                            <Eye className="w-5 h-5 text-blue-400" /> 1. Introduction
+                            <Eye className="w-5 h-5 text-blue-400" /> 1. Information We Collect
                         </h2>
-                        <p className="text-slate-400 leading-relaxed">
-                            At Marliz Intel, accessible from marlizintel.com, one of our main priorities is the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by Marliz Intel and how we use it.
-                        </p>
+                        <ul className="list-disc pl-6 space-y-2 text-slate-400">
+                            <li><strong>Personal Identification Information:</strong> Name, email address, phone number, etc., only when voluntarily submitted (e.g., subscription forms, contact requests).</li>
+                            <li><strong>Non-Personal Identification Information:</strong> Browser name, type of computer, operating system, ISP, and other technical information when users interact with our site.</li>
+                            <li><strong>Usage Data:</strong> Pages visited, time spent on pages, and other analytical data to help us improve user experience.</li>
+                        </ul>
                     </section>
 
                     <section>
                         <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                            <Lock className="w-5 h-5 text-blue-400" /> 2. Google AdSense & Third-Party Cookies
+                            <FileText className="w-5 h-5 text-blue-400" /> 2. How We Use Your Information
+                        </h2>
+                        <ul className="list-disc pl-6 space-y-2 text-slate-400">
+                            <li>To provide and maintain our Service, including monitoring the usage of our Service.</li>
+                            <li>To manage your Account and subscription preferences.</li>
+                            <li>To contact you regarding updates, security alerts, and administrative messages.</li>
+                            <li>To personalize user experience and deliver content relevant to your interests.</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                            <Lock className="w-5 h-5 text-blue-400" /> 3. Google AdSense & Cookies
                         </h2>
                         <div className="space-y-4 text-slate-400 text-sm md:text-base">
                             <p>
-                                Marliz Intel uses Google AdSense to serve advertisements. Google, as a third-party vendor, uses cookies to serve ads on our site. Google's use of the advertising cookies enables it and its partners to serve ads to our users based on their visit to our sites and/or other sites on the Internet.
+                                Marliz Intel uses Google AdSense to display advertisements. Google uses cookies to serve ads based on a user's prior visits to your website or other websites. Google's use of advertising cookies enables it and its partners to serve ads to your users based on their visit to your sites and/or other sites on the Internet.
                             </p>
                             <p>
-                                We participate in the Google AdSense program, which utilizes cookies to track user behavior and interests across the web. This data is used by Google and its partners to display personalized advertisements that are more relevant to you.
-                            </p>
-                            <p>
-                                You may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">Google Ad Settings</a>. Alternatively, you can opt out of a third-party vendor's use of cookies for personalized advertising by visiting <a href="https://www.aboutads.info" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">www.aboutads.info</a>.
-                            </p>
-                            <p>
-                                If you have not opted out of third-party ad serving, the cookies of other third-party vendors or ad networks may also be used to serve ads on our site.
+                                <strong>Opting Out:</strong> Users may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">Google Ad Settings</a>. Alternatively, you can opt out of a third-party vendor's use of cookies for personalized advertising by visiting <a href="https://www.aboutads.info" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">www.aboutads.info</a>.
                             </p>
                         </div>
                     </section>
 
                     <section>
                         <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                            <FileText className="w-5 h-5 text-blue-400" /> 3. Data Collection
+                            <Shield className="w-5 h-5 text-blue-400" /> 4. Data Retention & Security
                         </h2>
+                        <p className="text-slate-400 leading-relaxed mb-4">
+                            We retain your Personal Data only for as long as is necessary for the purposes set out in this Privacy Policy. We maintain appropriate technical and organizational measures to protect your personal data against unauthorized access, loss, or misuse.
+                        </p>
+                    </section>
+
+                    <section>
+                        <h2 className="text-xl font-semibold text-white mb-4">5. Your Data Protection Rights</h2>
+                        <p className="text-slate-400 leading-relaxed mb-4">
+                            Depending on your location, you may have the following rights:
+                        </p>
                         <ul className="list-disc pl-6 space-y-2 text-slate-400">
-                            <li>Log Files: We follow a standard procedure of using log files. These files log visitors when they visit websites.</li>
-                            <li>Cookies and Web Beacons: Like any other website, Marliz Intel uses 'cookies' to store information including visitors' preferences.</li>
-                            <li>Personal Information: If you subscribe to our newsletter, we collect your email address purely for the purpose of sending intelligence updates.</li>
+                            <li>The right to access, update, or delete the information we have on you.</li>
+                            <li>The right of rectification (to correct inaccurate information).</li>
+                            <li>The right to object (to our processing of your personal data).</li>
+                            <li>The right of restriction (to request that we restrict the processing of your personal information).</li>
                         </ul>
                     </section>
 
                     <section>
-                        <h2 className="text-xl font-semibold text-white mb-4">4. Privacy Policies
-                        </h2>
-                        <p className="text-slate-400">
-                            Third-party ad servers or ad networks uses technologies like cookies, JavaScript, or Web Beacons that are used in their respective advertisements and links that appear on Marliz Intel, which are sent directly to users' browser. They automatically receive your IP address when this occurs.
+                        <h2 className="text-xl font-semibold text-white mb-4">6. Children's Privacy</h2>
+                        <p className="text-slate-400 leading-relaxed">
+                            Our Service does not address anyone under the age of 13. We do not knowingly collect personally identifiable information from anyone under the age of 13. If you are a parent or guardian and you are aware that your child has provided us with Personal Data, please contact us.
                         </p>
                     </section>
 

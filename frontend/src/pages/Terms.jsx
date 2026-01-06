@@ -18,42 +18,70 @@ export default function Terms() {
                         <section>
                             <h2 className="text-xl font-semibold text-white mb-4">1. Acceptance of Terms</h2>
                             <p>
-                                By accessing and using Marliz Security ("the Website"), you accept and agree to be bound by the terms and provision of this agreement. In addition, when using this Website's particular services, you shall be subject to any posted guidelines or rules applicable to such services.
+                                By accessing and using Marliz Security ("the Website"), you accept and agree to be bound by the terms and provision of this agreement. Use of our services constitutes acceptance of these Terms of Service and our Privacy Policy. If you do not agree to these terms, please do not use our services.
                             </p>
                         </section>
 
                         <section>
-                            <h2 className="text-xl font-semibold text-white mb-4">2. Use of Intelligence</h2>
+                            <h2 className="text-xl font-semibold text-white mb-4">2. Use of Intelligence Services</h2>
                             <p>
-                                The cybersecurity alerts, threat intelligence, and analysis provided on this website are for informational purposes only. While we strive for accuracy, the rapidly evolving nature of cyber threats means we cannot guarantee that all information is completely up-to-date or error-free at all times.
+                                The cybersecurity alerts, threat intelligence, and analysis provided on this website are for informational and educational purposes only. Marliz Security exercises commercially reasonable efforts to ensure accuracy, but due to the rapidly evolving nature of cyber threats, we cannot guarantee that all information is real-time or error-free. Reliance on this information is at your own risk.
                             </p>
                         </section>
 
                         <section>
-                            <h2 className="text-xl font-semibold text-white mb-4">3. Intellectual Property</h2>
+                            <h2 className="text-xl font-semibold text-white mb-4">3. Intellectual Property Rights</h2>
                             <p>
-                                All content, including but not limited to text, graphics, logos, and code is the property of Marliz Security and John Mark and is protected by copyright, trademark, and other conceptual property laws. You may not reproduce, distribute, or create derivative works from this content without explicit permission.
+                                All content, including text, graphics, logos, software, and threat analysis code, is the exclusive property of Marliz Security and is protected by international copyright and intellectual property laws. You may not reproduce, distribute, display, or create derivative works of this content without explicit written permission from Marliz Security.
                             </p>
                         </section>
 
                         <section>
-                            <h2 className="text-xl font-semibold text-white mb-4">4. AdSense & Third-Party Links</h2>
+                            <h2 className="text-xl font-semibold text-white mb-4">4. User Obligations</h2>
                             <p>
-                                This website may use Google AdSense to display advertisements. These ads are served by Google and/or its partners. We do not endorse any products or services advertised unless explicitly stated. We are not responsible for the content or practices of third-party websites linked to from our site.
+                                You agree not to use the Website for any unlawful purpose or in any way that interrupts, damages, or impairs the service. potentially harmful automation, scraping, or data mining of our threat database without authorization is strictly prohibited.
                             </p>
                         </section>
 
                         <section>
-                            <h2 className="text-xl font-semibold text-white mb-4">5. Disclaimer of Warranties</h2>
+                            <h2 className="text-xl font-semibold text-white mb-4">5. AdSense & Third-Party Advertisements</h2>
                             <p>
-                                The website is provided on an "as is" and "as available" basis. Marliz Security explicitly disclaims all warranties of any kind, whether express or implied, including but not limited to the implied warranties of merchantability, fitness for a particular purpose, and non-infringement.
+                                This website utilizes Google AdSense to serve advertisements. These advertisements are automated and do not constitute an endorsement by Marliz Security. We are not responsible for the content, privacy practices, or availability of third-party websites linked through these advertisements. Your interaction with third-party ads is solely between you and the advertiser.
                             </p>
                         </section>
 
                         <section>
-                            <h2 className="text-xl font-semibold text-white mb-4">6. Contact Information</h2>
+                            <h2 className="text-xl font-semibold text-white mb-4">6. Disclaimer of Warranties</h2>
                             <p>
-                                If you have any questions about these Terms, please <a href="mailto:johnmarkoguta@gmail.com" className="text-blue-400 hover:text-blue-300 underline">contact us here</a>.
+                                The services are provided "as is" and "as available" without any warranties of any kind, express or implied. Marliz Security disclaims all warranties, including merchantability, fitness for a particular purpose, and non-infringement. We do not warrant that the service will be uninterrupted, secure, or free from viruses.
+                            </p>
+                        </section>
+
+                        <section>
+                            <h2 className="text-xl font-semibold text-white mb-4">7. Limitation of Liability</h2>
+                            <p>
+                                In no event shall Marliz Security or its affiliates be liable for any direct, indirect, incidental, special, or consequential damages resulting from the use or inability to use the service, including but not limited to damages for loss of profits, data, or other intangibles, even if we have been advised of the possibility of such damages.
+                            </p>
+                        </section>
+
+                        <section>
+                            <h2 className="text-xl font-semibold text-white mb-4">8. Governing Law</h2>
+                            <p>
+                                These Terms shall be governed by and construed in accordance with the laws of Kenya, without regard to its conflict of law provisions. Any legal action or proceeding arising under these Terms will be brought exclusively in the courts located in Nairobi, Kenya.
+                            </p>
+                        </section>
+
+                        <section>
+                            <h2 className="text-xl font-semibold text-white mb-4">9. Changes to Terms</h2>
+                            <p>
+                                We reserve the right to modify these terms at any time. We will provide notice of significant changes by updating the "Last Updated" date at the top of this policy. Your continued use of the Service after any such change constitutes your acceptance of the new Terms of Service.
+                            </p>
+                        </section>
+
+                        <section>
+                            <h2 className="text-xl font-semibold text-white mb-4">10. Contact Information</h2>
+                            <p>
+                                If you have any questions about these Terms, please contact us at <a href="mailto:admin@marlizintel.com" className="text-blue-400 hover:text-blue-300 underline">admin@marlizintel.com</a>.
                             </p>
                         </section>
                     </div>

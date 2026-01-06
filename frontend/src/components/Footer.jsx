@@ -65,11 +65,6 @@ export default function Footer({ categories }) {
                 </Link>
               </li>
               <li>
-                <Link to="/privacy" className="text-slate-400 hover:text-white transition-colors">
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
                 <Link to="/contact" className="text-slate-400 hover:text-white transition-colors">
                   Contact Us
                 </Link>
