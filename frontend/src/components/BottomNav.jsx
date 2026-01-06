@@ -13,7 +13,7 @@ export default function BottomNav() {
     ];
 
     return (
-        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-800 shadow-[0_-5px_20px_rgba(0,0,0,0.5)] z-50 safe-area-bottom">
+        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-800 shadow-[0_-5px_20px_rgba(0,0,0,0.5)] z-50 safe-area-bottom transform-gpu">
             <div className="grid grid-cols-4 h-16">
                 {navItems.map((item) => {
                     const active = isActive(item.path);
