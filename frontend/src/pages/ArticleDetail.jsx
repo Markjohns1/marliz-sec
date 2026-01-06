@@ -72,7 +72,7 @@ const formatAIContent = (text) => {
     }
 
     return line;
-  }).join('\n')
+  }).join('\n\n') // Force extra spacing for "jump" effect
     .replace(/\n\s*\n\s*\n+/g, '\n\n') // Normalize spacing
     .trim();
 };

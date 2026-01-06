@@ -87,12 +87,12 @@ body::before {
 }
 
 .prose li {
-  @apply relative pl-8 text-slate-300;
+  @apply relative pl-0 text-slate-300 mb-4 block;
 }
 
 .prose li::before {
   content: "◈";
-  @apply absolute left-0 text-blue-500 font-bold text-lg leading-none top-1;
+  @apply inline-block mr-2 text-blue-500 font-bold text-lg leading-none;
 }
 
 .prose strong {
