@@ -45,11 +45,13 @@ const formatAIContent = (text) => {
     const trimmed = line.trim();
     if (!trimmed) return '';
 
-    // Header Detection - Reset the Roman count
+    // Advanced Header Detection - Resets the I, II, III counter
+    // Catches # Headers or short Title Case lines (typical of sections like "Finance Sector")
     const isHeader = trimmed.startsWith('#') ||
       (trimmed.length > 3 && trimmed.length < 60 &&
-        /^[A-Z0-9]/.test(trimmed) &&
-        trimmed === trimmed.toUpperCase());
+        /^[A-Z][\w\s&:-]+$/.test(trimmed) &&
+        !trimmed.endsWith('.') &&
+        !trimmed.includes('*'));
 
     if (isHeader) {
       romanCount = 0;
