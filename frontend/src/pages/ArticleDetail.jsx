@@ -43,8 +43,8 @@ const formatAIContent = (text) => {
     // C. Split action keywords
     .replace(/([.!?])\s*(IMMEDIATE|SECONDARY|LONG-TERM|ONGOING|ACTION|STEP|PHASE):/gi, '$1\n\n* $2:')
     .replace(/(\w)\s+(IMMEDIATE|SECONDARY|LONG-TERM|ONGOING|ACTION|STEP|PHASE):/gi, '$1\n\n* $2:')
-    // D. Standardize everything to star bullets for processing
-    .replace(/^[•\d+\.]\s+/gm, '* ');
+    // D. Standardize everything (Roman, Digit, Star, Dot) at start of line to stars
+    .replace(/^([•\d+\.]|[IVXLC]+\.)\s+/gim, '* ');
 
   // 2. ROMAN PROCESSING: Line by line with Master Reset
   return healedText.split('\n').map(line => {
