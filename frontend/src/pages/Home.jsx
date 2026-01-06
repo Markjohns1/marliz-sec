@@ -88,13 +88,14 @@ export default function Home() {
               <span className="text-xs font-bold tracking-widest uppercase">Live Intelligence Feed</span>
             </div>
 
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-              Real. Talk. <br />
-              <span className="text-primary-200">Cyber News You Can Actually Understand.</span>
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold mb-6 leading-[1.1] tracking-tight">
+              Global Cyber <br />
+              <span className="text-blue-500">Threat Intelligence Hub</span>
             </h1>
 
-            <p className="text-lg md:text-2xl text-primary-100 mb-8 leading-relaxed">
-              Cybersecurity doesn't have to be complicated. We keep you safe, no matter who you are or what device you use.
+            <p className="text-lg md:text-xl text-slate-400 mb-10 leading-relaxed max-w-3xl">
+              Advanced monitoring and analysis of global cybercrime, data breaches, and state-sponsored activity.
+              Real-time actionable protocols for East African enterprises and individual security.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
@@ -117,8 +118,8 @@ export default function Home() {
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-8">
               <div>
-                <h2 className="text-3xl font-bold text-white mb-2">Latest Threats</h2>
-                <p className="text-slate-400">Updated twice daily with actionable insights</p>
+                <h2 className="text-3xl font-extrabold text-white mb-2 tracking-tight">Intelligence Operations</h2>
+                <p className="text-slate-500 font-mono text-xs uppercase tracking-[0.2em]">Updated Real-Time | Eastern Africa Time (EAT)</p>
               </div>
             </div>
 
@@ -200,6 +201,13 @@ export default function Home() {
                                 <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mr-2"></span>
                                 {article.category?.name}
                               </div>
+                              <Link
+                                to={`/article/${article.slug}`}
+                                className="mt-2 text-blue-500 hover:text-blue-400 font-bold text-xs uppercase tracking-widest flex items-center group/btn"
+                              >
+                                Analyze Intel
+                                <ChevronRight className="w-4 h-4 ml-1 group-hover/btn:translate-x-1 transition-transform" />
+                              </Link>
                             </Link>
                           ))}
                         </div>

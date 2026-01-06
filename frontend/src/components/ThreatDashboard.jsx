@@ -16,77 +16,79 @@ export default function ThreatDashboard({ stats }) {
 
     const threatConfig = {
         critical: {
-            color: 'text-red-600',
-            bg: 'bg-red-50',
-            border: 'border-red-200',
-            icon: <AlertTriangle className="w-8 h-8 text-red-600" />,
+            color: 'text-red-500',
+            bg: 'bg-red-500/10',
+            border: 'border-red-500/30',
+            icon: <AlertTriangle className="w-8 h-8 text-red-500 animate-pulse shadow-glow-critical" />,
             label: 'CRITICAL ALERT',
-            desc: 'Active widespread attacks detected. Immediate action required.'
+            desc: 'Extreme threats detected. Intelligence confirms active exploitation across multiple local sectors.'
         },
         high: {
-            color: 'text-orange-600',
-            bg: 'bg-orange-50',
-            border: 'border-orange-200',
-            icon: <Activity className="w-8 h-8 text-orange-600" />,
+            color: 'text-orange-500',
+            bg: 'bg-orange-500/10',
+            border: 'border-orange-500/30',
+            icon: <Activity className="w-8 h-8 text-orange-500" />,
             label: 'ELEVATED RISK',
-            desc: 'Multiple scams targeting local businesses reported.'
+            desc: 'Significant cyberactivity detected targeting East African enterprise networks.'
         },
         medium: {
-            color: 'text-yellow-600',
-            bg: 'bg-yellow-50',
-            border: 'border-yellow-200',
-            icon: <Shield className="w-8 h-8 text-yellow-600" />,
-            label: 'MODERATE',
-            desc: 'Standard security monitoring in effect. Stay vigilant.'
+            color: 'text-blue-500',
+            bg: 'bg-blue-500/10',
+            border: 'border-blue-500/30',
+            icon: <Shield className="w-8 h-8 text-blue-500" />,
+            label: 'SECURE / MONITORING',
+            desc: 'Active monitoring of signal intelligence in effect. All systems reporting within baseline.'
         },
         low: {
-            color: 'text-green-600',
-            bg: 'bg-green-50',
-            border: 'border-green-200',
-            icon: <CheckCircle className="w-8 h-8 text-green-600" />,
-            label: 'NORMAL',
-            desc: 'No major threats detected in the last 24 hours.'
+            color: 'text-emerald-500',
+            bg: 'bg-emerald-500/10',
+            border: 'border-emerald-500/30',
+            icon: <CheckCircle className="w-8 h-8 text-emerald-500" />,
+            label: 'NORMAL OPERATIONS',
+            desc: 'No significant adversarial activity detected within the last triage cycle.'
         }
     };
 
     const config = threatConfig[threatLevel] || threatConfig['medium'];
 
     return (
-        <div className="w-full bg-white border-b border-slate-200 shadow-sm">
-            <div className="max-w-7xl mx-auto px-4 py-4">
-                <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="w-full bg-slate-950 border-b border-slate-800 shadow-2xl relative overflow-hidden">
+            {/* HUD Scanline Effect */}
+            <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%]"></div>
+
+            <div className="max-w-7xl mx-auto px-4 py-4 relative z-10">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-6">
 
                     {/* Status Indicator */}
-                    <div className={`flex items-center space-x-4 px-6 py-3 rounded-xl border ${config.bg} ${config.border} w-full md:w-auto`}>
-                        {config.icon}
+                    <div className={`flex items-center space-x-6 px-6 py-4 rounded-xl border-2 backdrop-blur-md ${config.bg} ${config.border} w-full md:w-auto shadow-[0_0_20px_rgba(0,0,0,0.5)]`}>
+                        <div className="flex-shrink-0">{config.icon}</div>
                         <div>
-                            <p className={`text-xs font-bold tracking-wider ${config.color} uppercase`}>Current Threat Level</p>
-                            <h2 className={`text-xl font-black ${config.color}`}>{config.label}</h2>
+                            <p className={`text-[10px] font-black tracking-[0.3em] ${config.color} uppercase opacity-70`}>Threat Index</p>
+                            <h2 className={`text-2xl font-black tracking-tight ${config.color}`}>{config.label}</h2>
                         </div>
                     </div>
 
                     {/* Context & Ticker */}
-                    <div className="flex-1 w-full md:ml-6">
-                        <div className="flex items-center space-x-2 mb-1">
+                    <div className="flex-1 w-full md:ml-4">
+                        <div className="flex items-center space-x-3 mb-2">
                             <span className="relative flex h-3 w-3">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
                             </span>
-                            <span className="text-sm font-bold text-slate-700">LIVE ANALYSIS</span>
+                            <span className="text-xs font-black text-blue-400 tracking-[0.2em] uppercase">Intelligence Feed Active</span>
                         </div>
-                        <p className="text-slate-600 text-sm md:text-base">
-                            {config.desc} <span className="text-slate-400 text-xs ml-2">Updated: Just now</span>
+                        <p className="text-slate-300 text-sm md:text-lg leading-relaxed font-medium">
+                            {config.desc}
                         </p>
                     </div>
 
                     {/* Action Button */}
-                    <div className="w-full md:w-auto mt-2 md:mt-0">
-                        <button className="w-full md:w-auto bg-slate-900 text-white px-6 py-3 rounded-lg font-bold hover:bg-slate-800 transition-all flex items-center justify-center shadow-lg">
+                    <div className="w-full md:w-auto">
+                        <button className="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-xl font-bold transition-all flex items-center justify-center shadow-[0_0_20px_rgba(37,99,235,0.3)] border border-blue-400">
                             <Shield className="w-4 h-4 mr-2" />
-                            System Check
+                            Emergency Protocol
                         </button>
                     </div>
-
                 </div>
             </div>
         </div>

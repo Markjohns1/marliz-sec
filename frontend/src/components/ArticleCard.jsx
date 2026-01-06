@@ -99,12 +99,12 @@ export default function ArticleCard({ article }) {
           </p>
         )}
 
-        {/* Impact & Who's at Risk */}
+        {/* Impact Brief - Dossier Style */}
         {article.simplified?.business_impact && (
-          <div className="mb-4 p-3 bg-slate-800/50 rounded-lg border border-slate-700/50">
-            <div className="flex items-start text-xs text-slate-300">
-              <Users className="w-3 h-3 mr-2 mt-0.5 text-orange-400 flex-shrink-0" />
-              <span className="line-clamp-2">{stripHtml(article.simplified.business_impact)}</span>
+          <div className="mb-4 p-3 bg-blue-500/5 rounded-lg border border-blue-500/10 backdrop-blur-sm">
+            <div className="flex items-start text-[11px] text-blue-300 font-mono uppercase tracking-wider leading-relaxed">
+              <Shield className="w-3.5 h-3.5 mr-2 mt-0.5 text-blue-500 flex-shrink-0" />
+              <span className="line-clamp-2">IMPACT: {stripHtml(article.simplified.business_impact)}</span>
             </div>
           </div>
         )}
@@ -117,10 +117,10 @@ export default function ArticleCard({ article }) {
 
           <Link
             to={`/article/${article.slug}`}
-            className="text-primary-600 hover:text-primary-700 font-semibold text-sm flex items-center group"
+            className="text-blue-500 hover:text-blue-400 font-bold text-xs uppercase tracking-[0.2em] flex items-center group/btn"
           >
-            Read Full Alert
-            <TrendingUp className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+            Analyze Intelligence
+            <ChevronRight className="w-4 h-4 ml-1 group-hover/btn:translate-x-1 transition-transform" />
           </Link>
         </div>
       </div>
