@@ -95,7 +95,7 @@ export default function Home() {
 
             <p className="text-lg md:text-xl text-slate-400 mb-10 leading-relaxed max-w-3xl">
               Advanced monitoring and analysis of global cybercrime, data breaches, and state-sponsored activity.
-              Real-time actionable protocols for East African enterprises and individual security.
+              Real-time actionable protocols for global enterprise defense and critical infrastructure protection.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
@@ -119,7 +119,7 @@ export default function Home() {
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h2 className="text-3xl font-extrabold text-white mb-2 tracking-tight">Intelligence Operations</h2>
-                <p className="text-slate-500 font-mono text-xs uppercase tracking-[0.2em]">Updated Real-Time | Eastern Africa Time (EAT)</p>
+                <p className="text-slate-500 font-mono text-xs uppercase tracking-[0.2em]">Updated Real-Time | Global Grid (UTC)</p>
               </div>
             </div>
 

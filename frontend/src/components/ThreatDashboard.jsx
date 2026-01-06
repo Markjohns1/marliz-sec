@@ -21,7 +21,7 @@ export default function ThreatDashboard({ stats }) {
             border: 'border-red-500/30',
             icon: <AlertTriangle className="w-8 h-8 text-red-500 animate-pulse shadow-glow-critical" />,
             label: 'CRITICAL ALERT',
-            desc: 'Extreme threats detected. Intelligence confirms active exploitation across multiple local sectors.'
+            desc: 'Extreme threats detected. Verified active exploitation across global critical infrastructure.'
         },
         high: {
             color: 'text-orange-500',
@@ -29,7 +29,7 @@ export default function ThreatDashboard({ stats }) {
             border: 'border-orange-500/30',
             icon: <Activity className="w-8 h-8 text-orange-500" />,
             label: 'ELEVATED RISK',
-            desc: 'Significant cyberactivity detected targeting East African enterprise networks.'
+            desc: 'Significant cyberactivity detected targeting enterprise networks worldwide.'
         },
         medium: {
             color: 'text-blue-500',
@@ -69,25 +69,19 @@ export default function ThreatDashboard({ stats }) {
                     </div>
 
                     {/* Context & Ticker */}
-                    <div className="flex-1 w-full md:ml-4">
-                        <div className="flex items-center space-x-3 mb-2">
-                            <span className="relative flex h-3 w-3">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
-                            </span>
-                            <span className="text-xs font-black text-blue-400 tracking-[0.2em] uppercase">Intelligence Feed Active</span>
+                    <div className="flex-1 w-full md:ml-4 flex items-center justify-between">
+                        <div>
+                            <div className="flex items-center space-x-3 mb-2">
+                                <span className="relative flex h-3 w-3">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
+                                </span>
+                                <span className="text-xs font-black text-blue-400 tracking-[0.2em] uppercase">Global Intelligence Feed Active</span>
+                            </div>
+                            <p className="text-slate-300 text-sm md:text-lg leading-relaxed font-medium">
+                                {config.desc}
+                            </p>
                         </div>
-                        <p className="text-slate-300 text-sm md:text-lg leading-relaxed font-medium">
-                            {config.desc}
-                        </p>
-                    </div>
-
-                    {/* Action Button */}
-                    <div className="w-full md:w-auto">
-                        <button className="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-xl font-bold transition-all flex items-center justify-center shadow-[0_0_20px_rgba(37,99,235,0.3)] border border-blue-400">
-                            <Shield className="w-4 h-4 mr-2" />
-                            Emergency Protocol
-                        </button>
                     </div>
                 </div>
             </div>
