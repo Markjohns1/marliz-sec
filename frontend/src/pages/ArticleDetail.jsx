@@ -8,6 +8,7 @@ import {
 import { formatDistanceToNow, format } from 'date-fns';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 import { Helmet } from 'react-helmet-async';
 import AdUnit from '../components/AdUnit';
 import SocialShare from '../components/SocialShare';
@@ -271,7 +272,7 @@ export default function ArticleDetail() {
                   The Lowdown: Friendly Expert Summary
                 </h2>
                 <div className="prose prose-invert prose-blue max-w-none text-lg text-slate-300 leading-relaxed">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
                     {article.simplified?.friendly_summary?.replace(/\|\|\|/g, '')}
                   </ReactMarkdown>
                 </div>
@@ -285,7 +286,7 @@ export default function ArticleDetail() {
                     Technically: How The Attack Happened
                   </h2>
                   <div className="prose prose-invert prose-blue max-w-none text-lg text-slate-300 leading-relaxed">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
                       {article.simplified?.attack_vector
                         ?.replace(/\|\|\|/g, '')
                         .replace(/<h2>.*?<\/h2>/gi, '')}
@@ -305,7 +306,7 @@ export default function ArticleDetail() {
                   Why This Matters to You (Personal & Business)
                 </h2>
                 <div className="prose prose-invert prose-blue max-w-none text-lg text-blue-200 leading-relaxed">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
                     {article.simplified?.business_impact?.replace(/\|\|\|/g, '')}
                   </ReactMarkdown>
                 </div>
