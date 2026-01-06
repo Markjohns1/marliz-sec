@@ -26,30 +26,29 @@ const formatAIContent = (text) => {
   const toRoman = (num) => {
     const map = { M: 1000, CM: 900, D: 500, CD: 400, C: 100, XC: 90, L: 50, XL: 40, X: 10, IX: 9, V: 5, IV: 4, I: 1 };
     let res = '';
-    for (const i in map) {
-      while (num >= map[i]) { res += i; num -= map[i]; }
-    }
+    for (const i in map) { while (num >= map[i]) { res += i; num -= map[i]; } }
     return res;
   };
 
   let romanCount = 0;
 
-  // 1. Pass 1: Heal buried stars but turn them into DOTS so they don't steal the Roman count
+  // 1. PASS 1: Force new lines for ANY bullet or action keyword that is clumped
   let healedText = text
-    .replace(/([.!?])\s*\*\s+/g, '$1\n • ')
-    .replace(/(\w)\s*\* /g, '$1\n • ');
+    .replace(/([.!?])\s*([\*•])\s+/g, '$1\n\n* ') // Break at punctuation
+    .replace(/(\w)\s+([\*•])\s+/g, '$1\n\n* ')    // Break at words
+    .replace(/([\*•])\s+/g, '\n\n* ')              // Standardize all to stars for loop
+    .replace(/([.!?])\s*(IMMEDIATE|SECONDARY|LONG-TERM|ONGOING):/g, '$1\n\n* $2:'); // Break clumped actions
 
-  // 2. Pass 2: Process lines and apply Roman Numerals ONLY to leading stars
+  // 2. PASS 2: Process lines and apply Roman Numerals
   return healedText.split('\n').map(line => {
     const trimmed = line.trim();
     if (!trimmed) return '';
 
-    // Advanced Header Detection - Master Reset
-    const cleanForCheck = trimmed.replace(/\*/g, '');
+    // Advanced Header Detection
+    const cleanForCheck = trimmed.replace(/\*/g, '').trim();
     const isHeader = trimmed.startsWith('#') ||
-      trimmed.startsWith('<h') ||
       (cleanForCheck.length > 2 && cleanForCheck.length < 60 &&
-        /^[A-Z0-9][\w\s&:-]+$/.test(cleanForCheck) &&
+        /^[A-Z][\w\s&:-]+$/.test(cleanForCheck) &&
         !cleanForCheck.endsWith('.'));
 
     if (isHeader) {
@@ -57,7 +56,7 @@ const formatAIContent = (text) => {
       return trimmed.startsWith('#') ? line : `\n\n### ${cleanForCheck}\n`;
     }
 
-    // LIST POINT DETECTION (Roman Numerals for leading stars only)
+    // LIST POINT DETECTION
     if (trimmed.startsWith('*')) {
       romanCount++;
       return `\n\n**${toRoman(romanCount)}.** ${trimmed.substring(1).trim()}`;
@@ -66,7 +65,6 @@ const formatAIContent = (text) => {
     return line;
   }).join('\n')
     .replace(/\|\|\|/g, '')
-    .replace(/\s+\*\s+/g, ' ')
     .replace(/\n\s*\n\s*\n+/g, '\n\n')
     .trim();
 };
