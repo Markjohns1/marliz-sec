@@ -186,7 +186,7 @@ class NewsletterService:
                     # Track last sent time if it's a real subscriber
                     if sub.id:
                         from sqlalchemy import update
-                        from app.models import Subscriber
+                        # Subscriber is already imported globally
                         stmt = update(Subscriber).where(Subscriber.id == sub.id).values(last_email_sent=datetime.utcnow())
                         await db.execute(stmt)
                     

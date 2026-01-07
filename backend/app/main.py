@@ -160,6 +160,11 @@ if os.path.exists(FRONTEND_DIST):
     # Catch-all route for React Router (SPA)
     @app.api_route("/{full_path:path}", methods=["GET", "HEAD"])
     async def serve_react_app(full_path: str, request: Request):
+        # 🚨 SECURITY: Block access to hidden system files and secrets
+        if any(x in full_path for x in [".git", ".env", "docker-compose", ".yml", ".ini"]):
+            logger.warning(f"SECURITY ALERT: Blocked attempt to access {full_path} from {request.client.host}")
+            raise HTTPException(status_code=403, detail="Forbidden")
+
         # 0. Catch broken 'undefined' URLs (Common SEO issue)
         if "undefined" in full_path:
             from fastapi.responses import RedirectResponse
