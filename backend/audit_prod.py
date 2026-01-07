@@ -1,18 +1,21 @@
-
 import asyncio
 from app.database import AsyncSessionLocal
 from app.models import Article, SimplifiedContent
 from sqlalchemy import select, func
+from sqlalchemy.orm import selectinload
 
 async def check():
     async with AsyncSessionLocal() as db:
+        # Total Articles
         total = await db.scalar(select(func.count(Article.id)))
-        stmt = select(Article).join(SimplifiedContent)
+        
+        # Eagerly load simplified content to avoid MissingGreenlet error
+        stmt = select(Article).options(selectinload(Article.simplified)).join(SimplifiedContent)
         res = await db.execute(stmt)
         articles = res.scalars().all()
         
         # Calculate stats
-        upgraded = sum(1 for a in articles if len((a.simplified.friendly_summary or "").split()) >= 800)
+        upgraded = sum(1 for a in articles if a.simplified and len((a.simplified.friendly_summary or "").split()) >= 800)
         pending = len(articles) - upgraded
         raw = total - len(articles)
         
