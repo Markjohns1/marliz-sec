@@ -154,8 +154,8 @@ def start_scheduler():
         name="Initial cleanup"
     )
     
-    # scheduler.start()
-    logger.info("✓ Scheduler DISABLED for safety.")
+    scheduler.start()
+    logger.info("✓ Scheduler started: Automations active (7AM/7PM fetches).")
 
 def stop_scheduler():
     """Stop scheduler gracefully"""
