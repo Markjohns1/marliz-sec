@@ -203,6 +203,7 @@ export default function AdminDashboard() {
                         ].map((tab) => (
                             <button
                                 key={tab.id}
+                                data-tab={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
                                 className={`flex items-center gap-2 px-6 h-full text-xs sm:text-sm font-bold opacity-90 transition-all border-b-2 whitespace-nowrap ${activeTab === tab.id
                                     ? 'border-red-500 text-red-500 bg-red-500/5'

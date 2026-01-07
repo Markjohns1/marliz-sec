@@ -147,15 +147,30 @@ export default function NewsletterTab() {
 
                     <div className="h-6 w-px bg-slate-800 hidden sm:block"></div>
 
-                    {/* Trigger Control */}
-                    <button
-                        onClick={handleTriggerDigest}
-                        disabled={actionLoading}
-                        className="h-10 px-6 bg-primary-600 hover:bg-primary-500 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-lg hover:shadow-primary-500/20 active:scale-95 flex items-center gap-2"
-                    >
-                        {actionLoading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
-                        Blast Digest
-                    </button>
+                    {/* Trigger Controls */}
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={() => {
+                                // Find the Articles tab button and click it
+                                const articlesTab = document.querySelector('[data-tab="articles"]');
+                                if (articlesTab) articlesTab.click();
+                            }}
+                            className="h-10 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center gap-2 border border-slate-700"
+                        >
+                            <ExternalLink className="w-3.5 h-3.5" />
+                            Select Manually
+                        </button>
+
+                        <button
+                            onClick={handleTriggerDigest}
+                            disabled={actionLoading}
+                            className="h-10 px-6 bg-primary-600 hover:bg-primary-500 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-lg hover:shadow-primary-500/20 active:scale-95 flex items-center gap-2"
+                            title="Auto-send top 5 articles from the last 7 days"
+                        >
+                            {actionLoading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
+                            Quick Blast
+                        </button>
+                    </div>
                 </div>
             </div>
 

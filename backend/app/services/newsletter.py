@@ -45,60 +45,83 @@ class NewsletterService:
             return result.scalars().all()
 
     def _generate_html(self, articles, custom_note=None):
-        """Generate the HTML email content using a premium template."""
-        # Simple high-end template (usually we'd use a separate .html file)
+        """Generate the HTML email content using a bulletproof premium template."""
+        # This template is optimized to prevent Gmail collapsing and clipping
         template_str = """
         <!DOCTYPE html>
         <html>
         <head>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <style>
-                body { font-family: 'Inter', Helvetica, Arial, sans-serif; background-color: #020617; color: #f8fafc; margin: 0; padding: 20px; }
-                .container { max-width: 600px; margin: 0 auto; background-color: #0f172a; border-radius: 24px; overflow: hidden; border: 1px solid #1e293b; }
+                body { font-family: 'Inter', Helvetica, Arial, sans-serif; background-color: #020617; color: #f8fafc; margin: 0; padding: 0; -webkit-text-size-adjust: none; }
+                .wrapper { width: 100%; table-layout: fixed; background-color: #020617; padding-bottom: 60px; }
+                .container { max-width: 600px; margin: 0 auto; background-color: #0f172a; border-radius: 24px; border: 1px solid #1e293b; margin-top: 20px; overflow: hidden; }
+                .preheader { display: none; max-height: 0px; overflow: hidden; mso-hide: all; }
                 .header { padding: 40px 20px; text-align: center; border-bottom: 1px solid #1e293b; }
-                .logo { font-size: 24px; font-weight: 900; color: #ef4444; letter-spacing: -1px; }
+                .logo { font-size: 26px; font-weight: 900; color: #ef4444; letter-spacing: -1px; text-decoration: none; }
+                .intelligence-brief { padding: 20px 30px; background-color: #1e293b; color: #94a3b8; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; text-align: center; }
                 .content { padding: 30px; }
-                .article { margin-bottom: 40px; padding-bottom: 30px; border-bottom: 1px solid #1e293b; }
-                .article:last-child { border-bottom: none; }
+                .article-card { margin-bottom: 40px; background-color: #1e293b80; border-radius: 20px; padding: 25px; border: 1px solid #334155; }
                 .category { font-size: 10px; font-weight: 900; color: #ef4444; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; display: block; }
                 .title { font-size: 20px; font-weight: 800; margin-bottom: 15px; color: #ffffff; line-height: 1.3; }
-                .summary { font-size: 14px; color: #94a3b8; line-height: 1.6; margin-bottom: 20px; }
-                .button { background-color: #ef4444; color: white; padding: 12px 24px; border-radius: 12px; text-decoration: none; font-weight: 800; font-size: 13px; display: inline-block; }
-                .footer { padding: 30px; text-align: center; font-size: 11px; color: #64748b; background-color: #020617; }
-                .unsubscribe { color: #ef4444; text-decoration: underline; }
+                .summary { font-size: 14px; color: #cbd5e1; line-height: 1.7; margin-bottom: 25px; }
+                .button { background-color: #ef4444; color: #ffffff !important; padding: 14px 28px; border-radius: 14px; text-decoration: none; font-weight: 800; font-size: 13px; display: inline-block; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2); }
+                .footer { padding: 40px 30px; text-align: center; font-size: 11px; color: #64748b; line-height: 1.8; }
+                .unsubscribe { color: #ef4444; text-decoration: underline; font-weight: 700; }
+                .dispatch-tag { display: inline-block; padding: 4px 10px; background-color: #1e293b; border-radius: 6px; margin-bottom: 20px; }
             </style>
         </head>
         <body>
-            <div class="container">
-                <div class="header">
-                    <div class="logo">MARLIZ INTEL</div>
-                    <div style="font-size: 12px; color: #64748b; margin-top: 10px; text-transform: uppercase; font-weight: 900; letter-spacing: 2px;">Daily Intelligence Digest</div>
-                    {% if custom_note %}
-                    <div style="margin-top: 25px; padding: 20px; background-color: #1e293b; border-radius: 16px; font-size: 14px; line-height: 1.6; color: #f8fafc; font-style: italic; border-left: 4px solid #ef4444; font-weight: 500; text-align: left;">
-                        {{ custom_note }}
+            <span class="preheader">Latest Intel: {{ articles[0].title[:100] }}</span>
+            <div class="wrapper">
+                <div class="container">
+                    <div class="intelligence-brief">
+                        Marliz Intel Bulletin • {{ timestamp_readable }}
                     </div>
-                    {% endif %}
-                </div>
-                <div class="content">
-                    {% for article in articles %}
-                    <div class="article">
-                        <span class="category">{{ article.category.name if article.category else 'Security' }}</span>
-                        <div class="title">{{ article.title }}</div>
-                        <div class="summary">{{ article.simplified.friendly_summary[:250] }}...</div>
-                        <a href="https://marlizintel.com/article/{{ article.slug }}" class="button">Full Intelligence Report</a>
+                    <div class="header">
+                        <a href="https://marlizintel.com" class="logo">MARLIZ INTEL</a>
+                        {% if custom_note %}
+                        <div style="margin-top: 30px; padding: 25px; background-color: #ef44440a; border-radius: 20px; font-size: 15px; line-height: 1.7; color: #f8fafc; font-style: italic; border: 1px solid #ef444433; text-align: left;">
+                            "{{ custom_note }}"
+                        </div>
+                        {% endif %}
                     </div>
-                    {% endfor %}
-                </div>
-                <div class="footer">
-                    &copy; {{ year }} Marliz Intel. All rights reserved.<br>
-                    You are receiving this because you subscribed to Marliz Intel alerts.<br><br>
-                    <a href="https://marlizintel.com/unsubscribe" class="unsubscribe">Unsubscribe</a>
+                    <div class="content">
+                        {% for article in articles %}
+                        <div class="article-card">
+                            <span class="category">{{ article.category.name if article.category else 'SECURITY ALERT' }}</span>
+                            <div class="title">{{ article.title }}</div>
+                            <div class="summary">
+                                {% if article.simplified and article.simplified.friendly_summary %}
+                                    {{ article.simplified.friendly_summary[:350] }}...
+                                {% else %}
+                                    {{ article.summary[:350] if article.summary else 'Full technical intelligence report available on the portal.' }}...
+                                {% endif %}
+                            </div>
+                            <a href="https://marlizintel.com/article/{{ article.slug }}" class="button">Access Full Intelligence</a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="footer">
+                        <div class="dispatch-tag">OFFICIAL DISPATCH #{{ timestamp }}</div><br>
+                        &copy; {{ year }} Marliz Intelligence Systems. All rights reserved.<br>
+                        Confidentiality: This briefing is intended for subscribed parties only.<br><br>
+                        <a href="https://marlizintel.com/unsubscribe" class="unsubscribe">One-click Unsubscribe</a>
+                    </div>
                 </div>
             </div>
         </body>
         </html>
         """
         template = Template(template_str)
-        return template.render(articles=articles, year=datetime.now().year, custom_note=custom_note)
+        now = datetime.now()
+        return template.render(
+            articles=articles, 
+            year=now.year, 
+            custom_note=custom_note,
+            timestamp=now.strftime("%Y%m%d-%H%M%S"),
+            timestamp_readable=now.strftime("%B %d, %H:%M")
+        )
 
     async def send_daily_digest(self, article_ids=None, custom_note=None, to_email=None):
         """Main entry point to send the intelligence digest. Accepts manual article_ids or defaults to top articles."""
