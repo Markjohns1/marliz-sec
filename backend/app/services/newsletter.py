@@ -126,18 +126,28 @@ class NewsletterService:
             
         html_content = self._generate_html(articles, custom_note=custom_note)
         
-        # Batch sending logic
-        for sub in subscribers:
-            try:
-                resend.Emails.send({
-                    "from": self.from_email,
-                    "to": sub.email,
-                    "subject": f"INTEL ALERT: {articles[0].title[:50]}...",
-                    "html": html_content
-                })
-                logger.info(f"Newsletter sent to {sub.email}")
-            except Exception as e:
-                logger.error(f"Failed to send newsletter to {sub.email}: {e}")
+        # Batch sending logic and tracking
+        async with AsyncSessionLocal() as db:
+            for sub in subscribers:
+                try:
+                    resend.Emails.send({
+                        "from": self.from_email,
+                        "to": sub.email,
+                        "subject": f"INTEL ALERT: {articles[0].title[:50]}...",
+                        "html": html_content
+                    })
+                    logger.info(f"Newsletter sent to {sub.email}")
+                    
+                    # Track last sent time
+                    from sqlalchemy import update
+                    from app.models import Subscriber
+                    stmt = update(Subscriber).where(Subscriber.id == sub.id).values(last_email_sent=datetime.utcnow())
+                    await db.execute(stmt)
+                    
+                except Exception as e:
+                    logger.error(f"Failed to send newsletter to {sub.email}: {e}")
+            
+            await db.commit()
                 
         return True, f"Sent {len(articles)} articles to {len(subscribers)} subscribers"
 

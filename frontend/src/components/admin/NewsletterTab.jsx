@@ -188,9 +188,21 @@ export default function NewsletterTab() {
                                         </div>
                                     </td>
                                     <td className="px-8 py-5">
-                                        <div className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-950 border border-slate-800 w-fit">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                            <span className="text-[10px] font-black text-slate-400 uppercase">Trusted Host</span>
+                                        <div className="flex flex-col gap-1.5">
+                                            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-950 border border-slate-800 w-fit">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                                <span className="text-[10px] font-black text-slate-400 uppercase">Trusted Host</span>
+                                            </div>
+                                            {sub.last_email_sent ? (
+                                                <div className="flex items-center gap-1 text-[9px] font-bold text-blue-400 px-1 uppercase tracking-tighter">
+                                                    <MailCheck className="w-3 h-3" />
+                                                    Last Alert: {new Date(sub.last_email_sent).toLocaleDateString()}
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center gap-1 text-[9px] font-bold text-slate-600 px-1 uppercase tracking-tighter italic">
+                                                    No Alerts Sent
+                                                </div>
+                                            )}
                                         </div>
                                     </td>
                                     <td className="px-8 py-5 text-right">
