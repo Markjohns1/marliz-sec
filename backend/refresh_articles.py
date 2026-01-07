@@ -67,9 +67,9 @@ async def refresh_all_articles():
     batch_size = 1 # Sequential processing to prevent 429s
     processed_in_batch = 0
     
-    PER_ARTICLE_REST = 10   # Wait 10s between each article
+    PER_ARTICLE_REST = 45   # Wait 45s between each article (SAFE)
     BATCH_COOLDOWN = 5      # Short cooldown since batch is 1
-    RATE_LIMIT_REST = 60    # Wait 60s if we hit a limit
+    RATE_LIMIT_REST = 180   # Wait 3 min if we hit a limit (EXTRA SAFE)
 
     for i, aid in enumerate(article_ids):
         # We don't print immediately to avoid cluttering if we are just skipping
