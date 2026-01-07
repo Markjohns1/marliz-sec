@@ -185,4 +185,8 @@ async def diagnose_thin_articles():
         print("\n" + "=" * 60)
 
 if __name__ == "__main__":
-    asyncio.run(refresh_all_articles())
+    if len(sys.argv) > 1 and sys.argv[1] == "--diagnose":
+        print("Running diagnostic only...")
+        asyncio.run(diagnose_thin_articles())
+    else:
+        asyncio.run(refresh_all_articles())
