@@ -2,14 +2,13 @@
 import asyncio
 import os
 import sys
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.orm import selectinload
 
 # Add the current directory to sys.path to allow importing 'app'
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), ".")))
 
 # FORCE LOGGING TO CONTAINER STDOUT for detached mode monitoring
-# This allows usage of `docker compose logs -f web` to see progress of this script
 try:
     if os.path.exists('/proc/1/fd/1'):
         sys.stdout = open('/proc/1/fd/1', 'w', buffering=1)
@@ -18,84 +17,107 @@ except Exception:
     pass
 
 from app.database import AsyncSessionLocal
-from app.models import Article, ArticleStatus
+from app.models import Article, ArticleStatus, SimplifiedContent
 from app.services.ai_simplifier import ai_simplifier
 
-async def refresh_all_articles():
+async def upgrade_single_article(article_id):
+    """Process a single article with its own isolated session to prevent race conditions."""
     async with AsyncSessionLocal() as db:
-        # Fetch all articles with their simplified content eagerly loaded (Ordered by ID for stability)
-        stmt = select(Article).options(selectinload(Article.simplified)).where(
+        # Fetch the article inside the session
+        stmt = select(Article).options(selectinload(Article.simplified)).where(Article.id == article_id)
+        result = await db.execute(stmt)
+        article = result.scalars().first()
+        
+        if not article:
+            return "not_found"
+            
+        # Check word count again to be safe
+        word_count = 0
+        if article.simplified:
+            summary = article.simplified.friendly_summary or ""
+            word_count = len(summary.split()) + \
+                         len((article.simplified.attack_vector or "").split()) + \
+                         len((article.simplified.business_impact or "").split())
+        
+        if word_count >= 800:
+            return "already_upgraded"
+
+        # Initialize simplifier categories if needed
+        if not ai_simplifier.category_map:
+            await ai_simplifier._load_categories(db)
+            
+        # Run the simplification
+        return await ai_simplifier._simplify_article(db, article)
+
+async def refresh_all_articles():
+    """Main loop to drive the bulk upgrade process."""
+    print("Marliz Intel Bulk Upgrade Engine v2.0 Starting...")
+    
+    # 1. Get all eligible article IDs first
+    async with AsyncSessionLocal() as db:
+        stmt = select(Article.id).where(
             Article.status.in_([ArticleStatus.READY, ArticleStatus.EDITED, ArticleStatus.PUBLISHED])
         ).order_by(Article.id)
         result = await db.execute(stmt)
-        articles = result.scalars().all()
-        
-        print(f"Found {len(articles)} articles to upgrade to high-value content.")
-        
-        # Load categories for the simplifier
-        await ai_simplifier._load_categories(db)
-        
-        processed_count = 0
-        batch_size = 5
-        batch_cooldown = 900 # 15 minutes rest after 5 articles (Deep breath for 2800-word articles)
-        per_article_delay = 120 # 2 minute breath between articles
-        
-        for idx, article in enumerate(articles):
-            # 1. SMART RESUME: Skip anything already high-value (>800 words)
-            word_count = 0
-            if article.simplified:
-                summary = article.simplified.friendly_summary or ""
-                word_count = len(summary.split()) + \
-                             len((article.simplified.attack_vector or "").split()) + \
-                             len((article.simplified.business_impact or "").split())
-            
-            if word_count >= 800:
-                print(f"[{idx+1}/{len(articles)}] SKIP: '{article.title[:40]}...' already high-value ({word_count} words).")
-                continue
+        article_ids = result.scalars().all()
+    
+    total = len(article_ids)
+    print(f"Found {total} articles to verify/upgrade.")
+    
+    batch_size = 5
+    processed_in_batch = 0
+    
+    # NEW OPTIMIZED DELAYS: Faster default, respect 429 errors
+    PER_ARTICLE_REST = 15   # 15 seconds instead of 120
+    BATCH_COOLDOWN = 120    # 2 minutes instead of 900
+    RATE_LIMIT_REST = 300   # 5 minutes (Heavy cooldown for 429)
 
-            print(f"[{idx+1}/{len(articles)}] UPGRADING: {article.title} (Current: {word_count} words)")
-            
-            status = "idle"
-            retries = 15 
-            
-            while status != "success" and retries > 0:
-                try:
-                    status = await ai_simplifier._simplify_article(db, article)
-                    if status == "success":
-                        processed_count += 1
-                        print(f"  - SUCCESS: Content upgraded. [Batch Progress: {processed_count}/{batch_size}]")
-                        
-                        # Batch Cooldown Logic
-                        if processed_count >= batch_size:
-                            print(f"\n[!!!] BATCH COMPLETE ({batch_size} Articles). Resting for 10 minutes for safety...")
-                            await asyncio.sleep(batch_cooldown)
-                            processed_count = 0 
-                            print("[!] Cooldown over. Resuming next batch...\n")
-                        else:
-                            await asyncio.sleep(per_article_delay)
-                    elif status == "rate_limited":
-                        print(f"  - WARNING: Rate limited. ENTERING HEAVY COOLDOWN (5 MINUTES)...")
-                        await asyncio.sleep(300) 
-                        retries -= 1
-                    elif status == "parse_error":
-                        print(f"  - ERROR: AI Output was malformed. Retrying once (10s delay)...")
-                        await asyncio.sleep(10)
-                        retries -= 1
-                        if retries == 0:
-                            print(f"  - SKIPPING: AI failed to produce valid JSON 15 times.")
-                    else:
-                        print(f"  - API ERROR: {status}. Retrying in 30s...")
-                        await asyncio.sleep(30)
-                        retries -= 1
-                except Exception as e:
-                    print(f"  - SYSTEM ERROR: {e}. Retrying in 30s...")
+    for i, aid in enumerate(article_ids):
+        print(f"[{i+1}/{total}] Processing ID: {aid}...")
+        
+        retries = 3
+        success = False
+        
+        while retries > 0 and not success:
+            try:
+                status = await upgrade_single_article(aid)
+                
+                if status == "success":
+                    print(f"  - SUCCESS: Content upgraded to premium.")
+                    success = True
+                    processed_in_batch += 1
+                elif status == "already_upgraded":
+                    print(f"  - SKIP: Already high-value (800+ words).")
+                    success = True
+                elif status == "rate_limited":
+                    print(f"  - WARNING: Rate limited (429). Entering HEAVY COOLDOWN ({RATE_LIMIT_REST}s)...")
+                    await asyncio.sleep(RATE_LIMIT_REST)
+                    retries -= 1
+                elif status == "parse_error":
+                    print(f"  - ERROR: AI Output malformed. Retrying (15s)...")
+                    await asyncio.sleep(15)
+                    retries -= 1
+                else:
+                    print(f"  - API ERROR ({status}). Retrying in 30s...")
                     await asyncio.sleep(30)
                     retries -= 1
-            
-            if status != "success":
-                print(f"  - FAILED PERMANENTLY for: {article.title}")
-                
-    print("\nContent Refresh Process Complete.")
+            except Exception as e:
+                print(f"  - SYSTEM ERROR: {e}. Retrying in 30s...")
+                await asyncio.sleep(30)
+                retries -= 1
+        
+        if not success:
+            print(f"  - FAILED after retries for ID: {aid}. Moving to next.")
+
+        # Delay Logic
+        if processed_in_batch >= batch_size:
+            print(f"  - BATCH COMPLETE. Resting for {BATCH_COOLDOWN}s for safety...")
+            await asyncio.sleep(BATCH_COOLDOWN)
+            processed_in_batch = 0
+        else:
+            await asyncio.sleep(PER_ARTICLE_REST)
+
+    print("\nBulk Upgrade Engine finished all tasks.")
 
 if __name__ == "__main__":
     asyncio.run(refresh_all_articles())

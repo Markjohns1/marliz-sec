@@ -365,6 +365,8 @@ async def get_admin_articles(
     status: Optional[str] = None,
     sort_by: Optional[str] = "date", # date, views, impressions, position
     search: Optional[str] = None,
+    min_words: Optional[int] = None,
+    max_words: Optional[int] = None,
     api_key = Depends(verify_api_key),
     db: AsyncSession = Depends(get_db)
 ):
@@ -378,6 +380,17 @@ async def get_admin_articles(
         query = query.join(models.Category).filter(models.Category.slug == category)
     if status:
         query = query.filter(models.Article.status == status)
+        
+    # Word Count Filtering (AI-driven)
+    if min_words or max_words:
+        # Join with simplified content to check word count
+        query = query.join(models.SimplifiedContent, models.Article.id == models.SimplifiedContent.article_id)
+        
+        # Approximate word count check using SQLite length (rough estimate: 1 word ~ 5.5 chars)
+        if min_words:
+            query = query.where(func.length(models.SimplifiedContent.friendly_summary) >= (min_words * 5.5))
+        if max_words:
+            query = query.where(func.length(models.SimplifiedContent.friendly_summary) <= (max_words * 5.5))
     if search:
         search_term = f"%{search}%"
         query = query.filter(models.Article.title.ilike(search_term))
@@ -441,6 +454,10 @@ async def get_article(slug: str, request: Request, db: AsyncSession = Depends(ge
     
     # Track View Source
     await track_view(article.id, request, db)
+    
+    # CRITICAL: Re-refresh or ensure session state is clean after track_view's commit
+    # This prevents the 'MissingGreenlet' 500 error when Pydantic tries to serialize
+    await db.refresh(article, ['simplified', 'category'])
     
     return schemas.ArticleWithContent.model_validate(article)
 
