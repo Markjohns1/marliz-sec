@@ -115,6 +115,74 @@ async def refresh_all_articles():
             await asyncio.sleep(PER_ARTICLE_REST)
 
     print("\nBulk Upgrade Engine finished all tasks.")
+    
+    # Run diagnosis after completion
+    await diagnose_thin_articles()
+
+async def diagnose_thin_articles():
+    """Show all articles with less than 800 words."""
+    print("\n" + "=" * 60)
+    print("DIAGNOSTIC REPORT: Articles Below 800 Words")
+    print("=" * 60)
+    
+    async with AsyncSessionLocal() as db:
+        stmt = select(Article).options(selectinload(Article.simplified))
+        result = await db.execute(stmt)
+        articles = result.scalars().all()
+        
+        total = len(articles)
+        thin_articles = []
+        
+        for article in articles:
+            word_count = 0
+            if article.simplified:
+                summary = article.simplified.friendly_summary or ""
+                attack = article.simplified.attack_vector or ""
+                impact = article.simplified.business_impact or ""
+                word_count = len(summary.split()) + len(attack.split()) + len(impact.split())
+            
+            if word_count < 800:
+                thin_articles.append({
+                    'id': article.id,
+                    'title': article.title[:40] + "..." if len(article.title) > 40 else article.title,
+                    'status': article.status.value if article.status else "UNKNOWN",
+                    'words': word_count,
+                    'has_simplified': article.simplified is not None
+                })
+        
+        # Sort by word count
+        thin_articles.sort(key=lambda x: x['words'])
+        
+        print(f"\nTOTAL ARTICLES: {total}")
+        print(f"ARTICLES WITH < 800 WORDS: {len(thin_articles)}")
+        print(f"ARTICLES WITH 0 WORDS: {len([a for a in thin_articles if a['words'] == 0])}")
+        
+        # Group by status
+        by_status = {}
+        for a in thin_articles:
+            status = a['status']
+            if status not in by_status:
+                by_status[status] = []
+            by_status[status].append(a)
+        
+        print("\n" + "-" * 60)
+        for status, items in by_status.items():
+            print(f"\n[{status}] - {len(items)} articles:")
+            for item in items[:15]:  # Show first 15 per status
+                flag = "✓" if item['has_simplified'] else "✗"
+                print(f"  ID: {item['id']:4} | {item['words']:4} words | Simp: {flag} | {item['title']}")
+            if len(items) > 15:
+                print(f"  ... and {len(items) - 15} more")
+        
+        # Show zero-word IDs for quick targeting
+        zero_ids = [a['id'] for a in thin_articles if a['words'] == 0]
+        if zero_ids:
+            print("\n" + "-" * 60)
+            print(f"ZERO-WORD IDs ({len(zero_ids)}): {zero_ids[:30]}")
+            if len(zero_ids) > 30:
+                print(f"  ... and {len(zero_ids) - 30} more")
+        
+        print("\n" + "=" * 60)
 
 if __name__ == "__main__":
     asyncio.run(refresh_all_articles())
