@@ -113,7 +113,7 @@ class ManualArticleCreate(BaseModel):
     admin_secret: str
 
 class ManualNewsletterTrigger(BaseModel):
-    article_ids: List[int]
+    article_ids: Optional[List[int]] = None
     custom_note: Optional[str] = None
 
 # Subscriber Schemas
