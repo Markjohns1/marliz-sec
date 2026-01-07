@@ -225,5 +225,3 @@ if __name__ == "__main__":
         asyncio.run(cleanup_thin_articles())
     else:
         asyncio.run(refresh_all_articles())
-    else:
-        asyncio.run(refresh_all_articles())
