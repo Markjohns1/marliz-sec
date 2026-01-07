@@ -6,28 +6,47 @@ from sqlalchemy.orm import selectinload
 
 async def check():
     async with AsyncSessionLocal() as db:
-        # Total Articles
+        # Total Articles in DB
         total = await db.scalar(select(func.count(Article.id)))
         
-        # Eagerly load simplified content to avoid MissingGreenlet error
+        # Load all articles that have been "Simplified" by AI
         stmt = select(Article).options(selectinload(Article.simplified)).join(SimplifiedContent)
         res = await db.execute(stmt)
         articles = res.scalars().all()
         
-        # Calculate stats
-        upgraded = sum(1 for a in articles if a.simplified and len((a.simplified.friendly_summary or "").split()) >= 800)
-        pending = len(articles) - upgraded
+        upgraded = 0
+        pending = 0
+        
+        for a in articles:
+            if not a.simplified:
+                continue
+            
+            # Combine all sections to get the TRUE word count
+            combined_content = (
+                (a.simplified.friendly_summary or "") + " " +
+                (a.simplified.business_impact or "") + " " +
+                (a.simplified.attack_vector or "")
+            )
+            word_count = len(combined_content.split())
+            
+            # 800+ is our Senior Intel Threshold
+            if word_count >= 800:
+                upgraded += 1
+            else:
+                pending += 1
+        
+        # Raw news are articles without any SimplifiedContent entry yet
         raw = total - len(articles)
         
         print(f"\n" + "="*40)
         print(f"   MARLIZ INTEL PRODUCTION AUDIT")
         print(f"   {'-'*30}")
-        print(f"   Total Articles:      {total}")
-        print(f"   Senior Intel Ready:  {upgraded} (800+ words)")
-        print(f"   Short Summaries:     {pending}")
-        print(f"   Raw News Awaiting:   {raw}")
+        print(f"   Total Database Items: {total}")
+        print(f"   Senior Intel Ready:   {upgraded} (Full Report 800+ Words)")
+        print(f"   Standard Reports:    {pending}")
+        print(f"   Raw News Awaiting:    {raw}")
         print(f"   {'-'*30}")
-        print("   STATUS: " + ("OPTIMIZED" if pending == 0 else "UPGRADE IN PROGRESS"))
+        print(f"   PROGRESS: {((upgraded/total)*100 if total > 0 else 0):.1f}% High-Value Coverage")
         print("="*40 + "\n")
 
 if __name__ == "__main__":
