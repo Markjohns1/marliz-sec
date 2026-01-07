@@ -70,6 +70,9 @@ export default function AdminDashboard() {
     const navigate = useNavigate();
     const [actionLoading, setActionLoading] = useState(null);
     const [message, setMessage] = useState(null);
+    const [activeTab, setActiveTab] = useState('overview'); // overview, articles, categories, settings
+    const [editingArticle, setEditingArticle] = useState(null);
+    const [sharingArticle, setSharingArticle] = useState(null);
     const [viewingStats, setViewingStats] = useState(null);
     const [selectedSubscribers, setSelectedSubscribers] = useState([]); // Shared targeting state
 
