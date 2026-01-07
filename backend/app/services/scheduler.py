@@ -70,17 +70,23 @@ async def cleanup_job():
             # 2. protected_from_deletion = FALSE
             # 3. older than 30 days
             
-            stmt = delete(Article).where(
-                Article.published_at < cutoff_date,
-                (Article.content_type == 'news') | (Article.content_type == None),
-                Article.protected_from_deletion == False
-            )
-            result = await db.execute(stmt)
-            deleted = result.rowcount
+            # DELETION DISABLED BY ADMIN REQUEST (PRESERVE TRAFFIC/SEO)
+            # Traffic from indexed pages is too valuable to lose. 
+            # We now keep everything as an archive.
             
-            await db.commit()
-            if deleted > 0:
-                logger.info(f"✓ Retention Policy: Removed {deleted} expired NEWS articles (>30 days)")
+            # stmt = delete(Article).where(
+            #     Article.published_at < cutoff_date,
+            #     (Article.content_type == 'news') | (Article.content_type == None),
+            #     Article.protected_from_deletion == False
+            # )
+            # result = await db.execute(stmt)
+            # deleted = result.rowcount
+            
+            # await db.commit()
+            # if deleted > 0:
+            #    logger.info(f"✓ Retention Policy: Removed {deleted} expired NEWS articles (>30 days)")
+            
+            logger.info("✓ Retention Policy: CLEANUP SKIPPED. Preserving all archives for SEO.")
     except Exception as e:
         logger.error(f"✗ Cleanup failed: {str(e)}")
 
