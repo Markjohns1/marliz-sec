@@ -77,7 +77,6 @@ export default function AdminDashboard() {
     const [artSearch, setArtSearch] = useState('');
     const [artSort, setArtSort] = useState('date');
     const [artPage, setArtPage] = useState(1);
-    const [artWordCount, setArtWordCount] = useState('all'); // all, <800, 800-1000, >1000
 
     // Fetch Stats
     const { data: stats, isLoading, refetch } = useQuery({
@@ -93,14 +92,8 @@ export default function AdminDashboard() {
 
     // Fetch Admin Articles List
     const { data: articleData, isLoading: artLoading, refetch: artRefetch } = useQuery({
-        queryKey: ['admin-articles', artPage, artSort, artSearch, artWordCount],
-        queryFn: () => {
-            let params = { page: artPage, sort_by: artSort, search: artSearch };
-            if (artWordCount === '<800') { params.max_words = 800; }
-            else if (artWordCount === '800-1000') { params.min_words = 800; params.max_words = 1000; }
-            else if (artWordCount === '>1000') { params.min_words = 1000; }
-            return getAdminArticles(params);
-        },
+        queryKey: ['admin-articles', artPage, artSort, artSearch],
+        queryFn: () => getAdminArticles({ page: artPage, sort_by: artSort, search: artSearch }),
         enabled: activeTab === 'articles'
     });
 
@@ -247,8 +240,6 @@ export default function AdminDashboard() {
                         setArtPage={setArtPage}
                         artSort={artSort}
                         setArtSort={setArtSort}
-                        artWordCount={artWordCount}
-                        setArtWordCount={setArtWordCount}
                         artLoading={artLoading}
                         articleData={articleData}
                         artPage={artPage}

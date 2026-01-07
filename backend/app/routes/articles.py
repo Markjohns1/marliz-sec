@@ -365,8 +365,6 @@ async def get_admin_articles(
     status: Optional[str] = None,
     sort_by: Optional[str] = "date", # date, views, impressions, position
     search: Optional[str] = None,
-    min_words: Optional[int] = None,
-    max_words: Optional[int] = None,
     api_key = Depends(verify_api_key),
     db: AsyncSession = Depends(get_db)
 ):
@@ -381,16 +379,6 @@ async def get_admin_articles(
     if status:
         query = query.filter(models.Article.status == status)
         
-    # Word Count Filtering (AI-driven)
-    if min_words or max_words:
-        # Join with simplified content to check word count
-        query = query.join(models.SimplifiedContent, models.Article.id == models.SimplifiedContent.article_id)
-        
-        # Approximate word count check using SQLite length (rough estimate: 1 word ~ 5.5 chars)
-        if min_words:
-            query = query.where(func.length(models.SimplifiedContent.friendly_summary) >= (min_words * 5.5))
-        if max_words:
-            query = query.where(func.length(models.SimplifiedContent.friendly_summary) <= (max_words * 5.5))
     if search:
         search_term = f"%{search}%"
         query = query.filter(models.Article.title.ilike(search_term))

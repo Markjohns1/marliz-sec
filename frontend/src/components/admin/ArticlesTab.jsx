@@ -6,7 +6,6 @@ import {
 
 export default function ArticlesTab({
     artSearch, setArtSearch, setArtPage, artSort, setArtSort,
-    artWordCount, setArtWordCount,
     artLoading, articleData, artPage,
     setViewingStats, setSharingArticle, setEditingArticle
 }) {
@@ -21,16 +20,6 @@ export default function ArticlesTab({
                         initialValue={artSearch}
                         onSearch={(val) => { setArtSearch(val); setArtPage(1); }}
                     />
-                    <select
-                        value={artWordCount}
-                        onChange={(e) => { setArtWordCount(e.target.value); setArtPage(1); }}
-                        className="px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 text-sm font-bold outline-none focus:ring-2 focus:ring-primary-500 transition-all cursor-pointer hover:bg-slate-800"
-                    >
-                        <option value="all">Any Length</option>
-                        <option value="<800">Below 800 Words</option>
-                        <option value="800-1000">800 - 1000 Words</option>
-                        <option value=">1000">1000+ Words</option>
-                    </select>
                     <select
                         value={artSort}
                         onChange={(e) => setArtSort(e.target.value)}
@@ -76,19 +65,6 @@ export default function ArticlesTab({
                                                     <Clock className="w-3 h-3" />
                                                     {article.published_at ? new Date(article.published_at).toLocaleDateString() : 'Draft'}
                                                 </span>
-                                                {/* Word Count Indicator */}
-                                                {article.simplified?.friendly_summary ? (
-                                                    <span className={`flex items-center gap-1 text-[10px] font-black uppercase tracking-tighter ${article.simplified.friendly_summary.split(' ').length < 800 ? 'text-red-400' : 'text-emerald-500'
-                                                        }`}>
-                                                        <FileText className="w-3 h-3" />
-                                                        {article.simplified.friendly_summary.split(' ').length} words
-                                                    </span>
-                                                ) : (
-                                                    <span className="flex items-center gap-1 text-[10px] text-amber-500/50 font-black uppercase tracking-tighter">
-                                                        <FileText className="w-3 h-3" />
-                                                        Processing...
-                                                    </span>
-                                                )}
                                                 <button
                                                     onClick={() => setEditingArticle(article)}
                                                     className="text-[10px] text-blue-400 font-black uppercase hover:underline"
