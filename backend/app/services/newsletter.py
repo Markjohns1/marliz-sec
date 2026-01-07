@@ -17,6 +17,9 @@ class NewsletterService:
         self.api_key = settings.RESEND_API_KEY
         if self.api_key:
             resend.api_key = self.api_key
+            logger.info(f"✓ Newsletter Service: API Key detected ({self.api_key[:4]}...{self.api_key[-4:]})")
+        else:
+            logger.warning("✗ Newsletter Service: No Resend API Key found in settings.")
         self.from_email = settings.NEWSLETTER_FROM
 
     async def get_top_articles(self, limit=5):
@@ -97,7 +100,7 @@ class NewsletterService:
         template = Template(template_str)
         return template.render(articles=articles, year=datetime.now().year, custom_note=custom_note)
 
-    async def send_daily_digest(self, article_ids=None, custom_note=None):
+    async def send_daily_digest(self, article_ids=None, custom_note=None, to_email=None):
         """Main entry point to send the intelligence digest. Accepts manual article_ids or defaults to top articles."""
         if not self.api_key:
             logger.error("Resend API Key not found.")
@@ -120,7 +123,12 @@ class NewsletterService:
             logger.info("No articles found for newsletter.")
             return False, "No articles found"
             
-        subscribers = await self.get_active_subscribers()
+        if to_email:
+            # Special mode for test emails
+            subscribers = [type('obj', (object,), {'email': to_email, 'id': None})]
+        else:
+            subscribers = await self.get_active_subscribers()
+            
         if not subscribers:
             logger.info("No active subscribers.")
             return False, "No active subscribers"
@@ -129,6 +137,8 @@ class NewsletterService:
         
         # Batch sending logic and tracking
         async with AsyncSessionLocal() as db:
+            last_error = None
+            success_count = 0
             for sub in subscribers:
                 try:
                     resend.Emails.send({
@@ -138,18 +148,24 @@ class NewsletterService:
                         "html": html_content
                     })
                     logger.info(f"Newsletter sent to {sub.email}")
+                    success_count += 1
                     
-                    # Track last sent time
-                    from sqlalchemy import update
-                    from app.models import Subscriber
-                    stmt = update(Subscriber).where(Subscriber.id == sub.id).values(last_email_sent=datetime.utcnow())
-                    await db.execute(stmt)
+                    # Track last sent time if it's a real subscriber
+                    if sub.id:
+                        from sqlalchemy import update
+                        from app.models import Subscriber
+                        stmt = update(Subscriber).where(Subscriber.id == sub.id).values(last_email_sent=datetime.utcnow())
+                        await db.execute(stmt)
                     
                 except Exception as e:
+                    last_error = str(e)
                     logger.error(f"Failed to send newsletter to {sub.email}: {e}")
             
             await db.commit()
+            
+        if success_count == 0 and last_error:
+            return False, f"API Error: {last_error}"
                 
-        return True, f"Sent {len(articles)} articles to {len(subscribers)} subscribers"
+        return True, f"Sent {len(articles)} articles to {success_count} recipients"
 
 newsletter_service = NewsletterService()

@@ -141,27 +141,14 @@ async def toggle_premium(
 @router.post("/admin/test-email")
 async def send_test_email(
     email: str,
-    api_key_obj = Depends(verify_api_key),
-    db: AsyncSession = Depends(get_db)
+    api_key_obj = Depends(verify_api_key)
 ):
     """Send a test newsletter to a specific email"""
-    articles = await newsletter_service.get_top_articles(limit=3)
-    if not articles:
-        return {"status": "error", "message": "No articles found to send."}
-        
-    import resend
-    html_content = newsletter_service._generate_html(articles)
-    
-    try:
-        resend.Emails.send({
-            "from": newsletter_service.from_email,
-            "to": email,
-            "subject": "[TEST] Marliz Intel Digest",
-            "html": html_content
-        })
-        return {"status": "success", "message": f"Test email sent to {email}"}
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
+    success, message = await newsletter_service.send_daily_digest(to_email=email)
+    if success:
+        return {"status": "success", "message": message}
+    else:
+        return {"status": "error", "message": message}
 
 @router.post("/admin/trigger-digest")
 async def trigger_digest(
