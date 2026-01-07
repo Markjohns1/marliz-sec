@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { triggerNewsletterDigest } from '../../services/api';
 import {
     Clock, FileText, BarChart3, Share2,
-    Edit3, ExternalLink, Send, CheckSquare, Square
+    Edit3, ExternalLink, Send, CheckSquare, Square, X
 } from 'lucide-react';
 
 export default function ArticlesTab({
@@ -48,10 +48,10 @@ export default function ArticlesTab({
             console.error(err);
             alert("Failed to deploy digest.");
         } finally {
-            setIsDeploying(true); // Keeping state true for a moment for effect
             setTimeout(() => setIsDeploying(false), 1000);
         }
     };
+
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
             {targetAudience.length > 0 && (
@@ -73,6 +73,7 @@ export default function ArticlesTab({
                     </button>
                 </div>
             )}
+
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <h2 className="text-2xl font-black text-white tracking-tight">Article Management</h2>
                 <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -95,198 +96,202 @@ export default function ArticlesTab({
                 </div>
             </div>
 
-            {/* Article Table */}
-            <div className="card overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left">
-                        <thead>
-                            <tr className="bg-slate-900/50 border-b border-slate-800">
-                                <th className="px-6 py-4 w-12">
-                                    <div className="flex items-center justify-center">
-                                        <div className="w-2 h-2 rounded-full bg-slate-800"></div>
-                                    </div>
-                                </th>
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Intelligence Report</th>
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">Metrics</th>
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">Status</th>
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-800/50">
-                            {artLoading ? (
-                                <tr><td colSpan="5" className="px-6 py-12 text-center text-slate-500 font-bold italic">Scanning database...</td></tr>
-                            ) : articleData?.articles.map((article) => (
-                                <tr
-                                    key={article.id}
-                                    className={`hover:bg-white/5 transition-colors group ${selectedArticles.includes(article.id) ? 'bg-primary-500/5' : ''}`}
-                                >
-                                    <td className="px-6 py-4">
-                                        <button
-                                            onClick={() => toggleSelection(article.id)}
-                                            className={`p-2 rounded-lg transition-all ${selectedArticles.includes(article.id) ? 'text-primary-400' : 'text-slate-700 hover:text-slate-500'}`}
-                                        >
-                                            {selectedArticles.includes(article.id) ? <CheckSquare className="w-5 h-5" /> : <Square className="w-5 h-5" />}
-                                        </button>
-                                    </td>
-                                    <td className="px-6 py-4 max-w-md">
-                                        <div className="flex flex-col">
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-[13px] font-bold text-white group-hover:text-primary-400 transition-colors truncate max-w-[300px] lg:max-w-md">
-                                                    {article.title}
-                                                </span>
-                                            </div>
-                                            <div className="flex items-center gap-3 mt-1.5">
-                                                <span className="px-1.5 py-0.5 rounded bg-slate-950 text-[9px] font-black text-slate-500 border border-slate-800 uppercase tracking-tighter">
-                                                    {article.category?.name || 'General'}
-                                                </span>
-                                                <span className="flex items-center gap-1 text-[10px] text-slate-500 font-bold">
-                                                    <Clock className="w-3 h-3" />
-                                                    {article.published_at ? new Date(article.published_at).toLocaleDateString() : 'Draft'}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <div className="flex items-center justify-center gap-6">
-                                            <div className="text-center">
-                                                <div className="text-[9px] text-slate-500 font-black uppercase mb-0.5">Views</div>
-                                                <div className="text-xs font-black text-primary-400">{article.views.toLocaleString()}</div>
-                                            </div>
-                                            <div className="text-center">
-                                                <div className="text-[9px] text-slate-500 font-black uppercase mb-0.5">W:</div>
-                                                <div className={`text-xs font-black ${(
-                                                    (article.simplified?.friendly_summary?.length || 0) +
-                                                    (article.simplified?.attack_vector?.length || 0) +
-                                                    (article.simplified?.business_impact?.length || 0)
-                                                ) >= 4800 ? 'text-primary-400' : 'text-red-400 opacity-60'}`}>
-                                                    {Math.round((
-                                                        (article.simplified?.friendly_summary?.length || 0) +
-                                                        (article.simplified?.attack_vector?.length || 0) +
-                                                        (article.simplified?.business_impact?.length || 0)
-                                                    ) / 6)}
-                                                </div>
-                                            </div>
-                                            <div className="text-center">
-                                                <div className="text-[9px] text-slate-500 font-black uppercase mb-0.5">Pos</div>
-                                                <div className={`text-xs font-black ${article.position < 10 && article.position > 0 ? 'text-emerald-400' : 'text-slate-400'}`}>
-                                                    {article.position > 0 ? article.position.toFixed(1) : '-'}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 text-center">
-                                        {article.has_draft ? (
-                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 text-[9px] font-black uppercase tracking-widest border border-amber-500/20">
-                                                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
-                                                Draft
-                                            </span>
-                                        ) : (
-                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-[9px] font-black uppercase tracking-widest border border-emerald-500/20">
-                                                Live
-                                            </span>
-                                        )}
-                                    </td>
-                                    <td className="px-6 py-4 text-right">
-                                        <div className="flex items-center justify-end gap-1 transition-all">
-                                            <button
-                                                onClick={() => setViewingStats(article)}
-                                                className="p-2 text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-all border border-transparent hover:border-emerald-500/20"
-                                                title="Intel Breakdown"
-                                            >
-                                                <BarChart3 className="w-4 h-4" />
-                                            </button>
-                                            <button
-                                                onClick={() => setSharingArticle(article)}
-                                                className="p-2 text-blue-400 hover:bg-blue-500/10 rounded-xl transition-all border border-transparent hover:border-blue-500/20"
-                                                title="Tracked Share"
-                                            >
-                                                <Share2 className="w-4 h-4" />
-                                            </button>
-                                            <button
-                                                onClick={() => setEditingArticle(article)}
-                                                className="p-2 text-primary-400 hover:bg-primary-500/10 rounded-xl transition-all border border-transparent hover:border-primary-500/20"
-                                                title="Full Intel Editor"
-                                            >
-                                                <Edit3 className="w-4 h-4" />
-                                            </button>
-                                            <a
-                                                href={`/article/${article.slug}`}
-                                                target="_blank"
-                                                rel="noreferrer"
-                                                className="p-2 text-slate-500 hover:bg-white/5 rounded-xl transition-all"
-                                                title="Preview"
-                                            >
-                                                <ExternalLink className="w-4 h-4" />
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+            <div className="card overflow-hidden bg-slate-900/50 border border-slate-800 rounded-2xl">
+                {/* Desktop Header */}
+                <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-4 bg-slate-900/80 border-b border-slate-800 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                    <div className="col-span-1 text-center">#</div>
+                    <div className="col-span-5">Intelligence Report</div>
+                    <div className="col-span-3 text-center">Metrics</div>
+                    <div className="col-span-1 text-center">Status</div>
+                    <div className="col-span-2 text-right">Actions</div>
                 </div>
 
-                {/* Pagination */}
-                <div className="px-6 py-4 bg-slate-900/30 border-t border-slate-800 flex items-center justify-between">
-                    <div className="text-[10px] text-slate-500 font-black uppercase tracking-widest">
-                        Page {artPage} / {articleData?.pages || 1}
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <button
-                            disabled={artPage <= 1}
-                            onClick={() => setArtPage(p => p - 1)}
-                            className="px-4 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-xs font-black text-slate-400 uppercase tracking-widest disabled:opacity-30 hover:bg-slate-800 hover:text-white transition-all shadow-sm"
+                <div className="divide-y divide-slate-800/50">
+                    {artLoading ? (
+                        <div className="px-6 py-12 text-center text-slate-500 font-bold italic">Scanning database...</div>
+                    ) : articleData?.articles.length === 0 ? (
+                        <div className="px-6 py-12 text-center text-slate-500 font-bold italic">No articles found.</div>
+                    ) : articleData?.articles.map((article) => (
+                        <div
+                            key={article.id}
+                            className={`flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-4 hover:bg-white/5 transition-colors group ${selectedArticles.includes(article.id) ? 'bg-primary-500/5' : ''}`}
                         >
-                            Prev
-                        </button>
-                        <button
-                            disabled={artPage >= (articleData?.pages || 1)}
-                            onClick={() => setArtPage(p => p + 1)}
-                            className="px-4 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-xs font-black text-slate-400 uppercase tracking-widest disabled:opacity-30 hover:bg-slate-800 hover:text-white transition-all shadow-sm"
-                        >
-                            Next
-                        </button>
-                    </div>
+                            {/* Selection Column */}
+                            <div className="col-span-1 flex items-center justify-between md:justify-center border-b md:border-b-0 border-slate-800/30 pb-3 md:pb-0">
+                                <button
+                                    onClick={() => toggleSelection(article.id)}
+                                    className={`p-2 rounded-lg transition-all ${selectedArticles.includes(article.id) ? 'text-primary-400' : 'text-slate-700 hover:text-slate-500'}`}
+                                >
+                                    {selectedArticles.includes(article.id) ? <CheckSquare className="w-5 h-5" /> : <Square className="w-5 h-5" />}
+                                </button>
+                                <span className="md:hidden text-[10px] font-black text-slate-500 uppercase tracking-widest">Select for Digest</span>
+                            </div>
+
+                            {/* Info Column */}
+                            <div className="col-span-5 flex flex-col justify-center py-2 md:py-0">
+                                <span className="text-[13px] font-bold text-white group-hover:text-primary-400 transition-colors line-clamp-2">
+                                    {article.title}
+                                </span>
+                                <div className="flex items-center gap-3 mt-1.5">
+                                    <span className="px-1.5 py-0.5 rounded bg-slate-950 text-[9px] font-black text-slate-500 border border-slate-800 uppercase tracking-tighter">
+                                        {article.category?.name || 'General'}
+                                    </span>
+                                    <span className="flex items-center gap-1 text-[10px] text-slate-500 font-bold">
+                                        <Clock className="w-3 h-3" />
+                                        {article.published_at ? new Date(article.published_at).toLocaleDateString() : 'Draft'}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Metrics Column */}
+                            <div className="col-span-3 flex items-center justify-center gap-6 py-4 md:py-0 border-y md:border-y-0 border-slate-800/30 md:bg-transparent bg-slate-950/20 rounded-xl my-2 md:my-0">
+                                <div className="text-center">
+                                    <div className="text-[8px] md:text-[9px] text-slate-500 font-black uppercase mb-0.5">Views</div>
+                                    <div className="text-xs font-black text-primary-400">{article.views.toLocaleString()}</div>
+                                </div>
+                                <div className="text-center">
+                                    <div className="text-[8px] md:text-[9px] text-slate-500 font-black uppercase mb-0.5">Words</div>
+                                    <div className={`text-xs font-black ${(
+                                        (article.simplified?.friendly_summary?.length || 0) +
+                                        (article.simplified?.attack_vector?.length || 0) +
+                                        (article.simplified?.business_impact?.length || 0)
+                                    ) >= 4800 ? 'text-primary-400' : 'text-red-400 opacity-60'}`}>
+                                        {Math.round((
+                                            (article.simplified?.friendly_summary?.length || 0) +
+                                            (article.simplified?.attack_vector?.length || 0) +
+                                            (article.simplified?.business_impact?.length || 0)
+                                        ) / 6)}
+                                    </div>
+                                </div>
+                                <div className="text-center">
+                                    <div className="text-[8px] md:text-[9px] text-slate-500 font-black uppercase mb-0.5">Pos</div>
+                                    <div className={`text-xs font-black ${article.position < 10 && article.position > 0 ? 'text-emerald-400' : 'text-slate-400'}`}>
+                                        {article.position > 0 ? article.position.toFixed(1) : '-'}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Status Column */}
+                            <div className="col-span-1 flex items-center justify-center py-2 md:py-0">
+                                {article.has_draft ? (
+                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 text-[9px] font-black uppercase tracking-widest border border-amber-500/20">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                        Draft
+                                    </span>
+                                ) : (
+                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-[9px] font-black uppercase tracking-widest border border-emerald-500/20">
+                                        Live
+                                    </span>
+                                )}
+                            </div>
+
+                            {/* Actions Column */}
+                            <div className="col-span-2 flex items-center justify-center md:justify-end gap-1 border-t md:border-t-0 border-slate-800/30 pt-3 md:pt-0">
+                                <button
+                                    onClick={() => setViewingStats(article)}
+                                    className="p-3 md:p-2 text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-all border border-transparent hover:border-emerald-500/20"
+                                    title="Intel Breakdown"
+                                >
+                                    <BarChart3 className="w-5 h-5 md:w-4 md:h-4" />
+                                </button>
+                                <button
+                                    onClick={() => setSharingArticle(article)}
+                                    className="p-3 md:p-2 text-blue-400 hover:bg-blue-500/10 rounded-xl transition-all border border-transparent hover:border-blue-500/20"
+                                    title="Tracked Share"
+                                >
+                                    <Share2 className="w-5 h-5 md:w-4 md:h-4" />
+                                </button>
+                                <button
+                                    onClick={() => setEditingArticle(article)}
+                                    className="p-3 md:p-2 text-primary-400 hover:bg-primary-500/10 rounded-xl transition-all border border-transparent hover:border-primary-500/20"
+                                    title="Full Intel Editor"
+                                >
+                                    <Edit3 className="w-5 h-5 md:w-4 md:h-4" />
+                                </button>
+                                <a
+                                    href={`/article/${article.slug}`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="p-3 md:p-2 text-slate-500 hover:bg-white/5 rounded-xl transition-all"
+                                    title="Preview"
+                                >
+                                    <ExternalLink className="w-5 h-5 md:w-4 md:h-4" />
+                                </a>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </div>
 
-            {/* Floating Selection Bar */}
+            {/* Pagination */}
+            <div className="mt-4 px-6 py-4 bg-slate-900/30 border border-slate-800 rounded-2xl flex items-center justify-between">
+                <div className="text-[10px] text-slate-500 font-black uppercase tracking-widest">
+                    Page {artPage} / {articleData?.pages || 1}
+                </div>
+                <div className="flex items-center gap-2">
+                    <button
+                        disabled={artPage <= 1}
+                        onClick={() => setArtPage(p => p - 1)}
+                        className="px-4 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-xs font-black text-slate-400 uppercase tracking-widest disabled:opacity-30 hover:bg-slate-800 hover:text-white transition-all shadow-sm"
+                    >
+                        Prev
+                    </button>
+                    <button
+                        disabled={artPage >= (articleData?.pages || 1)}
+                        onClick={() => setArtPage(p => p + 1)}
+                        className="px-4 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-xs font-black text-slate-400 uppercase tracking-widest disabled:opacity-30 hover:bg-slate-800 hover:text-white transition-all shadow-sm"
+                    >
+                        Next
+                    </button>
+                </div>
+            </div>
+
+            {/* Floating Selection Bar - Mobile Optimized */}
             {selectedArticles.length > 0 && (
-                <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-8 fade-in duration-300">
-                    <div className="bg-slate-900/90 backdrop-blur-xl border border-primary-500/30 shadow-[0_0_50px_-12px_rgba(59,130,246,0.3)] px-6 py-4 rounded-3xl flex items-center gap-8 min-w-[320px]">
-                        <div className="flex flex-col">
-                            <div className="text-[10px] font-black text-primary-400 uppercase tracking-widest">Selection Active</div>
-                            <div className="text-white font-black text-sm">{selectedArticles.length} Article{selectedArticles.length > 1 ? 's' : ''} Targeted</div>
+                <div className="fixed bottom-20 md:bottom-8 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-8 fade-in duration-300 w-[95%] max-w-2xl md:w-auto">
+                    <div className="bg-slate-900/95 backdrop-blur-xl border border-primary-500/30 shadow-[0_0_50px_-12px_rgba(59,130,246,0.3)] px-4 py-3 md:px-6 md:py-4 rounded-2xl md:rounded-3xl flex flex-col md:flex-row items-center gap-4 md:gap-8">
+                        <div className="flex items-center justify-between w-full md:w-auto">
+                            <div className="flex flex-col">
+                                <div className="text-[9px] md:text-[10px] font-black text-primary-400 uppercase tracking-widest text-left">Selection Active</div>
+                                <div className="text-white font-black text-xs md:text-sm">{selectedArticles.length} Article{selectedArticles.length > 1 ? 's' : ''} Targeted</div>
+                            </div>
+                            <button
+                                onClick={() => setSelectedArticles([])}
+                                className="md:hidden p-2 text-slate-500 hover:text-white transition-colors"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
                         </div>
 
-                        <div className="h-8 w-px bg-slate-800"></div>
+                        <div className="hidden md:block h-8 w-px bg-slate-800"></div>
 
-                        <div className="flex-1 min-w-[200px]">
+                        <div className="w-full md:flex-1 md:min-w-[200px]">
                             <input
                                 type="text"
                                 placeholder="Add Editor's Note (Optional)..."
                                 value={customNote}
                                 onChange={(e) => setCustomNote(e.target.value)}
-                                className="w-full bg-slate-950/50 border border-slate-800 rounded-xl px-4 py-2 text-xs text-white placeholder:text-slate-600 outline-none focus:ring-1 focus:ring-primary-500/50 transition-all font-bold"
+                                className="w-full bg-slate-950/50 border border-slate-800 rounded-xl px-4 py-2 text-[10px] md:text-xs text-white placeholder:text-slate-600 outline-none focus:ring-1 focus:ring-primary-500/50 transition-all font-bold"
                             />
                         </div>
 
-                        <div className="h-8 w-px bg-slate-800"></div>
+                        <div className="hidden md:block h-8 w-px bg-slate-800"></div>
 
                         <button
                             onClick={handleManualDeploy}
                             disabled={isDeploying}
-                            className="flex items-center gap-2 px-6 py-2.5 bg-primary-600 hover:bg-primary-500 disabled:opacity-50 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg hover:shadow-primary-500/20 active:scale-95 group"
+                            className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-3 md:py-2.5 bg-primary-600 hover:bg-primary-500 disabled:opacity-50 text-white rounded-xl md:rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest transition-all shadow-lg hover:shadow-primary-500/20 active:scale-95 group"
                         >
                             {isDeploying ? (
                                 <span className="flex items-center gap-2">
                                     <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                                    Deploying...
+                                    <span className="md:hidden text-[9px]">Sending...</span>
+                                    <span className="hidden md:inline">Deploying...</span>
                                 </span>
                             ) : (
                                 <>
                                     <Send className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                                    Send Newsletter
+                                    <span>Send Newsletter</span>
                                 </>
                             )}
                         </button>

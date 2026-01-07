@@ -4,6 +4,7 @@ import { FolderOpen, TrendingUp, Eye, Share2, Edit3, ExternalLink } from 'lucide
 export default function InsightsTab({ stats, setSharingArticle, setEditingArticle }) {
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {/* Insights Header */}
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-black text-white uppercase tracking-tight">Intelligence Insights</h2>
             </div>
@@ -12,8 +13,8 @@ export default function InsightsTab({ stats, setSharingArticle, setEditingArticl
                 {stats?.categories_performance?.map((cat) => (
                     <div key={cat.name} className="card overflow-hidden">
                         {/* Category Header Stats */}
-                        <div className="px-6 py-4 bg-slate-900/50 border-b border-slate-800 flex flex-wrap items-center justify-between gap-4">
-                            <div className="flex items-center gap-3">
+                        <div className="px-6 py-4 bg-slate-900/50 border-b border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <div className="flex items-center gap-3 w-full sm:w-auto">
                                 <div className="w-10 h-10 rounded-2xl bg-primary-600/20 flex items-center justify-center text-primary-400 border border-primary-500/20 shadow-lg shadow-primary-900/20">
                                     <FolderOpen className="w-5 h-5" />
                                 </div>
@@ -23,7 +24,7 @@ export default function InsightsTab({ stats, setSharingArticle, setEditingArticl
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-8">
+                            <div className="flex items-center gap-8 justify-around w-full sm:w-auto py-2 sm:py-0 border-t sm:border-t-0 border-slate-800">
                                 <div className="text-center">
                                     <div className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-0.5">Total Impact</div>
                                     <div className="text-sm font-black text-primary-400">{cat.total_views.toLocaleString()}</div>

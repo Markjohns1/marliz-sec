@@ -190,6 +190,15 @@ export default function AdminDashboard() {
                     </div>
 
                     <div className="hidden sm:flex items-center gap-4">
+                        <a
+                            href="/"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 transition-all border border-slate-700 text-xs font-bold text-slate-300"
+                        >
+                            <ExternalLink className="w-4 h-4" />
+                            Site
+                        </a>
                         <button
                             onClick={handleLogout}
                             className="flex items-center gap-2 group px-3 py-1.5 rounded-xl hover:bg-slate-800 transition-all border border-slate-800"
@@ -231,8 +240,8 @@ export default function AdminDashboard() {
                 </div>
             </div>
 
-            {/* Main Content - Added padding-top to account for fixed header */}
-            <div className="container mx-auto max-w-6xl px-4 pt-36 pb-24">
+            {/* Main Content - Added padding-top to account for fixed header - Optimized for mobile */}
+            <div className="container mx-auto max-w-6xl px-4 pt-28 md:pt-36 pb-24">
 
                 {activeTab === 'overview' && (
                     <OverviewTab
@@ -292,46 +301,51 @@ export default function AdminDashboard() {
 
             </div>
 
-            {/* Mobile Bottom Navigation */}
-            <div className="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-800 z-50 safe-area-bottom">
-                <div className="grid grid-cols-5 h-16">
+            {/* Mobile Bottom Navigation - More Comprehensive */}
+            <div className="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 z-50 safe-area-bottom">
+                <div className="grid grid-cols-6 h-16">
                     <button
                         onClick={() => setActiveTab('overview')}
                         className={`flex flex-col items-center justify-center space-y-1 ${activeTab === 'overview' ? 'text-primary-400' : 'text-slate-500'}`}
                     >
                         <LayoutDashboard className={`w-5 h-5 ${activeTab === 'overview' ? 'fill-current opacity-20' : ''}`} />
-                        <span className="text-[9px] font-black uppercase tracking-wider">Stats</span>
+                        <span className="text-[8px] font-black uppercase">Stats</span>
                     </button>
                     <button
                         onClick={() => setActiveTab('articles')}
                         className={`flex flex-col items-center justify-center space-y-1 ${activeTab === 'articles' ? 'text-primary-400' : 'text-slate-500'}`}
                     >
                         <FileText className={`w-5 h-5 ${activeTab === 'articles' ? 'fill-current opacity-20' : ''}`} />
-                        <span className="text-[9px] font-black uppercase tracking-wider">News</span>
+                        <span className="text-[8px] font-black uppercase tracking-tighter">News</span>
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('publish')}
+                        className={`flex flex-col items-center justify-center space-y-1 ${activeTab === 'publish' ? 'text-primary-400' : 'text-slate-500'}`}
+                    >
+                        <PenLine className={`w-5 h-5 ${activeTab === 'publish' ? 'fill-current opacity-20' : ''}`} />
+                        <span className="text-[8px] font-black uppercase">Publish</span>
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('newsletter')}
+                        className={`flex flex-col items-center justify-center space-y-1 ${activeTab === 'newsletter' ? 'text-primary-400' : 'text-slate-500'}`}
+                    >
+                        <Mail className={`w-5 h-5 ${activeTab === 'newsletter' ? 'fill-current opacity-20' : ''}`} />
+                        <span className="text-[8px] font-black uppercase">NewsL</span>
                     </button>
                     <button
                         onClick={() => setActiveTab('categories')}
                         className={`flex flex-col items-center justify-center space-y-1 ${activeTab === 'categories' ? 'text-primary-400' : 'text-slate-500'}`}
                     >
                         <FolderOpen className={`w-5 h-5 ${activeTab === 'categories' ? 'fill-current opacity-20' : ''}`} />
-                        <span className="text-[9px] font-black uppercase tracking-wider">Insight</span>
+                        <span className="text-[8px] font-black uppercase">Insight</span>
                     </button>
                     <button
-                        onClick={() => setActiveTab('settings')}
-                        className={`flex flex-col items-center justify-center space-y-1 ${activeTab === 'settings' ? 'text-primary-400' : 'text-slate-500'}`}
+                        onClick={() => setActiveTab('guide')}
+                        className={`flex flex-col items-center justify-center space-y-1 ${activeTab === 'guide' ? 'text-primary-400' : 'text-slate-500'}`}
                     >
-                        <SettingsIcon className={`w-5 h-5 ${activeTab === 'settings' ? 'fill-current opacity-20' : ''}`} />
-                        <span className="text-[9px] font-black uppercase tracking-wider">Set</span>
+                        <BookOpen className={`w-5 h-5 ${activeTab === 'guide' ? 'fill-current opacity-20' : ''}`} />
+                        <span className="text-[8px] font-black uppercase">Guide</span>
                     </button>
-                    <a
-                        href="/"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="flex flex-col items-center justify-center space-y-1 text-emerald-500"
-                    >
-                        <Globe className="w-5 h-5" />
-                        <span className="text-[9px] font-black uppercase tracking-wider">Live</span>
-                    </a>
                 </div>
             </div>
 
