@@ -96,6 +96,16 @@ export const getSubscribers = async (page = 1, limit = 50) => {
   return data;
 };
 
+export const sendTestEmail = async (email) => {
+  const { data } = await api.post('/api/subscribers/admin/test-email', null, { params: { email } });
+  return data;
+};
+
+export const triggerNewsletterDigest = async () => {
+  const { data } = await api.post('/api/subscribers/admin/trigger-digest');
+  return data;
+};
+
 // Admin
 export const login = async (key) => {
   // We verified the key by trying to fetch stats. 

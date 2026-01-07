@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 from app.database import get_db
 from app import models, schemas
+from app.services.newsletter import newsletter_service
 import logging
 
 from app.auth import verify_api_key
@@ -99,6 +100,42 @@ async def get_admin_subscribers(
         "page": page,
         "pages": (total + limit - 1) // limit
     }
+
+@router.post("/admin/test-email")
+async def send_test_email(
+    email: str,
+    api_key_obj = Depends(verify_api_key),
+    db: AsyncSession = Depends(get_db)
+):
+    """Send a test newsletter to a specific email"""
+    articles = await newsletter_service.get_top_articles(limit=3)
+    if not articles:
+        return {"status": "error", "message": "No articles found to send."}
+        
+    import resend
+    html_content = newsletter_service._generate_html(articles)
+    
+    try:
+        resend.Emails.send({
+            "from": newsletter_service.from_email,
+            "to": email,
+            "subject": "[TEST] Marliz Intel Digest",
+            "html": html_content
+        })
+        return {"status": "success", "message": f"Test email sent to {email}"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+@router.post("/admin/trigger-digest")
+async def trigger_digest(
+    api_key_obj = Depends(verify_api_key)
+):
+    """Manually trigger the daily digest to all subscribers"""
+    success = await newsletter_service.send_daily_digest()
+    if success:
+        return {"status": "success", "message": "Newsletter digest triggered successfully."}
+    else:
+        return {"status": "error", "message": "Failed to trigger digest or no content/subscribers found."}
 
 @router.get("/count")
 async def get_subscriber_count(db: AsyncSession = Depends(get_db)):

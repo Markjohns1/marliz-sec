@@ -37,6 +37,20 @@ async def simplify_articles_job():
     except Exception as e:
         logger.error(f"✗ AI simplification failed: {str(e)}")
 
+async def newsletter_digest_job():
+    """Background job to send daily intelligence digest"""
+    from app.services.newsletter import newsletter_service
+    
+    logger.info("📧 Starting daily newsletter digest job...")
+    try:
+        success = await newsletter_service.send_daily_digest()
+        if success:
+            logger.info("✓ Newsletter digest sent successfully")
+        else:
+            logger.info("! Newsletter digest skipped (no content or subscribers)")
+    except Exception as e:
+        logger.error(f"✗ Newsletter digest job failed: {str(e)}")
+
 async def cleanup_job():
     """Background job to clean up old data"""
     from app.database import get_db_context
@@ -113,6 +127,17 @@ def start_scheduler():
         minute=0,
         id="cleanup",
         name="Cleanup old data",
+        replace_existing=True
+    )
+    
+    # Newsletter Digest daily at 8 AM EAT (5 AM UTC)
+    scheduler.add_job(
+        newsletter_digest_job,
+        trigger="cron",
+        hour=5,
+        minute=0,
+        id="newsletter_digest",
+        name="Daily intelligence digest (8 AM EAT)",
         replace_existing=True
     )
     

@@ -10,18 +10,50 @@ import {
     MailCheck,
     Search,
     RefreshCw,
-    ExternalLink
+    ExternalLink,
+    AlertCircle,
+    Zap
 } from 'lucide-react';
-import { getSubscribers } from '../../services/api';
+import { getSubscribers, sendTestEmail, triggerNewsletterDigest } from '../../services/api';
 
 export default function NewsletterTab() {
     const [page, setPage] = useState(1);
+    const [testEmail, setTestEmail] = useState('');
+    const [actionLoading, setActionLoading] = useState(false);
 
     const { data, isLoading, refetch } = useQuery({
         queryKey: ['admin-subscribers', page],
         queryFn: () => getSubscribers(page),
         refetchOnWindowFocus: false,
     });
+
+    const handleSendTest = async () => {
+        if (!testEmail) return alert("Enter email first");
+        setActionLoading(true);
+        try {
+            const res = await sendTestEmail(testEmail);
+            if (res.status === 'success') alert("Test Email Sent!");
+            else alert("Error: " + res.message);
+        } catch (e) {
+            alert("Failed to send test");
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleTriggerDigest = async () => {
+        if (!confirm("Are you sure you want to send the digest to ALL current active subscribers?")) return;
+        setActionLoading(true);
+        try {
+            const res = await triggerNewsletterDigest();
+            if (res.status === 'success') alert("Digest Sent to All!");
+            else alert("Error: " + res.message);
+        } catch (e) {
+            alert("Failed to trigger digest");
+        } finally {
+            setActionLoading(false);
+        }
+    };
 
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -58,17 +90,42 @@ export default function NewsletterTab() {
                     </div>
                 </div>
 
-                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between group">
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="p-2 bg-primary-500/10 rounded-xl">
-                            <Send className="w-5 h-5 text-primary-400" />
+                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between group h-full">
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                            <div className="p-2 bg-primary-500/10 rounded-xl">
+                                <Send className="w-5 h-5 text-primary-400" />
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="email"
+                                    placeholder="Test Email..."
+                                    value={testEmail}
+                                    onChange={(e) => setTestEmail(e.target.value)}
+                                    className="px-3 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-[10px] text-white outline-none focus:ring-1 focus:ring-primary-500 w-32"
+                                />
+                                <button
+                                    onClick={handleSendTest}
+                                    disabled={actionLoading}
+                                    className="p-1.5 hover:bg-primary-500/20 rounded-lg transition-all"
+                                >
+                                    <Send className="w-4 h-4 text-primary-400" />
+                                </button>
+                            </div>
                         </div>
-                        <button className="text-[9px] font-black text-primary-400 uppercase tracking-widest hover:underline">Configure Delivery</button>
+                        <div>
+                            <div className="text-xs font-black text-white uppercase tracking-widest mb-1">Intelligence Digest</div>
+                            <div className="text-[10px] text-slate-500 font-bold uppercase">Manual Trigger: </div>
+                        </div>
                     </div>
-                    <div>
-                        <div className="text-xs font-black text-white uppercase tracking-widest mb-1">Next Intelligence Digest</div>
-                        <div className="text-[10px] text-slate-500 font-bold uppercase">Scheduled: Tomorrow 07:00 AM</div>
-                    </div>
+                    <button
+                        onClick={handleTriggerDigest}
+                        disabled={actionLoading}
+                        className="mt-4 w-full py-2 bg-primary-600 hover:bg-primary-500 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-primary-500/20 flex items-center justify-center gap-2"
+                    >
+                        {actionLoading ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Zap className="w-3 h-3" />}
+                        Deploy Digest to All
+                    </button>
                 </div>
             </div>
 
