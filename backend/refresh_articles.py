@@ -223,34 +223,7 @@ if __name__ == "__main__":
     elif len(sys.argv) > 1 and sys.argv[1] == "--cleanup":
         print("Running cleanup...")
         asyncio.run(cleanup_thin_articles())
-    elif len(sys.argv) > 1 and sys.argv[1] == "--target":
-        # TARGETED MODE: Only process the 24 known thin articles
-        TARGET_IDS = [
-            # RAW (7)
-            727, 740, 688, 746, 694, 719, 756,
-            # PROCESSING (9)  
-            666, 670, 240, 664, 255, 665, 667, 652, 223,
-            # READY (8)
-            700, 780, 686, 713, 771, 680, 764, 763
-        ]
-        print(f"TARGETED MODE: Processing {len(TARGET_IDS)} specific articles...")
-        
-        async def targeted_upgrade():
-            for i, aid in enumerate(TARGET_IDS):
-                print(f"[{i+1}/{len(TARGET_IDS)}] Processing ID {aid}...")
-                result = await upgrade_single_article(aid)
-                if result == "success":
-                    print(f"  -> SUCCESS")
-                elif result == "already_upgraded":
-                    print(f"  -> SKIP (already 800+)")
-                elif result == "rate_limited":
-                    print(f"  -> RATE LIMITED. Waiting 180s...")
-                    await asyncio.sleep(180)
-                else:
-                    print(f"  -> {result}")
-                await asyncio.sleep(45)
-            print("\nTARGETED UPGRADE COMPLETE!")
-        
-        asyncio.run(targeted_upgrade())
+    else:
+        asyncio.run(refresh_all_articles())
     else:
         asyncio.run(refresh_all_articles())
