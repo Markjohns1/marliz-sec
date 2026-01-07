@@ -56,7 +56,7 @@ async def refresh_all_articles():
     # 1. Get all eligible article IDs first
     async with AsyncSessionLocal() as db:
         stmt = select(Article.id).where(
-            Article.status.in_([ArticleStatus.READY, ArticleStatus.EDITED, ArticleStatus.PUBLISHED])
+            Article.status.in_([ArticleStatus.RAW, ArticleStatus.READY, ArticleStatus.EDITED, ArticleStatus.PUBLISHED])
         ).order_by(Article.id)
         result = await db.execute(stmt)
         article_ids = result.scalars().all()
