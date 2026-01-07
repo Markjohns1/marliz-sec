@@ -144,9 +144,10 @@ async def diagnose_thin_articles():
             if word_count < 800:
                 thin_articles.append({
                     'id': article.id,
-                    'title': article.title[:40] + "..." if len(article.title) > 40 else article.title,
+                    'title': article.title[:35] + "..." if len(article.title) > 35 else article.title,
                     'status': article.status.value if article.status else "UNKNOWN",
                     'words': word_count,
+                    'views': article.views or 0,
                     'has_simplified': article.simplified is not None
                 })
         
@@ -168,11 +169,11 @@ async def diagnose_thin_articles():
         print("\n" + "-" * 60)
         for status, items in by_status.items():
             print(f"\n[{status}] - {len(items)} articles:")
-            for item in items[:15]:  # Show first 15 per status
+            for item in items[:20]:  # Show first 20 per status
                 flag = "✓" if item['has_simplified'] else "✗"
-                print(f"  ID: {item['id']:4} | {item['words']:4} words | Simp: {flag} | {item['title']}")
-            if len(items) > 15:
-                print(f"  ... and {len(items) - 15} more")
+                print(f"  ID: {item['id']:4} | {item['words']:4}w | {item['views']:3}v | {item['title']}")
+            if len(items) > 20:
+                print(f"  ... and {len(items) - 20} more")
         
         # Show zero-word IDs for quick targeting
         zero_ids = [a['id'] for a in thin_articles if a['words'] == 0]
