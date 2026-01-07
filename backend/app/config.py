@@ -23,6 +23,10 @@ class Settings(BaseSettings):
     # News Fetcher
     NEWSDATA_IO_KEY: str = os.getenv("NEWSDATA_IO_KEY", "")
     FETCH_INTERVAL_HOURS: int = 4
+    
+    # Newsletter (Resend)
+    RESEND_API_KEY: str = os.getenv("RESEND_API_KEY", "")
+    NEWSLETTER_FROM: str = os.getenv("NEWSLETTER_FROM", "Marliz Intel <alerts@marlizintel.com>")
     MAX_ARTICLES_PER_FETCH: int = 20
     MIN_ARTICLE_LENGTH: int = 200
     

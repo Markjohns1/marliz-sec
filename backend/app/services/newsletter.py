@@ -13,10 +13,10 @@ logger = logging.getLogger(__name__)
 
 class NewsletterService:
     def __init__(self):
-        self.api_key = os.getenv("RESEND_API_KEY")
+        self.api_key = settings.RESEND_API_KEY
         if self.api_key:
             resend.api_key = self.api_key
-        self.from_email = os.getenv("NEWSLETTER_FROM", "Marliz Intel <alerts@marlizintel.com>")
+        self.from_email = settings.NEWSLETTER_FROM
 
     async def get_top_articles(self, limit=5):
         """Fetch the most viewed and relevant articles from the last 7 days."""

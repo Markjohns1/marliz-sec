@@ -86,13 +86,14 @@ async def security_and_cache_middleware(request, call_next):
     )
     response.headers["Content-Security-Policy"] = csp
 
-    # 2. Caching Logic (Prevent stale React builds)
+    # 2. Caching Logic
     if request.method == "GET" and response.status_code == 200:
         path = request.url.path
-        if path == "/" or path.startswith("/console") or "index.html" in path:
+        # NEVER cache API data or the main HTML entry points
+        if path.startswith("/api/") or path == "/" or path.startswith("/console") or "index.html" in path:
             response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
         else:
-            # Standard assets can be cached
+            # Standard static assets (JS, CSS, Images) can be cached for performance
             response.headers["Cache-Control"] = "public, max-age=3600"
         
     return response
