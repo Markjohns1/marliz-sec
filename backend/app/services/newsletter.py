@@ -123,8 +123,9 @@ class NewsletterService:
             timestamp_readable=now.strftime("%B %d, %H:%M")
         )
 
-    async def send_daily_digest(self, article_ids=None, custom_note=None, to_email=None):
-        """Main entry point to send the intelligence digest. Accepts manual article_ids or defaults to top articles."""
+    async def send_daily_digest(self, article_ids=None, custom_note=None, to_email=None, subscriber_emails=None):
+        """Main entry point to send the intelligence digest. Accepts manual article_ids or defaults to top articles.
+        Can target a single to_email (test mode) or a list of subscriber_emails (targeted blast)."""
         if not self.api_key:
             logger.error("Resend API Key not found.")
             return False, "Missing API Key"
@@ -149,6 +150,12 @@ class NewsletterService:
         if to_email:
             # Special mode for test emails
             subscribers = [type('obj', (object,), {'email': to_email, 'id': None})]
+        elif subscriber_emails:
+            # Targeted Blast: Filter to specific email list
+            async with AsyncSessionLocal() as db:
+                stmt = select(Subscriber).where(Subscriber.email.in_(subscriber_emails), Subscriber.unsubscribed_at.is_(None))
+                result = await db.execute(stmt)
+                subscribers = result.scalars().all()
         else:
             subscribers = await self.get_active_subscribers()
             

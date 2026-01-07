@@ -111,9 +111,10 @@ export const toggleSubscriberPremium = async (id) => {
   return data;
 };
 
-export const triggerNewsletterDigest = async (articleIds, customNote) => {
+export const triggerNewsletterDigest = async (articleIds, customNote, subscriberEmails) => {
   const { data } = await api.post('/api/subscribers/admin/trigger-digest', {
     article_ids: articleIds,
+    subscriber_emails: subscriberEmails,
     custom_note: customNote
   });
   return data;

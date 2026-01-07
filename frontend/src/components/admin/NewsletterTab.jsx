@@ -14,7 +14,11 @@ import {
     AlertCircle,
     Zap,
     Trash2,
-    Star
+    Star,
+    CheckSquare,
+    Square,
+    UserCheck,
+    Users
 } from 'lucide-react';
 import {
     getSubscribers,
@@ -29,6 +33,8 @@ export default function NewsletterTab() {
     const [testEmail, setTestEmail] = useState('');
     const [actionLoading, setActionLoading] = useState(false);
     const [statusMsg, setStatusMsg] = useState({ type: '', text: '' });
+    const [selectedSubscribers, setSelectedSubscribers] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
 
     const { data, isLoading, refetch } = useQuery({
         queryKey: ['admin-subscribers', page],
@@ -58,9 +64,9 @@ export default function NewsletterTab() {
     };
 
     const handleTriggerDigest = async () => {
-        if (!confirm("Are you sure you want to send the digest to ALL current active subscribers?")) return;
+        if (!confirm("🚨 WARNING: You are about to broadcast to the ENTIRE active audience. Continue?")) return;
         setActionLoading(true);
-        setStatusMsg({ type: 'info', text: 'Broadcasting to all subscribers...' });
+        setStatusMsg({ type: 'info', text: 'Broadcasting to all globally...' });
         try {
             const res = await triggerNewsletterDigest();
             if (res.status === 'success') {
@@ -73,6 +79,36 @@ export default function NewsletterTab() {
             setStatusMsg({ type: 'error', text: 'Failed to trigger broadcast' });
         } finally {
             setActionLoading(false);
+        }
+    };
+
+    const handleBatchTrigger = async () => {
+        if (selectedSubscribers.length === 0) return;
+        if (!confirm(`Send intelligence to ${selectedSubscribers.length} selected subscribers ONLY?`)) return;
+
+        setActionLoading(true);
+        setStatusMsg({ type: 'info', text: 'Targeted broadcast in progress...' });
+        try {
+            const res = await triggerNewsletterDigest(null, null, selectedSubscribers);
+            if (res.status === 'success') {
+                setStatusMsg({ type: 'success', text: `Targeted Intel Delivered to ${selectedSubscribers.length} recipients` });
+                setSelectedSubscribers([]);
+                refetch();
+            } else {
+                setStatusMsg({ type: 'error', text: res.message });
+            }
+        } catch (e) {
+            setStatusMsg({ type: 'error', text: 'Targeted send failed' });
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const toggleSubSelection = (email) => {
+        if (selectedSubscribers.includes(email)) {
+            setSelectedSubscribers(prev => prev.filter(e => e !== email));
+        } else {
+            setSelectedSubscribers(prev => [...prev, email]);
         }
     };
 
@@ -193,10 +229,21 @@ export default function NewsletterTab() {
                         <MailCheck className="w-5 h-5 text-blue-400" />
                         <h3 className="font-bold text-white tracking-tight">Intelligence Subscribers</h3>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-4">
+                        <div className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                            <input
+                                type="text"
+                                placeholder="Filter audience..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="pl-10 pr-4 py-2 bg-slate-900/50 border border-slate-800 rounded-xl text-xs text-white placeholder:text-slate-600 outline-none focus:ring-1 focus:ring-primary-500/50 transition-all font-bold w-48 sm:w-64"
+                            />
+                        </div>
                         <button
                             onClick={() => refetch()}
-                            className="p-2 text-slate-500 hover:bg-white/5 rounded-xl transition-all"
+                            className="p-2 hover:bg-white/5 rounded-xl text-slate-500 hover:text-white transition-all border border-transparent hover:border-slate-800"
+                            title="Refresh List"
                         >
                             <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
                         </button>
@@ -207,6 +254,11 @@ export default function NewsletterTab() {
                     <table className="w-full text-left">
                         <thead>
                             <tr className="bg-slate-950/50 border-b border-slate-800">
+                                <th className="px-8 py-4 w-12 text-center">
+                                    <div className="flex items-center justify-center">
+                                        <div className="w-2 h-2 rounded-full bg-slate-800" />
+                                    </div>
+                                </th>
                                 <th className="px-8 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Subscriber Identity</th>
                                 <th className="px-8 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Status</th>
                                 <th className="px-8 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Engagement</th>
@@ -219,12 +271,16 @@ export default function NewsletterTab() {
                                 <tr>
                                     <td colSpan="4" className="px-8 py-12 text-center text-slate-500 font-bold italic">Scanning audience...</td>
                                 </tr>
-                            ) : data?.subscribers.length === 0 ? (
-                                <tr>
-                                    <td colSpan="4" className="px-8 py-12 text-center text-slate-500 font-bold italic">No subscribers found in current selection.</td>
-                                </tr>
-                            ) : data?.subscribers.map((sub) => (
-                                <tr key={sub.id} className="hover:bg-white/5 transition-colors group">
+                            ) : data?.subscribers.filter(s => s.email.toLowerCase().includes(searchTerm.toLowerCase())).map((sub) => (
+                                <tr key={sub.id} className={`hover:bg-white/5 transition-colors group ${selectedSubscribers.includes(sub.email) ? 'bg-primary-500/5' : ''}`}>
+                                    <td className="px-8 py-5">
+                                        <button
+                                            onClick={() => toggleSubSelection(sub.email)}
+                                            className={`p-2 rounded-lg transition-all ${selectedSubscribers.includes(sub.email) ? 'text-primary-400' : 'text-slate-700 hover:text-slate-500'}`}
+                                        >
+                                            {selectedSubscribers.includes(sub.email) ? <CheckSquare className="w-5 h-5" /> : <Square className="w-5 h-5" />}
+                                        </button>
+                                    </td>
                                     <td className="px-8 py-5">
                                         <div className="flex items-center gap-3">
                                             <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px] font-black text-slate-300">
@@ -320,6 +376,42 @@ export default function NewsletterTab() {
                     </div>
                 )}
             </div>
+
+            {/* Floating Selection Bar */}
+            {selectedSubscribers.length > 0 && (
+                <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-8 fade-in duration-300">
+                    <div className="bg-slate-900/90 backdrop-blur-xl border border-emerald-500/30 shadow-[0_0_50px_-12px_rgba(16,185,129,0.3)] px-6 py-4 rounded-3xl flex items-center gap-8 min-w-[320px]">
+                        <div className="flex flex-col">
+                            <div className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Targeting Mode</div>
+                            <div className="text-white font-black text-sm">{selectedSubscribers.length} Recipient{selectedSubscribers.length > 1 ? 's' : ''} Selected</div>
+                        </div>
+
+                        <div className="h-8 w-px bg-slate-800"></div>
+
+                        <button
+                            onClick={handleBatchTrigger}
+                            disabled={actionLoading}
+                            className="flex items-center gap-2 px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg hover:shadow-emerald-500/20 active:scale-95 group"
+                        >
+                            {actionLoading ? (
+                                <RefreshCw className="w-4 h-4 animate-spin" />
+                            ) : (
+                                <>
+                                    <UserCheck className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                                    Send to Selected
+                                </>
+                            )}
+                        </button>
+
+                        <button
+                            onClick={() => setSelectedSubscribers([])}
+                            className="p-2 text-slate-500 hover:text-white transition-colors"
+                        >
+                            <Trash2 className="w-4 h-4" />
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

@@ -157,10 +157,12 @@ async def trigger_digest(
 ):
     """Manually trigger the daily digest to all subscribers"""
     article_ids = trigger.article_ids if trigger else None
+    subscriber_emails = trigger.subscriber_emails if trigger else None
     custom_note = trigger.custom_note if trigger else None
     
     success, message = await newsletter_service.send_daily_digest(
         article_ids=article_ids,
+        subscriber_emails=subscriber_emails,
         custom_note=custom_note
     )
     if success:
