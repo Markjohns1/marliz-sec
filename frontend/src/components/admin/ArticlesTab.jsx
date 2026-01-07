@@ -65,12 +65,6 @@ export default function ArticlesTab({
                                                     <Clock className="w-3 h-3" />
                                                     {article.published_at ? new Date(article.published_at).toLocaleDateString() : 'Draft'}
                                                 </span>
-                                                <button
-                                                    onClick={() => setEditingArticle(article)}
-                                                    className="text-[10px] text-blue-400 font-black uppercase hover:underline"
-                                                >
-                                                    (Edit Content)
-                                                </button>
                                             </div>
                                         </div>
                                     </td>
@@ -119,7 +113,7 @@ export default function ArticlesTab({
                                             <button
                                                 onClick={() => setEditingArticle(article)}
                                                 className="p-2 text-primary-400 hover:bg-primary-500/10 rounded-xl transition-all border border-transparent hover:border-primary-500/20"
-                                                title="Quick SEO Edit"
+                                                title="Full Intel Editor"
                                             >
                                                 <Edit3 className="w-4 h-4" />
                                             </button>
