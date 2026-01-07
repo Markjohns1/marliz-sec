@@ -150,13 +150,15 @@ class NewsletterService:
         if to_email:
             # Special mode for test emails
             subscribers = [type('obj', (object,), {'email': to_email, 'id': None})]
-        elif subscriber_emails:
-            # Targeted Blast: Filter to specific email list
+        elif subscriber_emails and len(subscriber_emails) > 0:
+            # Targeted Blast: Filter to specific email list (ONLY if list is not empty)
             async with AsyncSessionLocal() as db:
                 stmt = select(Subscriber).where(Subscriber.email.in_(subscriber_emails), Subscriber.unsubscribed_at.is_(None))
                 result = await db.execute(stmt)
                 subscribers = result.scalars().all()
         else:
+            # Default: Send to ALL active subscribers
+            # (Matches when subscriber_emails is None OR empty list [])
             subscribers = await self.get_active_subscribers()
             
         if not subscribers:

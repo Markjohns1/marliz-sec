@@ -12,7 +12,13 @@ This document outlines the core architecture and high-value features implemented
 *   **Manual Selection Workflow:** Developed a command-and-control interface in the Admin Dashboard. The system allows an administrator to manually select up to two specific articles for immediate newsletter deployment, overriding default automation for time-sensitive alerts.
 *   **Subscriber Management:** Implemented paginated subscriber tracking with individual premium status, verification checks, and health scores to monitor audience engagement levels.
 
-## 3. Admin & UI/UX Systems
+## 3. Data Retention Strategy ("The Archivist Policy")
+*   **Never Delete:** The system is configured to **never delete** old articles.
+*   **Why:** Old articles ("archives") drive significant long-tail SEO traffic and serve as historical threat intelligence references.
+*   **Traffic Preservation:** Deleting articles causes `404 Errors` and loss of domain authority. We prioritize traffic growth over storage savings.
+*   **Cleanup Job:** The daily cleanup job runs but explicitly **skips deletion** steps, logging the decision for audit purposes.
+
+## 4. Admin & UI/UX Systems
 *   **High-Density Metrics:** Redesigned the Admin Dashboard with a focus on data density. Metrics such as "Active Reach" and "Health Score" are displayed in a compact, high-performance view to facilitate rapid assessment.
 *   **Intel Editor:** Transformed the SEO editing tool into a "Full Intel Editor," allowing granular control over AI-generated content, metadata, and publishing status.
 *   **Responsive Framework:** Ensured all administrative components are fully responsive, maintaining a professional "command center" aesthetic across mobile, tablet, and desktop devices.
