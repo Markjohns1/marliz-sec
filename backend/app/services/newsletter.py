@@ -91,20 +91,32 @@ class NewsletterService:
         template = Template(template_str)
         return template.render(articles=articles, year=datetime.now().year)
 
-    async def send_daily_digest(self):
-        """Main entry point to send the daily intelligence digest."""
+    async def send_daily_digest(self, article_ids=None):
+        """Main entry point to send the intelligence digest. Accepts manual article_ids or defaults to top articles."""
         if not self.api_key:
             logger.error("Resend API Key not found.")
             return False, "Missing API Key"
             
-        articles = await self.get_top_articles()
+        if article_ids:
+            # Manual Mode: Fetch specific articles
+            async with AsyncSessionLocal() as db:
+                stmt = select(Article).options(
+                    selectinload(Article.simplified),
+                    selectinload(Article.category)
+                ).where(Article.id.in_(article_ids))
+                result = await db.execute(stmt)
+                articles = result.scalars().all()
+        else:
+            # Auto Mode: Fetch top articles (for the morning scheduler)
+            articles = await self.get_top_articles()
+
         if not articles:
-            logger.info("No new articles to send in newsletter.")
-            return False, "No recent articles found"
+            logger.info("No articles found for newsletter.")
+            return False, "No articles found"
             
         subscribers = await self.get_active_subscribers()
         if not subscribers:
-            logger.info("No active subscribers to send newsletter to.")
+            logger.info("No active subscribers.")
             return False, "No active subscribers"
             
         html_content = self._generate_html(articles)
@@ -122,6 +134,6 @@ class NewsletterService:
             except Exception as e:
                 logger.error(f"Failed to send newsletter to {sub.email}: {e}")
                 
-        return True, "Success"
+        return True, f"Sent {len(articles)} articles to {len(subscribers)} subscribers"
 
 newsletter_service = NewsletterService()

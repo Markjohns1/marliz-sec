@@ -1,7 +1,9 @@
 import QuickSearch from '../QuickSearch';
+import { useState } from 'react';
+import { triggerNewsletterDigest } from '../../services/api';
 import {
     Clock, FileText, BarChart3, Share2,
-    Edit3, ExternalLink
+    Edit3, ExternalLink, Send, CheckSquare, Square
 } from 'lucide-react';
 
 export default function ArticlesTab({
@@ -9,6 +11,36 @@ export default function ArticlesTab({
     artLoading, articleData, artPage,
     setViewingStats, setSharingArticle, setEditingArticle
 }) {
+    const [selectedArticles, setSelectedArticles] = useState([]);
+    const [isDeploying, setIsDeploying] = useState(false);
+
+    const toggleSelection = (id) => {
+        if (selectedArticles.includes(id)) {
+            setSelectedArticles(prev => prev.filter(a => a !== id));
+        } else {
+            if (selectedArticles.length >= 2) {
+                alert("The intelligence digest is optimized for a maximum of 2 key articles for maximum impact.");
+                return;
+            }
+            setSelectedArticles(prev => [...prev, id]);
+        }
+    };
+
+    const handleManualDeploy = async () => {
+        if (selectedArticles.length === 0) return;
+
+        setIsDeploying(true);
+        try {
+            const res = await triggerNewsletterDigest(selectedArticles);
+            alert(res.message);
+            setSelectedArticles([]);
+        } catch (err) {
+            console.error(err);
+            alert("Failed to deploy digest. Check console for logs.");
+        } finally {
+            setIsDeploying(false);
+        }
+    };
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
@@ -39,6 +71,11 @@ export default function ArticlesTab({
                     <table className="w-full text-left">
                         <thead>
                             <tr className="bg-slate-900/50 border-b border-slate-800">
+                                <th className="px-6 py-4 w-12">
+                                    <div className="flex items-center justify-center">
+                                        <div className="w-2 h-2 rounded-full bg-slate-800"></div>
+                                    </div>
+                                </th>
                                 <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Intelligence Report</th>
                                 <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">Metrics</th>
                                 <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">Status</th>
@@ -47,9 +84,20 @@ export default function ArticlesTab({
                         </thead>
                         <tbody className="divide-y divide-slate-800/50">
                             {artLoading ? (
-                                <tr><td colSpan="4" className="px-6 py-12 text-center text-slate-500 font-bold italic">Scanning database...</td></tr>
+                                <tr><td colSpan="5" className="px-6 py-12 text-center text-slate-500 font-bold italic">Scanning database...</td></tr>
                             ) : articleData?.articles.map((article) => (
-                                <tr key={article.id} className="hover:bg-white/5 transition-colors group">
+                                <tr
+                                    key={article.id}
+                                    className={`hover:bg-white/5 transition-colors group ${selectedArticles.includes(article.id) ? 'bg-primary-500/5' : ''}`}
+                                >
+                                    <td className="px-6 py-4">
+                                        <button
+                                            onClick={() => toggleSelection(article.id)}
+                                            className={`p-2 rounded-lg transition-all ${selectedArticles.includes(article.id) ? 'text-primary-400' : 'text-slate-700 hover:text-slate-500'}`}
+                                        >
+                                            {selectedArticles.includes(article.id) ? <CheckSquare className="w-5 h-5" /> : <Square className="w-5 h-5" />}
+                                        </button>
+                                    </td>
                                     <td className="px-6 py-4 max-w-md">
                                         <div className="flex flex-col">
                                             <div className="flex items-center gap-2">
@@ -157,6 +205,38 @@ export default function ArticlesTab({
                     </div>
                 </div>
             </div>
+
+            {/* Floating Selection Bar */}
+            {selectedArticles.length > 0 && (
+                <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-8 fade-in duration-300">
+                    <div className="bg-slate-900/90 backdrop-blur-xl border border-primary-500/30 shadow-[0_0_50px_-12px_rgba(59,130,246,0.3)] px-6 py-4 rounded-3xl flex items-center gap-8 min-w-[320px]">
+                        <div className="flex flex-col">
+                            <div className="text-[10px] font-black text-primary-400 uppercase tracking-widest">Selection Active</div>
+                            <div className="text-white font-black text-sm">{selectedArticles.length} Article{selectedArticles.length > 1 ? 's' : ''} Targeted</div>
+                        </div>
+
+                        <div className="h-8 w-px bg-slate-800"></div>
+
+                        <button
+                            onClick={handleManualDeploy}
+                            disabled={isDeploying}
+                            className="flex items-center gap-2 px-6 py-2.5 bg-primary-600 hover:bg-primary-500 disabled:opacity-50 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg hover:shadow-primary-500/20 active:scale-95 group"
+                        >
+                            {isDeploying ? (
+                                <span className="flex items-center gap-2">
+                                    <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                    Deploying...
+                                </span>
+                            ) : (
+                                <>
+                                    <Send className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                                    Send Newsletter
+                                </>
+                            )}
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

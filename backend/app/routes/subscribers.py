@@ -128,10 +128,11 @@ async def send_test_email(
 
 @router.post("/admin/trigger-digest")
 async def trigger_digest(
+    trigger: schemas.ManualNewsletterTrigger,
     api_key_obj = Depends(verify_api_key)
 ):
-    """Manually trigger the daily digest to all subscribers"""
-    success, message = await newsletter_service.send_daily_digest()
+    """Manually trigger the daily digest to all subscribers with specific articles"""
+    success, message = await newsletter_service.send_daily_digest(article_ids=trigger.article_ids)
     if success:
         return {"status": "success", "message": f"Newsletter digest sent: {message}"}
     else:

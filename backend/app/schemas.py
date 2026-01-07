@@ -112,6 +112,9 @@ class ManualArticleCreate(BaseModel):
     image_url: Optional[str] = None
     admin_secret: str
 
+class ManualNewsletterTrigger(BaseModel):
+    article_ids: List[int]
+
 # Subscriber Schemas
 class SubscriberCreate(BaseModel):
     email: EmailStr
