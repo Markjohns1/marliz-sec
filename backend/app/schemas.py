@@ -114,6 +114,7 @@ class ManualArticleCreate(BaseModel):
 
 class ManualNewsletterTrigger(BaseModel):
     article_ids: List[int]
+    custom_note: Optional[str] = None
 
 # Subscriber Schemas
 class SubscriberCreate(BaseModel):
