@@ -546,6 +546,7 @@ async def update_article(
     simplified = res_simp.scalars().first()
     
     # Update fields (Article Level)
+    if updates.title: article.title = updates.title
     if updates.category_id: article.category_id = updates.category_id
     if updates.content_type: article.content_type = updates.content_type
     if updates.protected_from_deletion is not None: article.protected_from_deletion = updates.protected_from_deletion
@@ -553,6 +554,7 @@ async def update_article(
     # Update fields (Simplified Level - Optional)
     if simplified:
         if updates.friendly_summary: simplified.friendly_summary = updates.friendly_summary
+        if updates.attack_vector: simplified.attack_vector = updates.attack_vector
         if updates.business_impact: simplified.business_impact = updates.business_impact
         if updates.action_steps: simplified.action_steps = updates.action_steps
         if updates.threat_level: simplified.threat_level = updates.threat_level

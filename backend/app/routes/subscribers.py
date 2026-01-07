@@ -5,6 +5,8 @@ from app.database import get_db
 from app import models, schemas
 import logging
 
+from app.auth import verify_api_key
+
 router = APIRouter(prefix="/api/subscribers", tags=["subscribers"])
 logger = logging.getLogger(__name__)
 
@@ -68,6 +70,35 @@ async def unsubscribe(email: str, db: AsyncSession = Depends(get_db)):
     await db.commit()
     
     return {"message": "Successfully unsubscribed"}
+
+@router.get("/admin/list")
+async def get_admin_subscribers(
+    page: int = 1,
+    limit: int = 50,
+    api_key_obj = Depends(verify_api_key),
+    db: AsyncSession = Depends(get_db)
+):
+    """Admin-only subscriber listing"""
+    
+    # Base query
+    stmt = select(models.Subscriber).order_by(models.Subscriber.subscribed_at.desc())
+    
+    # Total count
+    count_stmt = select(func.count()).select_from(models.Subscriber)
+    count_result = await db.execute(count_stmt)
+    total = count_result.scalar_one()
+    
+    # Paginate
+    stmt = stmt.offset((page - 1) * limit).limit(limit)
+    result = await db.execute(stmt)
+    subscribers = result.scalars().all()
+    
+    return {
+        "subscribers": subscribers,
+        "total": total,
+        "page": page,
+        "pages": (total + limit - 1) // limit
+    }
 
 @router.get("/count")
 async def get_subscriber_count(db: AsyncSession = Depends(get_db)):

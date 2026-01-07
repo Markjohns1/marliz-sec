@@ -33,7 +33,8 @@ import {
     Share2,
     Copy,
     Share,
-    PenLine
+    PenLine,
+    Mail
 } from 'lucide-react';
 
 // API & Components
@@ -61,6 +62,7 @@ import ArticlesTab from '../components/admin/ArticlesTab';
 import InsightsTab from '../components/admin/InsightsTab';
 import SettingsTab from '../components/admin/SettingsTab';
 import QuickPublishTab from '../components/admin/QuickPublishTab';
+import NewsletterTab from '../components/admin/NewsletterTab';
 
 
 
@@ -195,8 +197,8 @@ export default function AdminDashboard() {
                             { id: 'overview', label: 'Overview', icon: BarChart3 },
                             { id: 'articles', label: 'Articles', icon: Edit3 },
                             { id: 'publish', label: 'Publish', icon: PenLine },
+                            { id: 'newsletter', label: 'Newsletter', icon: Mail },
                             { id: 'categories', label: 'Insights', icon: FolderOpen },
-                            { id: 'settings', label: 'Settings', icon: SettingsIcon },
                             { id: 'guide', label: 'Playbook', icon: BookOpen },
                         ].map((tab) => (
                             <button
@@ -262,6 +264,8 @@ export default function AdminDashboard() {
                 {activeTab === 'publish' && (
                     <QuickPublishTab onPublishSuccess={() => { refetch(); artRefetch(); }} />
                 )}
+
+                {activeTab === 'newsletter' && <NewsletterTab />}
 
                 {activeTab === 'guide' && <AdminGuide />}
 

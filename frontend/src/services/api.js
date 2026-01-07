@@ -91,6 +91,11 @@ export const subscribe = async (email) => {
   return data;
 };
 
+export const getSubscribers = async (page = 1, limit = 50) => {
+  const { data } = await api.get('/api/subscribers/admin/list', { params: { page, limit } });
+  return data;
+};
+
 // Admin
 export const login = async (key) => {
   // We verified the key by trying to fetch stats. 
