@@ -155,7 +155,7 @@ def start_scheduler():
     )
     
     # scheduler.start()
-    logger.info("✓ Scheduler DISABLED for overnight bulk upgrade.")
+    logger.info("✓ Scheduler DISABLED for safety.")
 
 def stop_scheduler():
     """Stop scheduler gracefully"""
