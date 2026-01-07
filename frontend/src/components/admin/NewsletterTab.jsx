@@ -149,16 +149,16 @@ export default function NewsletterTab({ selectedSubscribers, setSelectedSubscrib
                     </div>
                 </div>
 
-                {/* Operations Bar */}
-                <div className="lg:w-auto bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center gap-4">
+                {/* Operations Bar - Mobile Optimized */}
+                <div className="w-full lg:w-auto bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row items-center gap-4">
                     {/* Test Control */}
-                    <div className="flex items-center gap-2 bg-slate-950 border border-slate-800 rounded-xl p-1 px-3">
+                    <div className="w-full sm:w-auto flex items-center gap-2 bg-slate-950 border border-slate-800 rounded-xl p-1 px-3">
                         <input
                             type="email"
                             placeholder="Test Email..."
                             value={testEmail}
                             onChange={(e) => setTestEmail(e.target.value)}
-                            className="bg-transparent border-none text-[11px] text-white outline-none w-32 font-bold placeholder:text-slate-600"
+                            className="bg-transparent border-none text-[11px] text-white outline-none flex-1 sm:w-32 font-bold placeholder:text-slate-600"
                         />
                         <button
                             onClick={handleSendTest}
@@ -170,17 +170,17 @@ export default function NewsletterTab({ selectedSubscribers, setSelectedSubscrib
                         </button>
                     </div>
 
-                    <div className="h-6 w-px bg-slate-800 hidden sm:block"></div>
+                    <div className="hidden sm:block h-6 w-px bg-slate-800"></div>
 
                     {/* Trigger Controls */}
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
                         <button
                             onClick={() => {
                                 // Find the Articles tab button and click it
                                 const articlesTab = document.querySelector('[data-tab="articles"]');
                                 if (articlesTab) articlesTab.click();
                             }}
-                            className="h-10 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center gap-2 border border-slate-700"
+                            className="w-full sm:w-auto h-10 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 border border-slate-700"
                         >
                             <ExternalLink className="w-3.5 h-3.5" />
                             Select Manually
@@ -189,7 +189,7 @@ export default function NewsletterTab({ selectedSubscribers, setSelectedSubscrib
                         <button
                             onClick={handleTriggerDigest}
                             disabled={actionLoading}
-                            className="h-10 px-6 bg-primary-600 hover:bg-primary-500 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-lg hover:shadow-primary-500/20 active:scale-95 flex items-center gap-2"
+                            className="w-full sm:w-auto h-10 px-6 bg-primary-600 hover:bg-primary-500 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-lg hover:shadow-primary-500/20 active:scale-95 flex items-center justify-center gap-2"
                             title="Auto-send top 5 articles from the last 7 days"
                         >
                             {actionLoading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
@@ -366,35 +366,45 @@ export default function NewsletterTab({ selectedSubscribers, setSelectedSubscrib
                 )}
             </div>
 
-            {/* Floating Selection Bar */}
+            {/* Floating Selection Bar - Mobile Optimized */}
             {selectedSubscribers.length > 0 && (
-                <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-8 fade-in duration-300">
-                    <div className="bg-slate-900/90 backdrop-blur-xl border border-emerald-500/30 shadow-[0_0_50px_-12px_rgba(16,185,129,0.3)] px-6 py-4 rounded-3xl flex items-center gap-8 min-w-[320px]">
-                        <div className="flex flex-col">
-                            <div className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Targeting Mode</div>
-                            <div className="text-white font-black text-sm">{selectedSubscribers.length} Recipient{selectedSubscribers.length > 1 ? 's' : ''} Selected</div>
+                <div className="fixed bottom-20 md:bottom-8 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-8 fade-in duration-300 w-[95%] max-w-2xl md:w-auto">
+                    <div className="bg-slate-900/95 backdrop-blur-xl border border-emerald-500/30 shadow-[0_0_50px_-12px_rgba(16,185,129,0.3)] px-4 py-3 md:px-6 md:py-4 rounded-2xl md:rounded-3xl flex flex-col md:flex-row items-center gap-4 md:gap-8">
+                        <div className="flex items-center justify-between w-full md:w-auto">
+                            <div className="flex flex-col">
+                                <div className="text-[9px] md:text-[10px] font-black text-emerald-400 uppercase tracking-widest">Targeting Mode</div>
+                                <div className="text-white font-black text-xs md:text-sm">{selectedSubscribers.length} Recipient{selectedSubscribers.length > 1 ? 's' : ''} Selected</div>
+                            </div>
+                            {/* Mobile Delete Button (moved here for space) */}
+                            <button
+                                onClick={() => setSelectedSubscribers([])}
+                                className="md:hidden p-2 text-slate-500 hover:text-white transition-colors"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
                         </div>
 
-                        <div className="h-8 w-px bg-slate-800"></div>
+                        <div className="hidden md:block h-8 w-px bg-slate-800"></div>
 
                         <button
                             onClick={handleBatchTrigger}
                             disabled={actionLoading}
-                            className="flex items-center gap-2 px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg hover:shadow-emerald-500/20 active:scale-95 group"
+                            className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-3 md:py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white rounded-xl md:rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg hover:shadow-emerald-500/20 active:scale-95 group"
                         >
                             {actionLoading ? (
                                 <RefreshCw className="w-4 h-4 animate-spin" />
                             ) : (
                                 <>
                                     <ExternalLink className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                                    Select Stories for These Recipients
+                                    <span className="md:hidden">Select Stories</span>
+                                    <span className="hidden md:inline">Select Stories for These Recipients</span>
                                 </>
                             )}
                         </button>
 
                         <button
                             onClick={() => setSelectedSubscribers([])}
-                            className="p-2 text-slate-500 hover:text-white transition-colors"
+                            className="hidden md:block p-2 text-slate-500 hover:text-white transition-colors"
                         >
                             <Trash2 className="w-4 h-4" />
                         </button>

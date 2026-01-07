@@ -158,26 +158,38 @@ export default function AdminDashboard() {
 
             {/* Enhanced Admin Navigation Shell - Fixed Top */}
             <div className="fixed top-0 left-0 right-0 z-50">
-                {/* Primary Admin Top Bar */}
-                <div className="bg-slate-900 border-b border-white/5 text-white px-4 sm:px-8 py-3 flex items-center justify-between shadow-2xl">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-blue-600 rounded-lg shadow-lg shadow-blue-900/40">
-                            <Shield className="w-5 h-5 text-white" />
-                        </div>
-                        <div>
-                            <h1 className="text-lg sm:text-xl font-bold text-white tracking-tight flex items-center gap-2">
-                                <span>Marliz<span className="text-red-500">Intel</span></span>
-                                <span className="h-4 w-px bg-slate-800 mx-1"></span>
-                                <span className="text-xs sm:text-sm font-black text-blue-400 uppercase tracking-widest">Admin</span>
-                            </h1>
-                            <div className="hidden min-[450px]:flex items-center gap-1.5 -mt-0.5">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest truncate max-w-[150px] sm:max-w-none">Digital Intelligence Dashboard</span>
+                {/* Primary Admin Top Bar - Mobile Optimized */}
+                <div className="bg-slate-900 border-b border-white/5 text-white px-4 sm:px-8 py-3 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-2xl">
+                    <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-blue-600 rounded-lg shadow-lg shadow-blue-900/40">
+                                <Shield className="w-5 h-5 text-white" />
                             </div>
+                            <div>
+                                <h1 className="text-lg sm:text-xl font-bold text-white tracking-tight flex items-center gap-2">
+                                    <span>Marliz<span className="text-red-500">Intel</span></span>
+                                    <span className="h-4 w-px bg-slate-800 mx-1"></span>
+                                    <span className="text-xs sm:text-sm font-black text-blue-400 uppercase tracking-widest">Admin</span>
+                                </h1>
+                                <div className="hidden min-[450px]:flex items-center gap-1.5 -mt-0.5">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest truncate max-w-[150px] sm:max-w-none">Digital Intelligence Dashboard</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Mobile Logout Button (Visible only on small screens next to logo) */}
+                        <div className="sm:hidden">
+                            <button
+                                onClick={handleLogout}
+                                className="p-2 bg-slate-800 rounded-lg text-slate-400 hover:text-red-400"
+                            >
+                                <LogOut className="w-4 h-4" />
+                            </button>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-4">
+                    <div className="hidden sm:flex items-center gap-4">
                         <button
                             onClick={handleLogout}
                             className="flex items-center gap-2 group px-3 py-1.5 rounded-xl hover:bg-slate-800 transition-all border border-slate-800"
