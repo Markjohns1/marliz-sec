@@ -131,11 +131,11 @@ async def trigger_digest(
     api_key_obj = Depends(verify_api_key)
 ):
     """Manually trigger the daily digest to all subscribers"""
-    success = await newsletter_service.send_daily_digest()
+    success, message = await newsletter_service.send_daily_digest()
     if success:
-        return {"status": "success", "message": "Newsletter digest triggered successfully."}
+        return {"status": "success", "message": f"Newsletter digest sent: {message}"}
     else:
-        return {"status": "error", "message": "Failed to trigger digest or no content/subscribers found."}
+        return {"status": "error", "message": f"Deployment failed: {message}"}
 
 @router.get("/count")
 async def get_subscriber_count(db: AsyncSession = Depends(get_db)):

@@ -19,9 +19,9 @@ class NewsletterService:
         self.from_email = os.getenv("NEWSLETTER_FROM", "Marliz Intel <alerts@marlizintel.com>")
 
     async def get_top_articles(self, limit=5):
-        """Fetch the most viewed and relevant articles from the last 24-48 hours."""
+        """Fetch the most viewed and relevant articles from the last 7 days."""
         async with AsyncSessionLocal() as db:
-            since = datetime.utcnow() - timedelta(hours=48)
+            since = datetime.utcnow() - timedelta(days=7)
             stmt = select(Article).options(
                 selectinload(Article.simplified),
                 selectinload(Article.category)
@@ -94,23 +94,22 @@ class NewsletterService:
     async def send_daily_digest(self):
         """Main entry point to send the daily intelligence digest."""
         if not self.api_key:
-            logger.error("Resend API Key not found. Cannot send newsletter.")
-            return False
+            logger.error("Resend API Key not found.")
+            return False, "Missing API Key"
             
         articles = await self.get_top_articles()
         if not articles:
             logger.info("No new articles to send in newsletter.")
-            return False
+            return False, "No recent articles found"
             
         subscribers = await self.get_active_subscribers()
         if not subscribers:
             logger.info("No active subscribers to send newsletter to.")
-            return False
+            return False, "No active subscribers"
             
         html_content = self._generate_html(articles)
         
-        # Batch sending logic (Resend supports multiple recipients or we loop)
-        # For now, we'll send individually to ensure deliverability and personalization
+        # Batch sending logic
         for sub in subscribers:
             try:
                 resend.Emails.send({
@@ -123,6 +122,6 @@ class NewsletterService:
             except Exception as e:
                 logger.error(f"Failed to send newsletter to {sub.email}: {e}")
                 
-        return True
+        return True, "Success"
 
 newsletter_service = NewsletterService()
