@@ -12,6 +12,7 @@ export default function ArticlesTab({
     setViewingStats, setSharingArticle, setEditingArticle
 }) {
     const [selectedArticles, setSelectedArticles] = useState([]);
+    const [customNote, setCustomNote] = useState('');
     const [isDeploying, setIsDeploying] = useState(false);
 
     const toggleSelection = (id) => {
@@ -31,9 +32,10 @@ export default function ArticlesTab({
 
         setIsDeploying(true);
         try {
-            const res = await triggerNewsletterDigest(selectedArticles);
+            const res = await triggerNewsletterDigest(selectedArticles, customNote);
             alert(res.message);
             setSelectedArticles([]);
+            setCustomNote('');
         } catch (err) {
             console.error(err);
             alert("Failed to deploy digest. Check console for logs.");
@@ -213,6 +215,18 @@ export default function ArticlesTab({
                         <div className="flex flex-col">
                             <div className="text-[10px] font-black text-primary-400 uppercase tracking-widest">Selection Active</div>
                             <div className="text-white font-black text-sm">{selectedArticles.length} Article{selectedArticles.length > 1 ? 's' : ''} Targeted</div>
+                        </div>
+
+                        <div className="h-8 w-px bg-slate-800"></div>
+
+                        <div className="flex-1 min-w-[200px]">
+                            <input
+                                type="text"
+                                placeholder="Add Editor's Note (Optional)..."
+                                value={customNote}
+                                onChange={(e) => setCustomNote(e.target.value)}
+                                className="w-full bg-slate-950/50 border border-slate-800 rounded-xl px-4 py-2 text-xs text-white placeholder:text-slate-600 outline-none focus:ring-1 focus:ring-primary-500/50 transition-all font-bold"
+                            />
                         </div>
 
                         <div className="h-8 w-px bg-slate-800"></div>

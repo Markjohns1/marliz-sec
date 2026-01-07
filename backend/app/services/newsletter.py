@@ -40,7 +40,7 @@ class NewsletterService:
             result = await db.execute(stmt)
             return result.scalars().all()
 
-    def _generate_html(self, articles):
+    def _generate_html(self, articles, custom_note=None):
         """Generate the HTML email content using a premium template."""
         # Simple high-end template (usually we'd use a separate .html file)
         template_str = """
@@ -68,6 +68,11 @@ class NewsletterService:
                 <div class="header">
                     <div class="logo">MARLIZ INTEL</div>
                     <div style="font-size: 12px; color: #64748b; margin-top: 10px; text-transform: uppercase; font-weight: 900; letter-spacing: 2px;">Daily Intelligence Digest</div>
+                    {% if custom_note %}
+                    <div style="margin-top: 25px; padding: 20px; background-color: #1e293b; border-radius: 16px; font-size: 14px; line-height: 1.6; color: #f8fafc; font-style: italic; border-left: 4px solid #ef4444; font-weight: 500; text-align: left;">
+                        {{ custom_note }}
+                    </div>
+                    {% endif %}
                 </div>
                 <div class="content">
                     {% for article in articles %}
@@ -89,9 +94,9 @@ class NewsletterService:
         </html>
         """
         template = Template(template_str)
-        return template.render(articles=articles, year=datetime.now().year)
+        return template.render(articles=articles, year=datetime.now().year, custom_note=custom_note)
 
-    async def send_daily_digest(self, article_ids=None):
+    async def send_daily_digest(self, article_ids=None, custom_note=None):
         """Main entry point to send the intelligence digest. Accepts manual article_ids or defaults to top articles."""
         if not self.api_key:
             logger.error("Resend API Key not found.")
@@ -119,7 +124,7 @@ class NewsletterService:
             logger.info("No active subscribers.")
             return False, "No active subscribers"
             
-        html_content = self._generate_html(articles)
+        html_content = self._generate_html(articles, custom_note=custom_note)
         
         # Batch sending logic
         for sub in subscribers:

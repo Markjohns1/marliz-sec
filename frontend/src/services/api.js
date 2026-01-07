@@ -101,8 +101,11 @@ export const sendTestEmail = async (email) => {
   return data;
 };
 
-export const triggerNewsletterDigest = async (articleIds) => {
-  const { data } = await api.post('/api/subscribers/admin/trigger-digest', { article_ids: articleIds });
+export const triggerNewsletterDigest = async (articleIds, customNote) => {
+  const { data } = await api.post('/api/subscribers/admin/trigger-digest', {
+    article_ids: articleIds,
+    custom_note: customNote
+  });
   return data;
 };
 

@@ -132,7 +132,10 @@ async def trigger_digest(
     api_key_obj = Depends(verify_api_key)
 ):
     """Manually trigger the daily digest to all subscribers with specific articles"""
-    success, message = await newsletter_service.send_daily_digest(article_ids=trigger.article_ids)
+    success, message = await newsletter_service.send_daily_digest(
+        article_ids=trigger.article_ids,
+        custom_note=trigger.custom_note
+    )
     if success:
         return {"status": "success", "message": f"Newsletter digest sent: {message}"}
     else:
