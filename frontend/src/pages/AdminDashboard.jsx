@@ -70,10 +70,8 @@ export default function AdminDashboard() {
     const navigate = useNavigate();
     const [actionLoading, setActionLoading] = useState(null);
     const [message, setMessage] = useState(null);
-    const [activeTab, setActiveTab] = useState('overview'); // overview, articles, categories, settings
-    const [editingArticle, setEditingArticle] = useState(null);
-    const [sharingArticle, setSharingArticle] = useState(null);
     const [viewingStats, setViewingStats] = useState(null);
+    const [selectedSubscribers, setSelectedSubscribers] = useState([]); // Shared targeting state
 
     // Filter States for Articles Tab
     const [artSearch, setArtSearch] = useState('');
@@ -249,6 +247,8 @@ export default function AdminDashboard() {
                         setViewingStats={setViewingStats}
                         setSharingArticle={setSharingArticle}
                         setEditingArticle={setEditingArticle}
+                        targetAudience={selectedSubscribers}
+                        clearTargetAudience={() => setSelectedSubscribers([])}
                     />
                 )}
 
@@ -266,7 +266,12 @@ export default function AdminDashboard() {
                     <QuickPublishTab onPublishSuccess={() => { refetch(); artRefetch(); }} />
                 )}
 
-                {activeTab === 'newsletter' && <NewsletterTab />}
+                {activeTab === 'newsletter' && (
+                    <NewsletterTab
+                        selectedSubscribers={selectedSubscribers}
+                        setSelectedSubscribers={setSelectedSubscribers}
+                    />
+                )}
 
                 {activeTab === 'guide' && <AdminGuide />}
 

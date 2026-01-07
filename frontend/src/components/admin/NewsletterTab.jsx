@@ -28,12 +28,11 @@ import {
     toggleSubscriberPremium
 } from '../../services/api';
 
-export default function NewsletterTab() {
+export default function NewsletterTab({ selectedSubscribers, setSelectedSubscribers }) {
     const [page, setPage] = useState(1);
     const [testEmail, setTestEmail] = useState('');
     const [actionLoading, setActionLoading] = useState(false);
     const [statusMsg, setStatusMsg] = useState({ type: '', text: '' });
-    const [selectedSubscribers, setSelectedSubscribers] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
 
     const { data, isLoading, refetch } = useQuery({
@@ -84,23 +83,13 @@ export default function NewsletterTab() {
 
     const handleBatchTrigger = async () => {
         if (selectedSubscribers.length === 0) return;
-        if (!confirm(`Send intelligence to ${selectedSubscribers.length} selected subscribers ONLY?`)) return;
 
-        setActionLoading(true);
-        setStatusMsg({ type: 'info', text: 'Targeted broadcast in progress...' });
-        try {
-            const res = await triggerNewsletterDigest(null, null, selectedSubscribers);
-            if (res.status === 'success') {
-                setStatusMsg({ type: 'success', text: `Targeted Intel Delivered to ${selectedSubscribers.length} recipients` });
-                setSelectedSubscribers([]);
-                refetch();
-            } else {
-                setStatusMsg({ type: 'error', text: res.message });
-            }
-        } catch (e) {
-            setStatusMsg({ type: 'error', text: 'Targeted send failed' });
-        } finally {
-            setActionLoading(false);
+        // Find the Articles tab button and click it
+        const articlesTab = document.querySelector('[data-tab="articles"]');
+        if (articlesTab) {
+            articlesTab.click();
+            // Optional: set a localized status message
+            setStatusMsg({ type: 'info', text: 'Now select the 2 articles to send...' });
         }
     };
 
@@ -397,8 +386,8 @@ export default function NewsletterTab() {
                                 <RefreshCw className="w-4 h-4 animate-spin" />
                             ) : (
                                 <>
-                                    <UserCheck className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                                    Send to Selected
+                                    <ExternalLink className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                                    Select Stories for These Recipients
                                 </>
                             )}
                         </button>

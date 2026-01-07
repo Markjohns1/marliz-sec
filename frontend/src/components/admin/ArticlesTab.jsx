@@ -9,7 +9,8 @@ import {
 export default function ArticlesTab({
     artSearch, setArtSearch, setArtPage, artSort, setArtSort,
     artLoading, articleData, artPage,
-    setViewingStats, setSharingArticle, setEditingArticle
+    setViewingStats, setSharingArticle, setEditingArticle,
+    targetAudience = [], clearTargetAudience
 }) {
     const [selectedArticles, setSelectedArticles] = useState([]);
     const [customNote, setCustomNote] = useState('');
@@ -30,21 +31,48 @@ export default function ArticlesTab({
     const handleManualDeploy = async () => {
         if (selectedArticles.length === 0) return;
 
+        const confirmMsg = targetAudience.length > 0
+            ? `Send this custom intelligence to ${targetAudience.length} target recipients ONLY?`
+            : "Broadcast this intelligence to ALL active subscribers?";
+
+        if (!confirm(confirmMsg)) return;
+
         setIsDeploying(true);
         try {
-            const res = await triggerNewsletterDigest(selectedArticles, customNote);
+            const res = await triggerNewsletterDigest(selectedArticles, customNote, targetAudience);
             alert(res.message);
             setSelectedArticles([]);
             setCustomNote('');
+            if (clearTargetAudience) clearTargetAudience();
         } catch (err) {
             console.error(err);
-            alert("Failed to deploy digest. Check console for logs.");
+            alert("Failed to deploy digest.");
         } finally {
-            setIsDeploying(false);
+            setIsDeploying(true); // Keeping state true for a moment for effect
+            setTimeout(() => setIsDeploying(false), 1000);
         }
     };
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {targetAudience.length > 0 && (
+                <div className="mb-6 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-between animate-in slide-in-from-top-4">
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-500">
+                            <Send className="w-4 h-4" />
+                        </div>
+                        <div>
+                            <div className="text-[10px] font-black text-emerald-500 uppercase tracking-widest leading-none">Targeted Dispatch Mode</div>
+                            <div className="text-white font-bold text-sm">Sending to {targetAudience.length} selected recipients</div>
+                        </div>
+                    </div>
+                    <button
+                        onClick={clearTargetAudience}
+                        className="px-4 py-2 bg-slate-900 border border-slate-800 rounded-xl text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-white transition-all"
+                    >
+                        Switch to Full Blast
+                    </button>
+                </div>
+            )}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <h2 className="text-2xl font-black text-white tracking-tight">Article Management</h2>
                 <div className="flex items-center gap-2 w-full sm:w-auto">
