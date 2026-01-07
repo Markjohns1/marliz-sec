@@ -153,6 +153,20 @@ export default function ArticlesTab({
                                                 <div className="text-xs font-black text-primary-400">{article.views.toLocaleString()}</div>
                                             </div>
                                             <div className="text-center">
+                                                <div className="text-[9px] text-slate-500 font-black uppercase mb-0.5">W:</div>
+                                                <div className={`text-xs font-black ${(
+                                                    (article.simplified?.friendly_summary?.length || 0) +
+                                                    (article.simplified?.attack_vector?.length || 0) +
+                                                    (article.simplified?.business_impact?.length || 0)
+                                                ) >= 4800 ? 'text-primary-400' : 'text-red-400 opacity-60'}`}>
+                                                    {Math.round((
+                                                        (article.simplified?.friendly_summary?.length || 0) +
+                                                        (article.simplified?.attack_vector?.length || 0) +
+                                                        (article.simplified?.business_impact?.length || 0)
+                                                    ) / 6)}
+                                                </div>
+                                            </div>
+                                            <div className="text-center">
                                                 <div className="text-[9px] text-slate-500 font-black uppercase mb-0.5">Pos</div>
                                                 <div className={`text-xs font-black ${article.position < 10 && article.position > 0 ? 'text-emerald-400' : 'text-slate-400'}`}>
                                                     {article.position > 0 ? article.position.toFixed(1) : '-'}

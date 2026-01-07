@@ -117,8 +117,8 @@ class AISimplifier:
                         "content": prompt
                     }
                 ],
-                "temperature": 0.2, # Lower temperature for strictly valid JSON
-                "max_completion_tokens": 6000, 
+                "temperature": 0.3, # Slightly higher for creative expansion
+                "max_completion_tokens": 8192, # Allow for massive long-form output
                 "top_p": 1,
                 "stream": False,
                 "response_format": { "type": "json_object" }
@@ -256,9 +256,15 @@ Content: {content[:10000]}
 
 YOUR MISSION:
 1. TECHNICAL AUDIT: Analyze the mechanism (CVEs, tools, tactics).
-2. STRATEGIC REWRITE: Create a long-form Intel Report (Minimum 800 words, Target 1200-1600 words).
+2. STRATEGIC REWRITE: Create a long-form Intel Report (Target: 1000-2200 words).
 3. ADAPTIVE SEO: Generate a high-conversion Title and Meta Description.
 4. ACTIONABLE PROTOCOLS: Provide clear, prioritized mitigation steps.
+
+CONTENT VOLUME REQUIREMENT:
+- You MUST write at least 6-8 comprehensive sections.
+- Every section must be deep and analytical.
+- Your TOTAL OUTPUT for summary + attack_vector + impact MUST be at least 6000-8000 characters (approx 1000-1500 words).
+- If the source news is short, you MUST supplement it with relevant threat intelligence history, technical definitions, and industry post-mortems.
 
 FIELD INSTRUCTIONS:
 - "is_relevant": Set to true if cybersecurity related, false if political/war content.
