@@ -184,9 +184,40 @@ async def diagnose_thin_articles():
         
         print("\n" + "=" * 60)
 
+async def cleanup_thin_articles():
+    """Delete all articles with less than 300 words."""
+    print("=" * 60)
+    print("CLEANUP: Deleting articles with < 300 words")
+    print("=" * 60)
+    
+    async with AsyncSessionLocal() as db:
+        result = await db.execute(select(Article).options(selectinload(Article.simplified)))
+        articles = result.scalars().all()
+        deleted = 0
+        
+        for a in articles:
+            wc = 0
+            if a.simplified:
+                wc = len((a.simplified.friendly_summary or '').split()) + \
+                     len((a.simplified.attack_vector or '').split()) + \
+                     len((a.simplified.business_impact or '').split())
+            
+            if wc < 300:
+                print(f"Deleting ID {a.id}: {wc} words | {a.title[:40]}...")
+                await db.delete(a)
+                deleted += 1
+        
+        await db.commit()
+        print("-" * 60)
+        print(f"DONE. Deleted {deleted} articles with < 300 words.")
+        print("=" * 60)
+
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "--diagnose":
         print("Running diagnostic only...")
         asyncio.run(diagnose_thin_articles())
+    elif len(sys.argv) > 1 and sys.argv[1] == "--cleanup":
+        print("Running cleanup...")
+        asyncio.run(cleanup_thin_articles())
     else:
         asyncio.run(refresh_all_articles())
