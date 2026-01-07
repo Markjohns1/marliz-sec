@@ -101,6 +101,43 @@ async def get_admin_subscribers(
         "pages": (total + limit - 1) // limit
     }
 
+@router.delete("/admin/{subscriber_id}")
+async def delete_subscriber(
+    subscriber_id: int,
+    api_key_obj = Depends(verify_api_key),
+    db: AsyncSession = Depends(get_db)
+):
+    """Admin-only: Permanently delete a subscriber"""
+    stmt = select(models.Subscriber).filter_by(id=subscriber_id)
+    result = await db.execute(stmt)
+    subscriber = result.scalars().first()
+    
+    if not subscriber:
+        raise HTTPException(status_code=404, detail="Subscriber not found")
+    
+    await db.delete(subscriber)
+    await db.commit()
+    return {"status": "success", "message": "Subscriber deleted permanently"}
+
+@router.post("/admin/{subscriber_id}/toggle-premium")
+async def toggle_premium(
+    subscriber_id: int,
+    api_key_obj = Depends(verify_api_key),
+    db: AsyncSession = Depends(get_db)
+):
+    """Admin-only: Toggle premium status"""
+    stmt = select(models.Subscriber).filter_by(id=subscriber_id)
+    result = await db.execute(stmt)
+    subscriber = result.scalars().first()
+    
+    if not subscriber:
+        raise HTTPException(status_code=404, detail="Subscriber not found")
+    
+    subscriber.is_premium = not subscriber.is_premium
+    await db.commit()
+    await db.refresh(subscriber)
+    return {"status": "success", "is_premium": subscriber.is_premium}
+
 @router.post("/admin/test-email")
 async def send_test_email(
     email: str,

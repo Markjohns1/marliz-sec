@@ -101,6 +101,16 @@ export const sendTestEmail = async (email) => {
   return data;
 };
 
+export const deleteSubscriber = async (id) => {
+  const { data } = await api.delete(`/api/subscribers/admin/${id}`);
+  return data;
+};
+
+export const toggleSubscriberPremium = async (id) => {
+  const { data } = await api.post(`/api/subscribers/admin/${id}/toggle-premium`);
+  return data;
+};
+
 export const triggerNewsletterDigest = async (articleIds, customNote) => {
   const { data } = await api.post('/api/subscribers/admin/trigger-digest', {
     article_ids: articleIds,

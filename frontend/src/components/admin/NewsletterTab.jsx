@@ -12,9 +12,17 @@ import {
     RefreshCw,
     ExternalLink,
     AlertCircle,
-    Zap
+    Zap,
+    Trash2,
+    Star
 } from 'lucide-react';
-import { getSubscribers, sendTestEmail, triggerNewsletterDigest } from '../../services/api';
+import {
+    getSubscribers,
+    sendTestEmail,
+    triggerNewsletterDigest,
+    deleteSubscriber,
+    toggleSubscriberPremium
+} from '../../services/api';
 
 export default function NewsletterTab() {
     const [page, setPage] = useState(1);
@@ -52,6 +60,25 @@ export default function NewsletterTab() {
             alert("Failed to trigger digest");
         } finally {
             setActionLoading(false);
+        }
+    };
+
+    const handleTogglePremium = async (id) => {
+        try {
+            await toggleSubscriberPremium(id);
+            refetch();
+        } catch (e) {
+            alert("Failed to toggle status");
+        }
+    };
+
+    const handleDelete = async (id, email) => {
+        if (!confirm(`Permanently delete subscriber ${email}? This cannot be undone.`)) return;
+        try {
+            await deleteSubscriber(id);
+            refetch();
+        } catch (e) {
+            alert("Failed to delete subscriber");
         }
     };
 
@@ -143,7 +170,8 @@ export default function NewsletterTab() {
                                 <th className="px-8 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Subscriber Identity</th>
                                 <th className="px-8 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Status</th>
                                 <th className="px-8 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Engagement</th>
-                                <th className="px-8 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-right">Joined</th>
+                                <th className="px-8 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Joined</th>
+                                <th className="px-8 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-800/50 text-sm">
@@ -206,13 +234,21 @@ export default function NewsletterTab() {
                                         </div>
                                     </td>
                                     <td className="px-8 py-5 text-right">
-                                        <div className="flex flex-col items-end">
-                                            <div className="text-xs font-bold text-slate-300">
-                                                {new Date(sub.subscribed_at).toLocaleDateString()}
-                                            </div>
-                                            <div className="text-[9px] text-slate-500 font-bold uppercase">
-                                                {new Date(sub.subscribed_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                            </div>
+                                        <div className="flex items-center justify-end gap-2">
+                                            <button
+                                                onClick={() => handleTogglePremium(sub.id)}
+                                                className={`p-2 rounded-xl transition-all border ${sub.is_premium ? 'text-amber-500 bg-amber-500/10 border-amber-500/20' : 'text-slate-500 hover:bg-slate-800 border-transparent'}`}
+                                                title={sub.is_premium ? "Remove Premium" : "Grant Premium"}
+                                            >
+                                                <Trophy className="w-4 h-4" />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(sub.id, sub.email)}
+                                                className="p-2 text-red-500 hover:bg-red-500/10 rounded-xl transition-all border border-transparent hover:border-red-500/20"
+                                                title="Delete Subscriber"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
