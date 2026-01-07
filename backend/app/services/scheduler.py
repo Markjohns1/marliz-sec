@@ -147,21 +147,20 @@ def start_scheduler():
         replace_existing=True
     )
     
-    # Run jobs immediately on startup
-    scheduler.add_job(
-        fetch_news_job,
-        id="startup_fetch",
-        name="Initial news fetch"
-    )
-
-    scheduler.add_job(
-        cleanup_job,
-        id="startup_cleanup",
-        name="Initial cleanup"
-    )
+    # Run jobs immediately on startup - DISABLED TO SAVE API
+    # scheduler.add_job(
+    #     fetch_news_job,
+    #     id="startup_fetch",
+    #     name="Initial news fetch"
+    # )
+    # scheduler.add_job(
+    #     cleanup_job,
+    #     id="startup_cleanup",
+    #     name="Initial cleanup"
+    # )
     
-    scheduler.start()
-    logger.info("✓ Scheduler started: Automations active (7AM/7PM fetches).")
+    # scheduler.start()
+    logger.info("✓ Scheduler DISABLED. Waiting for manual release.")
 
 def stop_scheduler():
     """Stop scheduler gracefully"""
