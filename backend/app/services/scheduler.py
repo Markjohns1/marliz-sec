@@ -159,8 +159,8 @@ def start_scheduler():
     #     name="Initial cleanup"
     # )
     
-    # scheduler.start()
-    logger.info("✓ Scheduler DISABLED. Waiting for manual release.")
+    scheduler.start()
+    logger.info("✓ Scheduler STARTED. Automation active.")
 
 def stop_scheduler():
     """Stop scheduler gracefully"""
