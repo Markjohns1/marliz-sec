@@ -57,74 +57,64 @@ export default function NewsletterTab() {
 
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {/* Header / Summary */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 relative overflow-hidden group">
-                    <div className="relative z-10">
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="p-2 bg-blue-500/10 rounded-xl">
-                                <Mail className="w-5 h-5 text-blue-400" />
+            {/* High Density Intel Bar */}
+            <div className="flex flex-col lg:flex-row items-stretch gap-4 mb-8">
+                {/* Metrics Chip */}
+                <div className="flex-1 bg-slate-900/50 backdrop-blur-sm border border-slate-800 rounded-2xl p-4 flex items-center justify-between group hover:border-blue-500/30 transition-all">
+                    <div className="flex items-center gap-6">
+                        <div className="flex flex-col">
+                            <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Active Reach</span>
+                            <div className="flex items-baseline gap-2">
+                                <span className="text-3xl font-black text-white">{data?.total || 0}</span>
+                                <span className="text-[10px] text-emerald-400 font-black uppercase tracking-widest">Live Subs</span>
                             </div>
-                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Total Audience</span>
                         </div>
-                        <div className="text-4xl font-black text-white">{data?.total || 0}</div>
-                        <div className="mt-2 flex items-center gap-1.5">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Active Reach</span>
+                        <div className="h-10 w-px bg-slate-800"></div>
+                        <div className="flex flex-col">
+                            <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Health Score</span>
+                            <div className="flex items-baseline gap-2">
+                                <span className="text-xl font-black text-white">98%</span>
+                                <div className="flex gap-0.5">
+                                    {[1, 2, 3, 4, 5].map(i => (
+                                        <div key={i} className={`w-1 h-3 rounded-full ${i < 5 ? 'bg-emerald-500' : 'bg-slate-700'}`}></div>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 relative overflow-hidden group">
-                    <div className="relative z-10">
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="p-2 bg-emerald-500/10 rounded-xl">
-                                <ShieldCheck className="w-5 h-5 text-emerald-400" />
-                            </div>
-                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Health Score</span>
-                        </div>
-                        <div className="text-4xl font-black text-white">98%</div>
-                        <div className="mt-2 flex items-center gap-1.5">
-                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Premium Delivery Profile</span>
-                        </div>
+                {/* Operations Bar */}
+                <div className="lg:w-auto bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center gap-4">
+                    {/* Test Control */}
+                    <div className="flex items-center gap-2 bg-slate-950 border border-slate-800 rounded-xl p-1 px-3">
+                        <input
+                            type="email"
+                            placeholder="Test Email..."
+                            value={testEmail}
+                            onChange={(e) => setTestEmail(e.target.value)}
+                            className="bg-transparent border-none text-[11px] text-white outline-none w-32 font-bold placeholder:text-slate-600"
+                        />
+                        <button
+                            onClick={handleSendTest}
+                            disabled={actionLoading}
+                            className="p-1.5 hover:bg-white/5 rounded-lg text-primary-400 transition-all"
+                            title="Send Test"
+                        >
+                            <Send className="w-3.5 h-3.5" />
+                        </button>
                     </div>
-                </div>
 
-                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between group h-full">
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                            <div className="p-2 bg-primary-500/10 rounded-xl">
-                                <Send className="w-5 h-5 text-primary-400" />
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <input
-                                    type="email"
-                                    placeholder="Test Email..."
-                                    value={testEmail}
-                                    onChange={(e) => setTestEmail(e.target.value)}
-                                    className="px-3 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-[10px] text-white outline-none focus:ring-1 focus:ring-primary-500 w-32"
-                                />
-                                <button
-                                    onClick={handleSendTest}
-                                    disabled={actionLoading}
-                                    className="p-1.5 hover:bg-primary-500/20 rounded-lg transition-all"
-                                >
-                                    <Send className="w-4 h-4 text-primary-400" />
-                                </button>
-                            </div>
-                        </div>
-                        <div>
-                            <div className="text-xs font-black text-white uppercase tracking-widest mb-1">Intelligence Digest</div>
-                            <div className="text-[10px] text-slate-500 font-bold uppercase">Manual Trigger: </div>
-                        </div>
-                    </div>
+                    <div className="h-6 w-px bg-slate-800 hidden sm:block"></div>
+
+                    {/* Trigger Control */}
                     <button
                         onClick={handleTriggerDigest}
                         disabled={actionLoading}
-                        className="mt-4 w-full py-2 bg-primary-600 hover:bg-primary-500 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-primary-500/20 flex items-center justify-center gap-2"
+                        className="h-10 px-6 bg-primary-600 hover:bg-primary-500 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-lg hover:shadow-primary-500/20 active:scale-95 flex items-center gap-2"
                     >
-                        {actionLoading ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Zap className="w-3 h-3" />}
-                        Deploy Digest to All
+                        {actionLoading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
+                        Blast Digest
                     </button>
                 </div>
             </div>
