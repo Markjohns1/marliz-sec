@@ -51,7 +51,7 @@ async def upgrade_single_article(article_id):
 
 async def refresh_all_articles():
     """Main loop to drive the bulk upgrade process."""
-    print("Marliz Intel Bulk Upgrade Engine v2.0 Starting...")
+    print("Marliz Intel Bulk Upgrade Engine v2.1 (Aggressive Mode) Starting...")
     
     # 1. Get all eligible article IDs first
     async with AsyncSessionLocal() as db:
@@ -67,51 +67,48 @@ async def refresh_all_articles():
     batch_size = 5
     processed_in_batch = 0
     
-    # NEW OPTIMIZED DELAYS: Faster default, respect 429 errors
-    PER_ARTICLE_REST = 15   # 15 seconds instead of 120
-    BATCH_COOLDOWN = 120    # 2 minutes instead of 900
-    RATE_LIMIT_REST = 300   # 5 minutes (Heavy cooldown for 429)
+    PER_ARTICLE_REST = 15   
+    BATCH_COOLDOWN = 120    
+    RATE_LIMIT_REST = 300   
 
     for i, aid in enumerate(article_ids):
-        print(f"[{i+1}/{total}] Processing ID: {aid}...")
-        
+        # We don't print immediately to avoid cluttering if we are just skipping
         retries = 3
         success = False
+        was_skipped = False
         
         while retries > 0 and not success:
             try:
                 status = await upgrade_single_article(aid)
                 
                 if status == "success":
-                    print(f"  - SUCCESS: Content upgraded to premium.")
+                    print(f"[{i+1}/{total}] ID: {aid} -> SUCCESS: Content upgraded.")
                     success = True
                     processed_in_batch += 1
                 elif status == "already_upgraded":
-                    print(f"  - SKIP: Already high-value (800+ words).")
+                    # Instant skip - no print unless debugging, or very quiet print
+                    # print(f"[{i+1}/{total}] ID: {aid} -> SKIP")
                     success = True
+                    was_skipped = True
                 elif status == "rate_limited":
-                    print(f"  - WARNING: Rate limited (429). Entering HEAVY COOLDOWN ({RATE_LIMIT_REST}s)...")
+                    print(f"[{i+1}/{total}] ID: {aid} -> WARNING: Rate limited. Cooldown {RATE_LIMIT_REST}s...")
                     await asyncio.sleep(RATE_LIMIT_REST)
                     retries -= 1
-                elif status == "parse_error":
-                    print(f"  - ERROR: AI Output malformed. Retrying (15s)...")
-                    await asyncio.sleep(15)
-                    retries -= 1
                 else:
-                    print(f"  - API ERROR ({status}). Retrying in 30s...")
-                    await asyncio.sleep(30)
+                    print(f"[{i+1}/{total}] ID: {aid} -> API ERROR ({status}). Retrying...")
+                    await asyncio.sleep(20)
                     retries -= 1
             except Exception as e:
-                print(f"  - SYSTEM ERROR: {e}. Retrying in 30s...")
-                await asyncio.sleep(30)
+                print(f"[{i+1}/{total}] ID: {aid} -> SYSTEM ERROR: {e}")
+                await asyncio.sleep(20)
                 retries -= 1
         
-        if not success:
-            print(f"  - FAILED after retries for ID: {aid}. Moving to next.")
+        if was_skipped:
+            continue # MOVE TO NEXT IMMEDIATELY - NO DELAY
 
-        # Delay Logic
+        # If we reached here, we actually processed an article
         if processed_in_batch >= batch_size:
-            print(f"  - BATCH COMPLETE. Resting for {BATCH_COOLDOWN}s for safety...")
+            print(f"--- BATCH COMPLETE. Resting {BATCH_COOLDOWN}s ---")
             await asyncio.sleep(BATCH_COOLDOWN)
             processed_in_batch = 0
         else:
