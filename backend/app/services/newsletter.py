@@ -8,6 +8,7 @@ from sqlalchemy.orm import selectinload
 from app.models import Article, Subscriber, ArticleStatus
 from app.database import AsyncSessionLocal
 from jinja2 import Template
+from app.config import settings
 
 logger = logging.getLogger(__name__)
 
