@@ -204,6 +204,9 @@ async def cleanup_thin_articles():
             
             if wc < 300:
                 print(f"Deleting ID {a.id}: {wc} words | {a.title[:40]}...")
+                # Delete simplified content first (foreign key)
+                if a.simplified:
+                    await db.delete(a.simplified)
                 await db.delete(a)
                 deleted += 1
         
