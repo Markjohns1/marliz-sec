@@ -28,6 +28,7 @@ export default function NewsletterTab() {
     const [page, setPage] = useState(1);
     const [testEmail, setTestEmail] = useState('');
     const [actionLoading, setActionLoading] = useState(false);
+    const [statusMsg, setStatusMsg] = useState({ type: '', text: '' });
 
     const { data, isLoading, refetch } = useQuery({
         queryKey: ['admin-subscribers', page],
@@ -36,14 +37,21 @@ export default function NewsletterTab() {
     });
 
     const handleSendTest = async () => {
-        if (!testEmail) return alert("Enter email first");
+        if (!testEmail) {
+            setStatusMsg({ type: 'error', text: 'Enter email first' });
+            return;
+        }
         setActionLoading(true);
+        setStatusMsg({ type: 'info', text: 'Sending test intelligence...' });
         try {
             const res = await sendTestEmail(testEmail);
-            if (res.status === 'success') alert("Test Email Sent!");
-            else alert("Error: " + res.message);
+            if (res.status === 'success') {
+                setStatusMsg({ type: 'success', text: 'Test Intel Sent! Check your inbox/spam.' });
+            } else {
+                setStatusMsg({ type: 'error', text: res.message });
+            }
         } catch (e) {
-            alert("Failed to send test");
+            setStatusMsg({ type: 'error', text: 'Critical Error: Connection lost' });
         } finally {
             setActionLoading(false);
         }
@@ -52,12 +60,17 @@ export default function NewsletterTab() {
     const handleTriggerDigest = async () => {
         if (!confirm("Are you sure you want to send the digest to ALL current active subscribers?")) return;
         setActionLoading(true);
+        setStatusMsg({ type: 'info', text: 'Broadcasting to all subscribers...' });
         try {
             const res = await triggerNewsletterDigest();
-            if (res.status === 'success') alert("Digest Sent to All!");
-            else alert("Error: " + res.message);
+            if (res.status === 'success') {
+                setStatusMsg({ type: 'success', text: res.message });
+                refetch();
+            } else {
+                setStatusMsg({ type: 'error', text: res.message });
+            }
         } catch (e) {
-            alert("Failed to trigger digest");
+            setStatusMsg({ type: 'error', text: 'Failed to trigger broadcast' });
         } finally {
             setActionLoading(false);
         }
@@ -145,6 +158,18 @@ export default function NewsletterTab() {
                     </button>
                 </div>
             </div>
+
+            {/* Status Feedback Bar */}
+            {statusMsg.text && (
+                <div className={`mb-4 p-4 rounded-xl border animate-in slide-in-from-top-2 flex items-center gap-3 ${statusMsg.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' :
+                    statusMsg.type === 'error' ? 'bg-red-500/10 border-red-500/20 text-red-400' :
+                        'bg-blue-500/10 border-blue-500/20 text-blue-400'
+                    }`}>
+                    {statusMsg.type === 'success' ? <MailCheck className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+                    <span className="text-[11px] font-bold uppercase tracking-wider">{statusMsg.text}</span>
+                    <button onClick={() => setStatusMsg({ type: '', text: '' })} className="ml-auto opacity-50 hover:opacity-100 text-[10px] font-black">CLOSE</button>
+                </div>
+            )}
 
             {/* Subscriber List */}
             <div className="card overflow-hidden">

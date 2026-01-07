@@ -141,13 +141,14 @@ class NewsletterService:
             success_count = 0
             for sub in subscribers:
                 try:
-                    resend.Emails.send({
+                    logger.info(f"Attempting to send intel to {sub.email} via {self.from_email}...")
+                    response = resend.Emails.send({
                         "from": self.from_email,
                         "to": sub.email,
                         "subject": f"INTEL ALERT: {articles[0].title[:50]}...",
                         "html": html_content
                     })
-                    logger.info(f"Newsletter sent to {sub.email}")
+                    logger.info(f"✓ Resend Response for {sub.email}: {response}")
                     success_count += 1
                     
                     # Track last sent time if it's a real subscriber
