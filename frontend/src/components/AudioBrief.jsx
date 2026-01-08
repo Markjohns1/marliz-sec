@@ -1,31 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Play, Pause, Square, Volume2, VolumeX, Loader2 } from 'lucide-react';
+import { Play, Pause, Square, Volume2, Loader2, Info, Headphones } from 'lucide-react';
 
 const AudioBrief = ({ article }) => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [hasVoice, setHasVoice] = useState(false);
+    const [progress, setProgress] = useState(0);
+
+    // We use a ref for synth to avoid re-renders during checks
     const synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
     const utteranceRef = useRef(null);
+    const heartbeatInterval = useRef(null);
 
+    // CLEANUP on unmount
     useEffect(() => {
-        // Check if voices are available
-        const checkVoices = () => {
-            const voices = synth?.getVoices();
-            if (voices && voices.length > 0) {
-                setHasVoice(true);
-            }
-        };
-
-        checkVoices();
-        if (synth?.onvoiceschanged !== undefined) {
-            synth.onvoiceschanged = checkVoices;
-        }
-
         return () => {
             if (synth) {
                 synth.cancel();
+                if (heartbeatInterval.current) clearInterval(heartbeatInterval.current);
             }
         };
     }, [synth]);
@@ -36,110 +28,104 @@ const AudioBrief = ({ article }) => {
         return doc.body.textContent || "";
     };
 
+    const startHeartbeat = () => {
+        if (heartbeatInterval.current) clearInterval(heartbeatInterval.current);
+        // Every 10 seconds, toggle pause/resume to keep the browser from "falling asleep"
+        // This is a known fix for long speech synthesis tasks on Chrome/Android
+        heartbeatInterval.current = setInterval(() => {
+            if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+                window.speechSynthesis.pause();
+                window.speechSynthesis.resume();
+            }
+        }, 10000);
+    };
+
+    const stopHeartbeat = () => {
+        if (heartbeatInterval.current) {
+            clearInterval(heartbeatInterval.current);
+            heartbeatInterval.current = null;
+        }
+    };
+
     const handlePlay = () => {
         if (!synth) return;
 
-        // Reset if browser dropped the sync
-        if (isPaused) {
-            try {
-                synth.resume();
-                setIsPlaying(true);
-                setIsPaused(false);
-                // Chrome Bug Fix: Sometimes resume() needs a kick
-                if (synth.paused) {
-                    synth.cancel();
-                    // Fallthrough to a fresh start
-                } else {
-                    return;
-                }
-            } catch (e) {
-                synth.cancel();
-            }
+        // 1. RESUME LOGIC (If already paused)
+        if (isPaused && !isPlaying) {
+            synth.resume();
+            setIsPlaying(true);
+            setIsPaused(false);
+            return;
         }
 
+        // 2. FRESH START LOGIC
         setIsLoading(true);
+        synth.cancel(); // Clear any stuck utterances
 
         try {
-            const title = article.title || "Unknown Article";
-            const summary = stripHtml(article.simplified?.friendly_summary || "No summary available.");
-            const impact = stripHtml(article.simplified?.business_impact || "Business impact details are currently unavailable.");
+            const title = article.title || "Defense Briefing";
+            const summary = stripHtml(article.simplified?.friendly_summary || "");
+            const impact = stripHtml(article.simplified?.business_impact || "");
+            const actionsArr = article.simplified?.action_steps ? JSON.parse(article.simplified.action_steps) : [];
+            const actions = Array.isArray(actionsArr) ? actionsArr.join(". ") : "No specific actions provided.";
 
-            let actions = "";
-            const rawActions = article.simplified?.action_steps;
-            if (rawActions) {
-                if (Array.isArray(rawActions)) {
-                    actions = "Recommended actions: " + rawActions.join(". ");
-                } else if (typeof rawActions === 'object') {
-                    actions = "Recommended actions: " + Object.values(rawActions).join(". ");
-                } else {
-                    try {
-                        const parsed = JSON.parse(rawActions);
-                        actions = "Recommended actions: " + (Array.isArray(parsed) ? parsed.join(". ") : Object.values(parsed).join(". "));
-                    } catch (e) {
-                        actions = "Recommended actions: " + stripHtml(rawActions);
-                    }
-                }
-            }
-
-            const script = `Digital Intelligence Briefing. Title: ${title}. Summary: ${summary}. Impact Analysis: ${impact}. ${actions}. This concludes the briefing.`;
+            const script = `${title}. Intelligence Summary: ${summary}. Operational Impact: ${impact}. Recommended Actions: ${actions}. End of briefing.`;
             const utterance = new SpeechSynthesisUtterance(script);
 
-            // Select a premium sounding voice
+            // VOICE SELECTION (Prioritize Premium Natural Voices)
             const voices = synth.getVoices();
             const preferredVoice = voices.find(v =>
-                (v.name.includes('Google') && v.lang.includes('en')) ||
-                (v.name.includes('Natural') && v.lang.includes('en')) ||
-                (v.name.includes('Premium') && v.lang.includes('en')) ||
-                (v.name.includes('Female') && v.lang.includes('en'))
+                v.name.includes('Google') || v.name.includes('Premium') || v.name.includes('Enhanced')
             ) || voices.find(v => v.lang.startsWith('en'));
 
-            if (preferredVoice) {
-                utterance.voice = preferredVoice;
-                utterance.lang = preferredVoice.lang;
-            } else {
-                utterance.lang = 'en-US';
-            }
-
-            utterance.rate = 0.92;
+            if (preferredVoice) utterance.voice = preferredVoice;
+            utterance.rate = 0.95;
             utterance.pitch = 1.0;
             utterance.volume = 1.0;
-            utteranceRef.current = utterance;
 
+            // EVENT HANDLERS
             utterance.onstart = () => {
                 setIsLoading(false);
                 setIsPlaying(true);
+                setIsPaused(false);
+                startHeartbeat();
             };
 
             utterance.onend = () => {
                 setIsPlaying(false);
                 setIsPaused(false);
-                utteranceRef.current = null;
+                stopHeartbeat();
             };
 
-            utterance.onerror = (event) => {
-                console.error('Audio Intelligence Error:', event);
+            utterance.onerror = (e) => {
+                console.error("Speech Error:", e);
                 setIsLoading(false);
                 setIsPlaying(false);
-                setIsPaused(false);
+                stopHeartbeat();
             };
 
-            // Force cancel any stuck processes before starting fresh
-            synth.cancel();
+            // MOBILE COMPATIBILITY: Do not use setTimeout here.
+            // Speak must be called directly in the execution thread of the click.
+            synth.speak(utterance);
 
-            // Short delay to let the cancel settle (fixes some mobile browser issues)
+            // UI FALLBACK: If browser doesn't trigger onstart within 2 seconds
+            // Force the state so the user isn't stuck looking at a spinning loader
             setTimeout(() => {
-                synth.speak(utterance);
-            }, 100);
+                if (synth.speaking && isLoading) {
+                    setIsLoading(false);
+                    setIsPlaying(true);
+                }
+            }, 2000);
 
         } catch (err) {
-            console.error("Briefing Initialization Failed:", err);
+            console.error("Initialization failed:", err);
             setIsLoading(false);
         }
     };
 
     const handlePause = () => {
         if (synth) {
-            synth.pause(); // Use pause() instead of cancel() to allow resume()
+            synth.pause();
             setIsPlaying(false);
             setIsPaused(true);
         }
@@ -150,38 +136,68 @@ const AudioBrief = ({ article }) => {
             synth.cancel();
             setIsPlaying(false);
             setIsPaused(false);
+            stopHeartbeat();
         }
     };
 
     if (!synth) return null;
 
-    // Simplified AudioBrief: Just a sleek button
     return (
-        <div className="mb-8">
-            {isLoading ? (
-                <button disabled className="w-full md:w-auto bg-slate-800 text-slate-400 font-bold py-3 px-6 rounded-lg flex items-center justify-center gap-2 transition-all cursor-wait border border-slate-700">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Preparing Briefing...
-                </button>
-            ) : isPlaying ? (
-                <button
-                    onClick={handlePause}
-                    className="w-full md:w-auto bg-slate-800 text-white hover:bg-slate-700 font-bold py-3 px-6 rounded-lg flex items-center justify-center gap-2 transition-all border border-slate-600 shadow-lg"
-                >
-                    <Pause className="w-4 h-4 fill-current" />
-                    Pause Briefing
-                </button>
-            ) : (
-                <button
-                    onClick={handlePlay}
-                    className="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-6 rounded-lg flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-600/20 active:scale-95"
-                >
-                    <div className="flex items-center justify-center bg-white/20 rounded-full w-6 h-6 mr-1">
-                        <Play className="w-3 h-3 fill-current ml-0.5" />
+        <div className="relative group overflow-hidden rounded-xl border border-slate-800 bg-slate-900/40 backdrop-blur-sm p-5 transition-all hover:bg-slate-900/60">
+            {/* Background Glow */}
+            <div className="absolute top-0 right-0 -mr-12 -mt-12 w-32 h-32 bg-blue-500/5 blur-3xl rounded-full"></div>
+
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
+                <div className="flex items-center gap-4">
+                    <div className="p-3 bg-blue-900/20 rounded-lg border border-blue-500/20">
+                        <Headphones className="w-6 h-6 text-blue-400" />
                     </div>
-                    Play Audio Briefing
-                </button>
-            )}
+                    <div>
+                        <h4 className="text-white font-bold text-sm tracking-wide uppercase">AI Audio Intelligence Briefing</h4>
+                        <div className="flex items-center gap-2 mt-1">
+                            <span className="flex h-2 w-2 rounded-full bg-blue-500 animate-pulse"></span>
+                            <p className="text-xs text-slate-400 font-medium">Virtual Assistant Ready</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-3 w-full md:w-auto">
+                    {isLoading ? (
+                        <div className="flex items-center gap-3 px-6 py-3 bg-slate-800 rounded-lg border border-slate-700 text-slate-400 w-full justify-center">
+                            <Loader2 className="w-4 h-4 animate-spin text-blue-400" />
+                            <span className="text-sm font-bold uppercase tracking-widest">Processing</span>
+                        </div>
+                    ) : isPlaying ? (
+                        <div className="flex items-center gap-2 w-full">
+                            <button
+                                onClick={handlePause}
+                                className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-lg border border-slate-600 transition-all active:scale-95 shadow-lg"
+                            >
+                                <Pause className="w-4 h-4 fill-current" />
+                                <span className="text-sm font-bold uppercase tracking-widest">Pause</span>
+                            </button>
+                            <button
+                                onClick={handleStop}
+                                className="p-3 bg-red-900/20 hover:bg-red-900/40 text-red-400 rounded-lg border border-red-500/20 transition-all"
+                                title="Stop Briefing"
+                            >
+                                <Square className="w-4 h-4 fill-current" />
+                            </button>
+                        </div>
+                    ) : (
+                        <button
+                            onClick={handlePlay}
+                            className="bg-blue-600 hover:bg-blue-500 text-white font-black py-3 px-8 rounded-lg flex items-center justify-center gap-3 transition-all shadow-[0_0_20px_rgba(37,99,235,0.2)] hover:shadow-[0_0_25px_rgba(37,99,235,0.4)] active:scale-95 w-full uppercase tracking-widest text-sm"
+                        >
+                            <Play className="w-4 h-4 fill-current" />
+                            {isPaused ? "Resume Briefing" : "Play Briefing"}
+                        </button>
+                    )}
+                </div>
+            </div>
+
+            {/* Bottom Accent */}
+            <div className="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-transparent via-blue-500/30 to-transparent w-full"></div>
         </div>
     );
 };
