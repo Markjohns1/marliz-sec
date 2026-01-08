@@ -108,54 +108,70 @@ export default function ArticlesTab({
 
                 <div className="divide-y divide-slate-800/50">
                     {artLoading ? (
-                        <div className="px-6 py-12 text-center text-slate-500 font-bold italic">Scanning database...</div>
+                        <div className="px-6 py-12 flex flex-col items-center justify-center gap-4">
+                            <div className="w-8 h-8 border-2 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
+                            <div className="text-slate-500 font-bold italic text-sm">Scanning Intelligence Database...</div>
+                        </div>
                     ) : (!articleData || !articleData.articles || articleData.articles.length === 0) ? (
-                        <div className="px-6 py-12 text-center text-slate-500 font-bold italic">No articles found.</div>
+                        <div className="px-6 py-12 text-center text-slate-500 font-bold italic">No intelligence reports found.</div>
                     ) : articleData.articles.map((article) => (
                         <div
                             key={article.id}
-                            className={`flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-4 hover:bg-white/5 transition-colors group ${selectedArticles.includes(article.id) ? 'bg-primary-500/5' : ''}`}
+                            className={`flex flex-col md:grid md:grid-cols-12 gap-4 px-5 py-5 md:px-6 md:py-4 hover:bg-white/5 transition-all group ${selectedArticles.includes(article.id) ? 'bg-blue-500/5' : ''}`}
                         >
-                            {/* Selection Column */}
-                            <div className="col-span-1 flex items-center justify-between md:justify-center border-b md:border-b-0 border-slate-800/30 pb-3 md:pb-0">
+                            {/* TOP ROW: Selection & Status (Mobile Optimized) */}
+                            <div className="col-span-1 flex items-center justify-between md:justify-center mb-1 md:mb-0">
                                 <button
                                     onClick={() => toggleSelection(article.id)}
-                                    className={`p-2 rounded-lg transition-all ${selectedArticles.includes(article.id) ? 'text-primary-400' : 'text-slate-700 hover:text-slate-500'}`}
+                                    className={`flex items-center gap-2 p-2 -ml-2 rounded-xl transition-all ${selectedArticles.includes(article.id) ? 'text-blue-400 bg-blue-400/10' : 'text-slate-600 hover:text-slate-400'}`}
                                 >
                                     {selectedArticles.includes(article.id) ? <CheckSquare className="w-5 h-5" /> : <Square className="w-5 h-5" />}
+                                    <span className="md:hidden text-[10px] font-black uppercase tracking-widest">Target for Digest</span>
                                 </button>
-                                <span className="md:hidden text-[10px] font-black text-slate-500 uppercase tracking-widest">Select for Digest</span>
+
+                                <div className="md:hidden">
+                                    {article.has_draft ? (
+                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 text-[9px] font-black uppercase tracking-widest border border-amber-500/20">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                            Draft
+                                        </span>
+                                    ) : (
+                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-[9px] font-black uppercase tracking-widest border border-emerald-500/20">
+                                            Live
+                                        </span>
+                                    )}
+                                </div>
                             </div>
 
-                            {/* Info Column */}
-                            <div className="col-span-5 flex flex-col justify-center py-2 md:py-0">
-                                <span className="text-[13px] font-bold text-white group-hover:text-primary-400 transition-colors line-clamp-2">
+                            {/* MAIN INFO: Title & Meta */}
+                            <div className="col-span-5 flex flex-col justify-center">
+                                <span className="text-sm md:text-[13px] font-bold text-white group-hover:text-blue-400 transition-colors leading-snug">
                                     {article.title}
                                 </span>
-                                <div className="flex items-center gap-3 mt-1.5">
-                                    <span className="px-1.5 py-0.5 rounded bg-slate-950 text-[9px] font-black text-slate-500 border border-slate-800 uppercase tracking-tighter">
+                                <div className="flex items-center gap-3 mt-2.5">
+                                    <span className="px-2 py-0.5 rounded-md bg-slate-950 text-[9px] font-black text-slate-500 border border-slate-800 uppercase tracking-widest">
                                         {article.category?.name || 'General'}
                                     </span>
-                                    <span className="flex items-center gap-1 text-[10px] text-slate-500 font-bold">
-                                        <Clock className="w-3 h-3" />
-                                        {article.published_at ? new Date(article.published_at).toLocaleDateString() : 'Draft'}
+                                    <span className="flex items-center gap-1.5 text-[10px] text-slate-500 font-bold">
+                                        <Clock className="w-3 h-3 text-slate-600" />
+                                        {article.published_at ? new Date(article.published_at).toLocaleDateString([], { month: 'short', day: 'numeric' }) : 'Pending'}
                                     </span>
                                 </div>
                             </div>
 
-                            {/* Metrics Column */}
-                            <div className="col-span-3 flex items-center justify-center gap-6 py-4 md:py-0 border-y md:border-y-0 border-slate-800/30 md:bg-transparent bg-slate-950/20 rounded-xl my-2 md:my-0">
+                            {/* METRICS GRID: Space-saving layout for mobile */}
+                            <div className="col-span-3 grid grid-cols-3 md:flex md:items-center md:justify-center gap-4 md:gap-6 py-4 px-4 md:py-0 md:px-0 bg-slate-950/40 md:bg-transparent rounded-2xl my-2 md:my-0 border border-slate-800/50 md:border-0">
                                 <div className="text-center">
-                                    <div className="text-[8px] md:text-[9px] text-slate-500 font-black uppercase mb-0.5">Views</div>
-                                    <div className="text-xs font-black text-primary-400">{(article.views || 0).toLocaleString()}</div>
+                                    <div className="text-[8px] md:text-[9px] text-slate-500 font-black uppercase tracking-tighter mb-0.5">Views</div>
+                                    <div className="text-xs font-black text-blue-400">{(article.views || 0).toLocaleString()}</div>
                                 </div>
-                                <div className="text-center">
-                                    <div className="text-[8px] md:text-[9px] text-slate-500 font-black uppercase mb-0.5">Words</div>
+                                <div className="text-center border-x border-slate-800/50 md:border-0 px-2">
+                                    <div className="text-[8px] md:text-[9px] text-slate-500 font-black uppercase tracking-tighter mb-0.5">Words</div>
                                     <div className={`text-xs font-black ${(
                                         (article.simplified?.friendly_summary?.length || 0) +
                                         (article.simplified?.attack_vector?.length || 0) +
                                         (article.simplified?.business_impact?.length || 0)
-                                    ) >= 4800 ? 'text-primary-400' : 'text-red-400 opacity-60'}`}>
+                                    ) >= 4800 ? 'text-emerald-400' : 'text-rose-400 opacity-80'}`}>
                                         {Math.round((
                                             (article.simplified?.friendly_summary?.length || 0) +
                                             (article.simplified?.attack_vector?.length || 0) +
@@ -164,15 +180,15 @@ export default function ArticlesTab({
                                     </div>
                                 </div>
                                 <div className="text-center">
-                                    <div className="text-[8px] md:text-[9px] text-slate-500 font-black uppercase mb-0.5">Pos</div>
+                                    <div className="text-[8px] md:text-[9px] text-slate-500 font-black uppercase tracking-tighter mb-0.5">Rank</div>
                                     <div className={`text-xs font-black ${article.position < 10 && article.position > 0 ? 'text-emerald-400' : 'text-slate-400'}`}>
                                         {article.position > 0 ? article.position.toFixed(1) : '-'}
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Status Column */}
-                            <div className="col-span-1 flex items-center justify-center py-2 md:py-0">
+                            {/* STATUS: Desktop only (Mobile shows in top row) */}
+                            <div className="hidden md:flex col-span-1 items-center justify-center">
                                 {article.has_draft ? (
                                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 text-[9px] font-black uppercase tracking-widest border border-amber-500/20">
                                         <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
@@ -185,37 +201,39 @@ export default function ArticlesTab({
                                 )}
                             </div>
 
-                            {/* Actions Column */}
-                            <div className="col-span-2 flex items-center justify-center md:justify-end gap-1 border-t md:border-t-0 border-slate-800/30 pt-3 md:pt-0">
-                                <button
-                                    onClick={() => setViewingStats(article)}
-                                    className="p-3 md:p-2 text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-all border border-transparent hover:border-emerald-500/20"
-                                    title="Intel Breakdown"
-                                >
-                                    <BarChart3 className="w-5 h-5 md:w-4 md:h-4" />
-                                </button>
-                                <button
-                                    onClick={() => setSharingArticle(article)}
-                                    className="p-3 md:p-2 text-blue-400 hover:bg-blue-500/10 rounded-xl transition-all border border-transparent hover:border-blue-500/20"
-                                    title="Tracked Share"
-                                >
-                                    <Share2 className="w-5 h-5 md:w-4 md:h-4" />
-                                </button>
-                                <button
-                                    onClick={() => setEditingArticle(article)}
-                                    className="p-3 md:p-2 text-primary-400 hover:bg-primary-500/10 rounded-xl transition-all border border-transparent hover:border-primary-500/20"
-                                    title="Full Intel Editor"
-                                >
-                                    <Edit3 className="w-5 h-5 md:w-4 md:h-4" />
-                                </button>
+                            {/* ACTIONS: Premium toolbar */}
+                            <div className="col-span-2 flex items-center justify-between md:justify-end gap-1 mt-2 md:mt-0 pt-3 md:pt-0 border-t md:border-0 border-slate-800/30">
+                                <div className="flex items-center gap-1">
+                                    <button
+                                        onClick={() => setViewingStats(article)}
+                                        className="p-2.5 text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-all border border-slate-800 md:border-transparent"
+                                        title="Analytics"
+                                    >
+                                        <BarChart3 className="w-5 h-5 md:w-4 md:h-4" />
+                                    </button>
+                                    <button
+                                        onClick={() => setSharingArticle(article)}
+                                        className="p-2.5 text-blue-400 hover:bg-blue-500/10 rounded-xl transition-all border border-slate-800 md:border-transparent"
+                                        title="Share"
+                                    >
+                                        <Share2 className="w-5 h-5 md:w-4 md:h-4" />
+                                    </button>
+                                    <button
+                                        onClick={() => setEditingArticle(article)}
+                                        className="p-2.5 text-orange-400 hover:bg-orange-500/10 rounded-xl transition-all border border-slate-800 md:border-transparent"
+                                        title="Edit Intelligence"
+                                    >
+                                        <Edit3 className="w-5 h-5 md:w-4 md:h-4" />
+                                    </button>
+                                </div>
                                 <a
                                     href={`/article/${article.slug}`}
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="p-3 md:p-2 text-slate-500 hover:bg-white/5 rounded-xl transition-all"
-                                    title="Preview"
+                                    className="p-2.5 text-slate-400 hover:bg-white/5 rounded-xl transition-all flex items-center gap-2 group/btn"
                                 >
-                                    <ExternalLink className="w-5 h-5 md:w-4 md:h-4" />
+                                    <span className="md:hidden text-[10px] font-black uppercase tracking-widest">Preview</span>
+                                    <ExternalLink className="w-5 h-5 md:w-4 md:h-4 group-hover/btn:text-blue-400" />
                                 </a>
                             </div>
                         </div>
