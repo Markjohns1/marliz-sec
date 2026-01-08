@@ -159,7 +159,7 @@ export default function AdminDashboard() {
             {/* Enhanced Admin Navigation Shell - Fixed Top */}
             <div className="fixed top-0 left-0 right-0 z-50">
                 {/* Primary Admin Top Bar - Mobile Optimized */}
-                <div className="bg-slate-900 border-b border-white/5 text-white px-4 sm:px-8 py-3 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-2xl">
+                <div className="bg-slate-900 border-b border-white/5 text-white px-4 sm:px-8 py-2 sm:py-3 flex items-center justify-between gap-4 shadow-2xl">
                     <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
                         <div className="flex items-center gap-3">
                             <div className="p-2 bg-blue-600 rounded-lg shadow-lg shadow-blue-900/40">
@@ -214,7 +214,7 @@ export default function AdminDashboard() {
 
                 {/* Sticky Secondary Navigation (Tabs) */}
                 <div className="bg-slate-950/80 backdrop-blur-md border-b border-slate-800 shadow-sm overflow-x-auto no-scrollbar">
-                    <div className="container mx-auto max-w-6xl px-4 flex items-center gap-1 h-16">
+                    <div className="container mx-auto max-w-6xl px-4 flex items-center gap-1 h-12 md:h-16">
                         {[
                             { id: 'overview', label: 'Overview', icon: BarChart3 },
                             { id: 'articles', label: 'Articles', icon: Edit3 },
