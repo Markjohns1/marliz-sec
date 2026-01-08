@@ -37,7 +37,7 @@ class AISimplifier:
         """Process up to 10 RAW articles through AI simplification"""
         processed = 0
         failed = 0
-        BATCH_LIMIT = 8  # Strictly 8 articles per batch to ensure high-quality, long-form processing
+        BATCH_LIMIT = 5  # STRICT LIMIT: 5 articles per run to save API
         
         # Use single async context manager
         async with get_db_context() as db:
@@ -73,8 +73,8 @@ class AISimplifier:
                              article.status = ArticleStatus.RAW
                              await db.commit()
                     
-                    # Add delay to avoid rate limits (500ms between requests)
-                    await asyncio.sleep(2.0)
+                    # Add delay to avoid rate limits (10s between requests)
+                    await asyncio.sleep(10.0)
                 
                 except Exception as e:
                     logger.error(f"Failed to process article {article.id}: {str(e)}")
