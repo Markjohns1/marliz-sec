@@ -36,17 +36,35 @@ const formatAIContent = (text) => {
     const trimmed = line.trim();
     if (!trimmed) return '';
 
-    // Logic: If it looks like a header (Short, Capitalized, No Period) OR starts with Hash
-    const isHeader = (
-      (trimmed.length > 2 && trimmed.length < 85 && !trimmed.endsWith('.') && !trimmed.includes('*')) &&
-      (/^[A-Z0-9]/.test(trimmed) || trimmed.startsWith('#'))
-    );
+    // Logic: If it starts with # (even if mashed) OR meets our "Premium" header criteria
+    let isHeader = false;
+    let cleanHeader = '';
+    let mashedText = '';
 
-    if (isHeader) {
-      // Strip out any existing hash marks or asterisks
-      const cleanHeader = trimmed.replace(/[#*]/g, '').trim();
+    if (trimmed.startsWith('#')) {
+      isHeader = true;
+      // Extract header part and possible mashed text part
+      const hashMatch = trimmed.match(/^(#+)\s*(.*)/);
+      if (hashMatch) {
+        const content = hashMatch[2];
+        // Search for the first sentence end if it's very long (likely mashed)
+        const firstPeriod = content.indexOf('. ');
+        if (content.length > 85 && firstPeriod !== -1 && firstPeriod < 100) {
+          cleanHeader = content.substring(0, firstPeriod).replace(/[#*]/g, '').trim();
+          mashedText = content.substring(firstPeriod + 1).trim();
+        } else {
+          cleanHeader = content.replace(/[#*]/g, '').trim();
+        }
+      }
+    } else if (trimmed.length > 2 && trimmed.length < 85 && !trimmed.endsWith('.') && !trimmed.includes('*') && /^[A-Z0-9]/.test(trimmed)) {
+      isHeader = true;
+      cleanHeader = trimmed.replace(/\*/g, '').trim();
+    }
+
+    if (isHeader && cleanHeader) {
       // Design: Use H3 with extra vertical breathing room
-      return `\n\n### ${cleanHeader}\n`;
+      const headerMarkdown = `\n\n### ${cleanHeader}\n`;
+      return mashedText ? `${headerMarkdown}\n${mashedText}` : headerMarkdown;
     }
 
     // Logic: Bullet Points with "Key-Value" emphasis for scannability
