@@ -12,7 +12,6 @@ import rehypeRaw from 'rehype-raw';
 import { Helmet } from 'react-helmet-async';
 import AdUnit from '../components/AdUnit';
 import SocialShare from '../components/SocialShare';
-import AudioBrief from '../components/AudioBrief';
 import config from '../config';
 
 const stripHtml = (html) => {
@@ -333,10 +332,6 @@ export default function ArticleDetail() {
               </div>
             </div>
 
-            {/* Audio Briefing */}
-            <div className="mb-8">
-              <AudioBrief article={article} />
-            </div>
 
             {/* Featured Image */}
             {article.image_url && (
