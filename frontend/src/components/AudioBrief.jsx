@@ -39,55 +39,70 @@ const AudioBrief = ({ article }) => {
     const handlePlay = () => {
         if (!synth) return;
 
-        // Correct Resume Logic
+        // Reset if browser dropped the sync
         if (isPaused) {
-            synth.resume();
-            setIsPlaying(true);
-            setIsPaused(false);
-            return;
+            try {
+                synth.resume();
+                setIsPlaying(true);
+                setIsPaused(false);
+                // Chrome Bug Fix: Sometimes resume() needs a kick
+                if (synth.paused) {
+                    synth.cancel();
+                    // Fallthrough to a fresh start
+                } else {
+                    return;
+                }
+            } catch (e) {
+                synth.cancel();
+            }
         }
 
         setIsLoading(true);
 
         try {
-            // Comprehensive script for the Voice Briefing
-            const title = article.title || "Unknown Title";
+            const title = article.title || "Unknown Article";
             const summary = stripHtml(article.simplified?.friendly_summary || "No summary available.");
-            const impact = stripHtml(article.simplified?.business_impact || "Impact not specified.");
+            const impact = stripHtml(article.simplified?.business_impact || "Business impact details are currently unavailable.");
 
             let actions = "";
-            if (article.simplified?.action_steps) {
-                try {
-                    const steps = JSON.parse(article.simplified.action_steps);
-                    if (Array.isArray(steps)) {
-                        actions = "Recommended actions are: " + steps.join(". ");
-                    } else if (typeof steps === 'object' && steps !== null) {
-                        // Handle Dictionary/Object Format
-                        actions = "Recommended actions are: " + Object.values(steps).join(". ");
+            const rawActions = article.simplified?.action_steps;
+            if (rawActions) {
+                if (Array.isArray(rawActions)) {
+                    actions = "Recommended actions: " + rawActions.join(". ");
+                } else if (typeof rawActions === 'object') {
+                    actions = "Recommended actions: " + Object.values(rawActions).join(". ");
+                } else {
+                    try {
+                        const parsed = JSON.parse(rawActions);
+                        actions = "Recommended actions: " + (Array.isArray(parsed) ? parsed.join(". ") : Object.values(parsed).join(". "));
+                    } catch (e) {
+                        actions = "Recommended actions: " + stripHtml(rawActions);
                     }
-                } catch (e) {
-                    // Fallback for plain text
-                    actions = stripHtml(article.simplified.action_steps);
                 }
             }
 
-            const script = `Intelligence briefing on: ${title}. ${summary}. Impact analysis: ${impact}. ${actions}. End of briefing.`;
+            const script = `Digital Intelligence Briefing. Title: ${title}. Summary: ${summary}. Impact Analysis: ${impact}. ${actions}. This concludes the briefing.`;
             const utterance = new SpeechSynthesisUtterance(script);
 
-            // Select a premium sounding voice if available
+            // Select a premium sounding voice
             const voices = synth.getVoices();
             const preferredVoice = voices.find(v =>
-                (v.name.includes('Google') && v.lang.startsWith('en')) ||
-                (v.name.includes('Premium') && v.lang.startsWith('en')) ||
-                (v.name.includes('Female') && v.lang === 'en-US')
+                (v.name.includes('Google') && v.lang.includes('en')) ||
+                (v.name.includes('Natural') && v.lang.includes('en')) ||
+                (v.name.includes('Premium') && v.lang.includes('en')) ||
+                (v.name.includes('Female') && v.lang.includes('en'))
             ) || voices.find(v => v.lang.startsWith('en'));
 
             if (preferredVoice) {
                 utterance.voice = preferredVoice;
+                utterance.lang = preferredVoice.lang;
+            } else {
+                utterance.lang = 'en-US';
             }
 
-            utterance.rate = 0.95; // Slightly slower for clarity
-            utterance.pitch = 1;
+            utterance.rate = 0.92;
+            utterance.pitch = 1.0;
+            utterance.volume = 1.0;
             utteranceRef.current = utterance;
 
             utterance.onstart = () => {
@@ -98,18 +113,26 @@ const AudioBrief = ({ article }) => {
             utterance.onend = () => {
                 setIsPlaying(false);
                 setIsPaused(false);
+                utteranceRef.current = null;
             };
 
             utterance.onerror = (event) => {
-                console.error('TTS Error:', event);
+                console.error('Audio Intelligence Error:', event);
                 setIsLoading(false);
                 setIsPlaying(false);
+                setIsPaused(false);
             };
 
-            synth.cancel(); // Stop any current speech
-            synth.speak(utterance);
+            // Force cancel any stuck processes before starting fresh
+            synth.cancel();
+
+            // Short delay to let the cancel settle (fixes some mobile browser issues)
+            setTimeout(() => {
+                synth.speak(utterance);
+            }, 100);
+
         } catch (err) {
-            console.error("Audio Generation Error:", err);
+            console.error("Briefing Initialization Failed:", err);
             setIsLoading(false);
         }
     };
