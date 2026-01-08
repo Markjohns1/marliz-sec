@@ -1,24 +1,34 @@
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { getArticles } from '../services/api';
 import ArticleCard from '../components/ArticleCard';
 import { Helmet } from 'react-helmet-async';
-import { Shield } from 'lucide-react';
+import { Shield, ChevronDown } from 'lucide-react';
 
 export default function AllThreats() {
-    const { data, isLoading } = useQuery({
-        queryKey: ['articles', { limit: 50 }],
-        queryFn: () => getArticles({ limit: 50 })
+    const {
+        data,
+        isLoading,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage
+    } = useInfiniteQuery({
+        queryKey: ['articles', 'archive'],
+        queryFn: ({ pageParam = 1 }) => getArticles({ page: pageParam, limit: 12 }),
+        getNextPageParam: (lastPage) => {
+            return lastPage.page < lastPage.pages ? lastPage.page + 1 : undefined;
+        }
     });
+
+    const allArticles = data?.pages.flatMap(page => page.articles) || [];
 
     return (
         <>
             <Helmet>
-                <title>All Active Threats | Marliz Threat Intel</title>
-                <meta name="description" content="Browse the complete database of simplified cybersecurity threats affecting East African businesses." />
+                <title>Global Threat Index | Marliz Threat Intel</title>
+                <meta name="description" content="Access the complete archive of global cybersecurity threats, data breaches, and ransomware alerts analyzed by Marliz Intel." />
             </Helmet>
 
             <div className="bg-slate-950 min-h-screen">
-                {/* Header */}
                 {/* Header */}
                 <div className="bg-slate-900 border-b border-slate-800 relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
@@ -51,12 +61,41 @@ export default function AllThreats() {
                                 </div>
                             ))}
                         </div>
-                    ) : data?.articles?.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {data.articles.map((article) => (
-                                <ArticleCard key={article.id} article={article} />
-                            ))}
-                        </div>
+                    ) : allArticles.length > 0 ? (
+                        <>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {allArticles.map((article) => (
+                                    <ArticleCard key={article.id} article={article} />
+                                ))}
+                            </div>
+
+                            {/* Pagination/Load More */}
+                            <div className="flex justify-center mt-16 pb-12">
+                                {hasNextPage ? (
+                                    <button
+                                        onClick={() => fetchNextPage()}
+                                        disabled={isFetchingNextPage}
+                                        className="px-8 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-medium transition-all shadow-lg hover:shadow-xl disabled:opacity-50 flex items-center"
+                                    >
+                                        {isFetchingNextPage ? (
+                                            <>
+                                                <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin mr-2"></span>
+                                                Scanning Records...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <ChevronDown className="w-5 h-5 mr-2" />
+                                                Load More Intelligence
+                                            </>
+                                        )}
+                                    </button>
+                                ) : (
+                                    <div className="text-slate-500 text-sm italic">
+                                        End of Intelligence Index. All verified threats loaded.
+                                    </div>
+                                )}
+                            </div>
+                        </>
                     ) : (
                         <div className="text-center py-12">
                             <p className="text-slate-600">No threats recorded yet.</p>
