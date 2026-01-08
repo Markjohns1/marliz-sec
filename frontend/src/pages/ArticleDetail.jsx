@@ -36,14 +36,15 @@ const formatAIContent = (text) => {
     const trimmed = line.trim();
     if (!trimmed) return '';
 
-    // Logic: If it looks like a header (Short, Capitalized, No Period)
-    const isHeader = (trimmed.length > 2 && trimmed.length < 65 &&
-      /^[A-Z0-9]/.test(trimmed) &&
-      !trimmed.endsWith('.') &&
-      !trimmed.includes('*'));
+    // Logic: If it looks like a header (Short, Capitalized, No Period) OR starts with Hash
+    const isHeader = (
+      (trimmed.length > 2 && trimmed.length < 85 && !trimmed.endsWith('.') && !trimmed.includes('*')) &&
+      (/^[A-Z0-9]/.test(trimmed) || trimmed.startsWith('#'))
+    );
 
     if (isHeader) {
-      const cleanHeader = trimmed.replace(/\*/g, '').trim();
+      // Strip out any existing hash marks or asterisks
+      const cleanHeader = trimmed.replace(/[#*]/g, '').trim();
       // Design: Use H3 with extra vertical breathing room
       return `\n\n### ${cleanHeader}\n`;
     }
