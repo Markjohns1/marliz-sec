@@ -17,7 +17,12 @@ import config from '../config';
 
 const stripHtml = (html) => {
   if (!html) return '';
-  return html.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ').trim();
+  return html
+    .replace(/<[^>]*>?/gm, '')   // Remove HTML
+    .replace(/^#+\s*/gm, '')    // Remove Markdown headers at start of lines
+    .replace(/#+/g, '')         // Remove any stray hashtags
+    .replace(/&nbsp;/g, ' ')
+    .trim();
 };
 
 const formatAIContent = (text) => {

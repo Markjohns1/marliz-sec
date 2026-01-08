@@ -3,7 +3,11 @@ import { Clock, TrendingUp, AlertCircle, Shield, AlertTriangle, CheckCircle, Inf
 import { formatDistanceToNow } from 'date-fns';
 
 const stripHtml = (html) => {
-  return (html || '').replace(/<[^>]+>/g, '');
+  return (html || '')
+    .replace(/<[^>]+>/g, '')    // Remove HTML
+    .replace(/^#+\s*/gm, '')    // Remove Markdown headers at start of lines
+    .replace(/#+/g, '')         // Remove any stray hashtags
+    .trim();
 };
 
 const getLevelColor = (level) => {

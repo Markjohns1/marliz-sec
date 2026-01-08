@@ -11,7 +11,11 @@ import AdUnit from '../components/AdUnit';
 import config from '../config';
 
 const stripHtml = (html) => {
-  return (html || '').replace(/<[^>]+>/g, '');
+  return (html || '')
+    .replace(/<[^>]+>/g, '')    // Remove HTML
+    .replace(/^#+\s*/gm, '')    // Remove Markdown headers at start of lines
+    .replace(/#+/g, '')         // Remove any stray hashtags
+    .trim();
 };
 
 export default function Home() {
