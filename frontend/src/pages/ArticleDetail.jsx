@@ -91,8 +91,9 @@ const formatAIContent = (text) => {
     }
 
     return line;
-  }).join('\n\n')
-    .replace(/\n\s*\n\s*\n+/g, '\n\n')
+  })
+    .filter(line => line.trim() !== '') // CRITICAL: Remove empty lines to prevent "Space Eating"
+    .join('\n\n')
     .trim();
 };
 
