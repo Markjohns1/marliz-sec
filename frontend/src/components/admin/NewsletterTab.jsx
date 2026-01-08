@@ -218,65 +218,65 @@ export default function NewsletterTab({ selectedSubscribers, setSelectedSubscrib
                 <div className="divide-y divide-slate-800/50">
                     {isLoading ? (
                         <div className="px-6 py-12 text-center text-slate-500 font-bold italic">Scanning audience...</div>
-                    ) : data?.subscribers.filter(s => s.email.toLowerCase().includes(searchTerm.toLowerCase())).map((sub) => (
-                        <div key={sub.id} className={`flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-4 hover:bg-white/5 transition-colors group ${selectedSubscribers.includes(sub.email) ? 'bg-emerald-500/5' : ''}`}>
-                            {/* Selection */}
-                            <div className="col-span-1 flex items-center justify-between md:justify-center border-b md:border-b-0 border-slate-800/30 pb-2 md:pb-0">
+                    ) : (data?.subscribers || []).filter(s => s.email.toLowerCase().includes(searchTerm.toLowerCase())).map((sub) => (
+                        <div key={sub.id} className={`flex flex-col md:grid md:grid-cols-12 gap-3 p-4 md:px-6 md:py-4 hover:bg-white/5 transition-colors group ${selectedSubscribers.includes(sub.email) ? 'bg-emerald-500/5' : ''}`}>
+                            <div className="md:col-span-1 flex items-center justify-between md:justify-center">
                                 <button
                                     onClick={() => toggleSubSelection(sub.email)}
-                                    className={`p-2 rounded-lg transition-all ${selectedSubscribers.includes(sub.email) ? 'text-emerald-400' : 'text-slate-700 hover:text-slate-500'}`}
+                                    className={`p-2 rounded-xl transition-all ${selectedSubscribers.includes(sub.email) ? 'text-emerald-400 bg-emerald-400/10' : 'text-slate-700 hover:text-slate-500'}`}
                                 >
                                     {selectedSubscribers.includes(sub.email) ? <CheckSquare className="w-5 h-5" /> : <Square className="w-5 h-5" />}
                                 </button>
-                                <span className="md:hidden text-[10px] font-black text-slate-500 uppercase tracking-widest">Select for Target</span>
+                                <div className="md:hidden">
+                                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border ${sub.unsubscribed_at ? 'bg-red-500/10 text-red-500 border-red-500/20' : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'}`}>
+                                        {sub.unsubscribed_at ? 'Inactive' : 'Active'}
+                                    </span>
+                                </div>
                             </div>
 
-                            {/* Identity */}
-                            <div className="col-span-5 flex items-center gap-3 py-2 md:py-0">
-                                <div className="w-9 h-9 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-[10px] font-black text-slate-400 uppercase">
+                            <div className="md:col-span-5 flex items-center gap-3">
+                                <div className="hidden sm:flex w-9 h-9 shrink-0 rounded-xl bg-slate-900 border border-slate-800 items-center justify-center text-[10px] font-black text-slate-400 uppercase">
                                     {sub.email[0]}
                                 </div>
-                                <div className="flex flex-col">
-                                    <span className="text-sm font-bold text-white group-hover:text-primary-400 transition-colors">{sub.email}</span>
-                                    <span className="text-[10px] text-slate-600 font-black uppercase tracking-tight">Intelligence Reader</span>
+                                <div className="flex flex-col overflow-hidden">
+                                    <span className="text-sm font-bold text-white group-hover:text-primary-400 transition-colors truncate">{sub.email}</span>
+                                    <div className="flex items-center gap-2 mt-0.5">
+                                        <span className="text-[9px] text-slate-600 font-black uppercase tracking-tight">Intelligence Reader</span>
+                                        {sub.is_premium && (
+                                            <span className="text-[8px] font-black text-amber-500 uppercase px-1.5 py-0.5 bg-amber-500/10 border border-amber-500/20 rounded">PRO</span>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 
-                            {/* Status */}
-                            <div className="col-span-2 flex items-center md:justify-center py-2 md:py-0">
+                            <div className="hidden md:flex md:col-span-2 items-center justify-center">
                                 <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border ${sub.unsubscribed_at ? 'bg-red-500/10 text-red-500 border-red-500/20' : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'}`}>
                                     {sub.unsubscribed_at ? 'Inactive' : 'Active'}
                                 </span>
                             </div>
 
-                            {/* Engagement */}
-                            <div className="col-span-2 flex flex-col items-start md:items-center justify-center py-2 md:py-0 space-y-1">
+                            <div className="md:col-span-2 flex items-center justify-between md:justify-center py-2 px-3 md:p-0 bg-slate-950/40 md:bg-transparent rounded-lg md:rounded-0">
+                                <span className="md:hidden text-[8px] font-black text-slate-600 uppercase tracking-widest">Last Intel:</span>
                                 {sub.last_email_sent ? (
                                     <div className="flex items-center gap-1.5 text-[9px] font-black text-primary-400 uppercase tracking-tighter">
                                         <MailCheck className="w-3 h-3" />
-                                        Sent {new Date(sub.last_email_sent).toLocaleDateString()}
+                                        {new Date(sub.last_email_sent).toLocaleDateString([], { month: 'short', day: 'numeric' })}
                                     </div>
                                 ) : (
-                                    <span className="text-[9px] text-slate-600 font-black uppercase italic">New Recruit</span>
-                                )}
-                                {sub.is_premium && (
-                                    <span className="flex items-center gap-1 text-[8px] font-black text-amber-500 uppercase px-1.5 py-0.5 bg-amber-500/10 border border-amber-500/20 rounded">
-                                        Premium
-                                    </span>
+                                    <span className="text-[9px] text-slate-700 font-black uppercase italic">New Recruit</span>
                                 )}
                             </div>
 
-                            {/* Actions */}
-                            <div className="col-span-2 flex items-center justify-end gap-1 pt-2 md:pt-0 border-t md:border-t-0 border-slate-800/30">
+                            <div className="md:col-span-2 flex items-center justify-end gap-1 pt-2 md:pt-0 border-t md:border-0 border-slate-800/30">
                                 <button
                                     onClick={() => handleTogglePremium(sub.id)}
-                                    className={`p-3 md:p-2 rounded-xl transition-all ${sub.is_premium ? 'text-amber-500 bg-amber-500/10' : 'text-slate-500 hover:text-amber-500'}`}
+                                    className={`p-2.5 rounded-xl transition-all ${sub.is_premium ? 'text-amber-500 bg-amber-500/10' : 'text-slate-600 hover:text-amber-500'}`}
                                 >
                                     <Trophy className="w-4 h-4" />
                                 </button>
                                 <button
                                     onClick={() => handleDelete(sub.id, sub.email)}
-                                    className="p-3 md:p-2 text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
+                                    className="p-2.5 text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
                                 >
                                     <Trash2 className="w-4 h-4" />
                                 </button>

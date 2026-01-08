@@ -138,17 +138,23 @@ export default function OverviewTab({
                                     const explanation = explanations[source.platform] || 'External channel traffic';
 
                                     return (
-                                        <div key={idx} className="flex flex-col md:grid md:grid-cols-12 p-4 hover:bg-white/[0.02] transition-colors items-center gap-2 md:gap-0">
-                                            <div className="w-full md:col-span-4 flex items-center gap-3">
-                                                <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
-                                                <span className="text-xs font-black text-slate-200">{source.platform}</span>
+                                        <div key={idx} className="flex flex-col gap-1 p-4 md:grid md:grid-cols-12 hover:bg-white/[0.02] transition-colors border-b border-white/5 md:border-0 last:border-0">
+                                            <div className="md:col-span-4 flex items-center justify-between">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
+                                                    <span className="text-xs font-black text-white">{source.platform}</span>
+                                                </div>
+                                                <div className="md:hidden text-xs font-black text-blue-400">
+                                                    {source.hits.toLocaleString()}
+                                                </div>
                                             </div>
-                                            <div className="w-full md:col-span-5">
-                                                <span className="text-[10px] md:text-sm text-slate-500 md:text-slate-400 font-medium italic">{explanation}</span>
+                                            <div className="md:col-span-5">
+                                                <p className="text-[10px] md:text-sm text-slate-500 font-medium leading-relaxed italic">
+                                                    {explanation}
+                                                </p>
                                             </div>
-                                            <div className="w-full md:col-span-3 text-left md:text-right flex items-center justify-between md:justify-end">
-                                                <span className="md:hidden text-[9px] font-black text-slate-700 uppercase">Signal Strength:</span>
-                                                <span className="text-sm font-black text-white px-3 py-1 bg-slate-950 rounded-xl border border-slate-800 shadow-inner">
+                                            <div className="hidden md:flex md:col-span-3 text-right items-center justify-end">
+                                                <span className="text-xs font-black text-blue-400">
                                                     {source.hits.toLocaleString()}
                                                 </span>
                                             </div>
