@@ -83,20 +83,19 @@ body::before {
 }
 
 .prose p {
-  @apply text-slate-300 leading-relaxed mb-6 text-[1.05rem];
+  @apply text-slate-300 leading-relaxed mb-4 text-[1.05rem];
 }
 
 .prose ul {
-  @apply list-none ml-2 space-y-4 my-8;
+  @apply list-disc ml-6 space-y-2 my-4;
 }
 
 .prose li {
-  @apply relative pl-0 text-slate-300 mb-4 block;
+  @apply text-slate-300 mb-1;
 }
 
-.prose li::before {
-  content: "◈";
-  @apply inline-block mr-2 text-blue-500 font-bold text-lg leading-none;
+.prose li::marker {
+  @apply text-blue-500;
 }
 
 .prose strong {

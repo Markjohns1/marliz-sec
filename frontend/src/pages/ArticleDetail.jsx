@@ -67,32 +67,32 @@ const formatAIContent = (text) => {
       return mashedText ? `${headerMarkdown}\n${mashedText}` : headerMarkdown;
     }
 
-    // Logic: Bullet Points with "Key-Value" emphasis for scannability
+    // Logic: Key-Value style paragraphs for scannability (Replacing Bullets)
     if (trimmed.startsWith('*')) {
       let content = trimmed.replace(/^\*\s*/, '').trim();
 
-      // If the bullet has a colon, bold the Label (Key-Value design)
+      // If it has a colon, bold the Label
       if (content.includes(': ')) {
         const parts = content.split(': ');
         const key = parts[0].trim();
         const value = parts.slice(1).join(': ').trim();
-        return `\n* **${key}:** ${value}`;
+        return `**${key}:** ${value}`;
       }
 
-      // If no colon, bold the first 3-4 words for "F-Pattern" scannability
+      // Bold the first 3 words for scannability
       const words = content.split(' ');
       if (words.length > 5) {
         const lead = words.slice(0, 3).join(' ');
         const rest = words.slice(3).join(' ');
-        return `\n* **${lead}** ${rest}`;
+        return `**${lead}** ${rest}`;
       }
 
-      return `\n* ${content}`;
+      return content;
     }
 
     return line;
-  }).join('\n\n') // Force extra spacing for "jump" effect
-    .replace(/\n\s*\n\s*\n+/g, '\n\n') // Normalize spacing
+  }).join('\n\n')
+    .replace(/\n\s*\n\s*\n+/g, '\n\n')
     .trim();
 };
 
