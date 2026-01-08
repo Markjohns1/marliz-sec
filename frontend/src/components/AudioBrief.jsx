@@ -39,6 +39,7 @@ const AudioBrief = ({ article }) => {
     const handlePlay = () => {
         if (!synth) return;
 
+        // Correct Resume Logic
         if (isPaused) {
             synth.resume();
             setIsPlaying(true);
@@ -48,65 +49,74 @@ const AudioBrief = ({ article }) => {
 
         setIsLoading(true);
 
-        // Comprehensive script for the Voice Briefing
-        const title = article.title;
-        const summary = stripHtml(article.simplified?.friendly_summary);
-        const impact = stripHtml(article.simplified?.business_impact);
+        try {
+            // Comprehensive script for the Voice Briefing
+            const title = article.title || "Unknown Title";
+            const summary = stripHtml(article.simplified?.friendly_summary || "No summary available.");
+            const impact = stripHtml(article.simplified?.business_impact || "Impact not specified.");
 
-        let actions = "";
-        if (article.simplified?.action_steps) {
-            try {
-                const steps = JSON.parse(article.simplified.action_steps);
-                actions = "Recommended actions are: " + steps.join(". ");
-            } catch (e) {
-                actions = stripHtml(article.simplified.action_steps);
+            let actions = "";
+            if (article.simplified?.action_steps) {
+                try {
+                    const steps = JSON.parse(article.simplified.action_steps);
+                    if (Array.isArray(steps)) {
+                        actions = "Recommended actions are: " + steps.join(". ");
+                    } else if (typeof steps === 'object' && steps !== null) {
+                        // Handle Dictionary/Object Format
+                        actions = "Recommended actions are: " + Object.values(steps).join(". ");
+                    }
+                } catch (e) {
+                    // Fallback for plain text
+                    actions = stripHtml(article.simplified.action_steps);
+                }
             }
-        }
 
-        const script = `Intelligence briefing on: ${title}. ${summary}. Impact analysis: ${impact}. ${actions}. End of briefing.`;
+            const script = `Intelligence briefing on: ${title}. ${summary}. Impact analysis: ${impact}. ${actions}. End of briefing.`;
+            const utterance = new SpeechSynthesisUtterance(script);
 
-        const utterance = new SpeechSynthesisUtterance(script);
+            // Select a premium sounding voice if available
+            const voices = synth.getVoices();
+            const preferredVoice = voices.find(v =>
+                (v.name.includes('Google') && v.lang.startsWith('en')) ||
+                (v.name.includes('Premium') && v.lang.startsWith('en')) ||
+                (v.name.includes('Female') && v.lang === 'en-US')
+            ) || voices.find(v => v.lang.startsWith('en'));
 
-        // Select a premium sounding voice if available (Google US English, etc)
-        const voices = synth.getVoices();
-        const preferredVoice = voices.find(v =>
-            v.name.includes('Google') && v.lang.startsWith('en') ||
-            v.name.includes('Premium') ||
-            v.name.includes('Female') && v.lang === 'en-US'
-        ) || voices.find(v => v.lang.startsWith('en'));
+            if (preferredVoice) {
+                utterance.voice = preferredVoice;
+            }
 
-        if (preferredVoice) {
-            utterance.voice = preferredVoice;
-        }
+            utterance.rate = 0.95; // Slightly slower for clarity
+            utterance.pitch = 1;
+            utteranceRef.current = utterance;
 
-        utterance.rate = 0.95; // Slightly slower for clarity
-        utterance.pitch = 1;
-        utteranceRef.current = utterance;
+            utterance.onstart = () => {
+                setIsLoading(false);
+                setIsPlaying(true);
+            };
 
-        utterance.onstart = () => {
+            utterance.onend = () => {
+                setIsPlaying(false);
+                setIsPaused(false);
+            };
+
+            utterance.onerror = (event) => {
+                console.error('TTS Error:', event);
+                setIsLoading(false);
+                setIsPlaying(false);
+            };
+
+            synth.cancel(); // Stop any current speech
+            synth.speak(utterance);
+        } catch (err) {
+            console.error("Audio Generation Error:", err);
             setIsLoading(false);
-            setIsPlaying(true);
-        };
-
-        utterance.onend = () => {
-            setIsPlaying(false);
-            setIsPaused(false);
-        };
-
-        utterance.onerror = (event) => {
-            console.error('TTS Error:', event);
-            setIsLoading(false);
-            setIsPlaying(false);
-        };
-
-        synth.cancel(); // Stop any current speech
-        synth.speak(utterance);
+        }
     };
 
     const handlePause = () => {
         if (synth) {
-            // Force stop immediately as 'pause' can be unreliable on mobile
-            synth.cancel();
+            synth.pause(); // Use pause() instead of cancel() to allow resume()
             setIsPlaying(false);
             setIsPaused(true);
         }
