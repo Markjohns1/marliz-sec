@@ -24,23 +24,26 @@ const AudioBrief = ({ article }) => {
 
     const cleanText = (text) => {
         if (!text) return '';
-        // 1. Remove HTML
-        const doc = new DOMParser().parseFromString(text, 'text/html');
-        let content = doc.body.textContent || "";
 
-        // 2. Remove Markdown & Code Formatting
+        // 1. Remove HTML using a safer regex first, then DOMParser as fallback
+        let content = text.replace(/<[^>]*>/g, ' ');
+        const doc = new DOMParser().parseFromString(content, 'text/html');
+        content = doc.body.textContent || content;
+
+        // 2. Remove Markdown & Code Formatting (SAFE VERSION)
         return content
-            .replace(/https?:\/\/\S+/g, '') // Remove URLs
-            .replace(/#+/g, '')            // Remove hashtags
-            .replace(/\*+/g, '')           // Remove asterisks
-            .replace(/_+/g, '')            // Remove underscores
-            .replace(/`+/g, '')            // Remove backticks
-            .replace(/>+/g, '')            // Remove blockquotes
-            .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1') // Keep link text, remove URL
-            .replace(/-\s+/g, '')          // Remove list dashes
-            .replace(/\|/g, ' ')           // Remove vertical bars (tables)
-            .replace(/\{.*\}/g, '')        // Remove anything in curly braces (possible JSON/Code)
-            .replace(/\s+/g, ' ')          // Normalize spaces
+            .replace(/https?:\/\/\S+/g, '')     // Remove URLs
+            .replace(/#+/g, ' ')                // Remove hashtags, replace with space for pause
+            .replace(/\*+/g, '')                // Remove asterisks
+            .replace(/_+/g, '')                 // Remove underscores
+            .replace(/`+/g, '')                 // Remove backticks
+            .replace(/>+/g, '')                 // Remove blockquotes
+            .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1') // Keep link text
+            .replace(/-\s+/g, ' ')              // Remove list dashes
+            .replace(/\|/g, ' ')                // Remove table bars
+            .replace(/[\{\}]/g, ' ')            // Remove braces safely (not greedy)
+            .replace(/\n+/g, '. ')              // Convert newlines to periods for natural pauses
+            .replace(/\s+/g, ' ')               // Normalize spaces
             .trim();
     };
 
@@ -85,7 +88,7 @@ const AudioBrief = ({ article }) => {
             const actionsArr = article.simplified?.action_steps ? JSON.parse(article.simplified.action_steps) : [];
             const actions = Array.isArray(actionsArr) ? actionsArr.join(". ") : "No specific actions provided.";
 
-            const script = `${title}. Intelligence Summary: ${summary}. Operational Impact: ${impact}. Recommended Actions: ${actions}. End of briefing.`;
+            const script = `${title}. This is your Intelligence Briefing. ${summary}. Regarding the Operational Impact: ${impact}. Recommended Actions include: ${actions}. This concludes the briefing.`;
             const utterance = new SpeechSynthesisUtterance(script);
 
             // VOICE SELECTION (Prioritize Premium Natural Voices)
