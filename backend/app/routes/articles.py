@@ -443,9 +443,13 @@ async def get_article(slug: str, request: Request, db: AsyncSession = Depends(ge
     # Track View Source
     await track_view(article.id, request, db)
     
-    # CRITICAL: Re-refresh or ensure session state is clean after track_view's commit
-    # This prevents the 'MissingGreenlet' 500 error when Pydantic tries to serialize
-    await db.refresh(article, ['simplified', 'category'])
+    # Reload with all relationships to avoid MissingGreenlet error during Pydantic validation
+    stmt = select(models.Article).filter_by(id=article.id).options(
+        selectinload(models.Article.simplified),
+        selectinload(models.Article.category)
+    )
+    res = await db.execute(stmt)
+    article = res.scalars().first()
     
     return schemas.ArticleWithContent.model_validate(article)
 
