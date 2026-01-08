@@ -240,8 +240,8 @@ export default function AdminDashboard() {
                 </div>
             </div>
 
-            {/* Main Content - Added padding-top to account for fixed header - Optimized for mobile */}
-            <div className="container mx-auto max-w-6xl px-4 pt-28 md:pt-36 pb-24">
+            {/* Main Content - Substantially increased padding to clear the stacked mobile header */}
+            <div className="container mx-auto max-w-6xl px-4 pt-48 md:pt-40 pb-32">
 
                 {activeTab === 'overview' && (
                     <OverviewTab

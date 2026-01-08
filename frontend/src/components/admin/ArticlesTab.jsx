@@ -109,9 +109,9 @@ export default function ArticlesTab({
                 <div className="divide-y divide-slate-800/50">
                     {artLoading ? (
                         <div className="px-6 py-12 text-center text-slate-500 font-bold italic">Scanning database...</div>
-                    ) : articleData?.articles.length === 0 ? (
+                    ) : (!articleData || !articleData.articles || articleData.articles.length === 0) ? (
                         <div className="px-6 py-12 text-center text-slate-500 font-bold italic">No articles found.</div>
-                    ) : articleData?.articles.map((article) => (
+                    ) : articleData.articles.map((article) => (
                         <div
                             key={article.id}
                             className={`flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-4 hover:bg-white/5 transition-colors group ${selectedArticles.includes(article.id) ? 'bg-primary-500/5' : ''}`}
@@ -147,7 +147,7 @@ export default function ArticlesTab({
                             <div className="col-span-3 flex items-center justify-center gap-6 py-4 md:py-0 border-y md:border-y-0 border-slate-800/30 md:bg-transparent bg-slate-950/20 rounded-xl my-2 md:my-0">
                                 <div className="text-center">
                                     <div className="text-[8px] md:text-[9px] text-slate-500 font-black uppercase mb-0.5">Views</div>
-                                    <div className="text-xs font-black text-primary-400">{article.views.toLocaleString()}</div>
+                                    <div className="text-xs font-black text-primary-400">{(article.views || 0).toLocaleString()}</div>
                                 </div>
                                 <div className="text-center">
                                     <div className="text-[8px] md:text-[9px] text-slate-500 font-black uppercase mb-0.5">Words</div>

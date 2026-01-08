@@ -8,7 +8,7 @@ export default function StatCard({ title, value, icon: Icon, color, loading, sub
                     <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
             </div>
-            <h3 className="text-slate-400 text-xs sm:text-sm font-medium mb-1 uppercase tracking-widest">{title}</h3>
+            <h3 className="text-slate-400 text-[10px] sm:text-xs font-bold mb-1 uppercase tracking-wider truncate" title={title}>{title}</h3>
             <div className="text-2xl sm:text-3xl font-black text-white">
                 {loading ? '...' : (value?.toLocaleString() || 0)}
             </div>
