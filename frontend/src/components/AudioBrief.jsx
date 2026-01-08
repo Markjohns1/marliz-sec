@@ -22,10 +22,26 @@ const AudioBrief = ({ article }) => {
         };
     }, [synth]);
 
-    const stripHtml = (html) => {
-        if (!html) return '';
-        const doc = new DOMParser().parseFromString(html, 'text/html');
-        return doc.body.textContent || "";
+    const cleanText = (text) => {
+        if (!text) return '';
+        // 1. Remove HTML
+        const doc = new DOMParser().parseFromString(text, 'text/html');
+        let content = doc.body.textContent || "";
+
+        // 2. Remove Markdown & Code Formatting
+        return content
+            .replace(/https?:\/\/\S+/g, '') // Remove URLs
+            .replace(/#+/g, '')            // Remove hashtags
+            .replace(/\*+/g, '')           // Remove asterisks
+            .replace(/_+/g, '')            // Remove underscores
+            .replace(/`+/g, '')            // Remove backticks
+            .replace(/>+/g, '')            // Remove blockquotes
+            .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1') // Keep link text, remove URL
+            .replace(/-\s+/g, '')          // Remove list dashes
+            .replace(/\|/g, ' ')           // Remove vertical bars (tables)
+            .replace(/\{.*\}/g, '')        // Remove anything in curly braces (possible JSON/Code)
+            .replace(/\s+/g, ' ')          // Normalize spaces
+            .trim();
     };
 
     const startHeartbeat = () => {
@@ -64,8 +80,8 @@ const AudioBrief = ({ article }) => {
 
         try {
             const title = article.title || "Defense Briefing";
-            const summary = stripHtml(article.simplified?.friendly_summary || "");
-            const impact = stripHtml(article.simplified?.business_impact || "");
+            const summary = cleanText(article.simplified?.friendly_summary || "");
+            const impact = cleanText(article.simplified?.business_impact || "");
             const actionsArr = article.simplified?.action_steps ? JSON.parse(article.simplified.action_steps) : [];
             const actions = Array.isArray(actionsArr) ? actionsArr.join(". ") : "No specific actions provided.";
 
