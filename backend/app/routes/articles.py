@@ -500,7 +500,7 @@ async def create_manual_article(
     article = models.Article(
         title=article_data.title,
         slug=slug,
-        original_url=article_data.original_url or f"https://yourdomain.com/article/{slug}",
+        original_url=article_data.original_url or f"https://marlizintel.com/article/{slug}",
         source_name=article_data.source_name,
         published_at=datetime.now(),
         image_url=article_data.image_url,

@@ -454,15 +454,22 @@ export default function ArticleDetail() {
 
               {/* Original Source CTA */}
               <div className="mt-8 mb-12 flex justify-center">
-                <a
-                  href={article.original_url || '#'}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-colors shadow-lg shadow-blue-900/20"
-                >
-                  Open Original Source
-                  <ExternalLink className="w-4 h-4 ml-2" />
-                </a>
+                {article.original_url && !article.original_url.includes('marlizintel.com') && !article.original_url.includes('yourdomain.com') ? (
+                  <a
+                    href={article.original_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-colors shadow-lg shadow-blue-900/20"
+                  >
+                    Open Original Source
+                    <ExternalLink className="w-4 h-4 ml-2" />
+                  </a>
+                ) : (
+                  <div className="inline-flex items-center px-6 py-3 bg-slate-800/50 text-slate-400 font-bold rounded-lg border border-slate-700/50 shadow-inner">
+                    <Shield className="w-4 h-4 mr-2 text-blue-500/50" />
+                    Marliz Intel Original Report
+                  </div>
+                )}
               </div>
             </div>
 
