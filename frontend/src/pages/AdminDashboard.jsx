@@ -12,6 +12,7 @@ import {
     Clock,
     Eye,
     TrendingUp,
+    Activity,
     Calendar,
     BarChart3,
     Flame,
@@ -63,6 +64,7 @@ import InsightsTab from '../components/admin/InsightsTab';
 import SettingsTab from '../components/admin/SettingsTab';
 import QuickPublishTab from '../components/admin/QuickPublishTab';
 import NewsletterTab from '../components/admin/NewsletterTab';
+import HealthTab from '../components/admin/HealthTab';
 
 
 
@@ -221,6 +223,7 @@ export default function AdminDashboard() {
                             { id: 'publish', label: 'Publish', icon: PenLine },
                             { id: 'newsletter', label: 'Newsletter', icon: Mail },
                             { id: 'categories', label: 'Insights', icon: FolderOpen },
+                            { id: 'health', label: 'Health', icon: Activity },
                             { id: 'guide', label: 'Playbook', icon: BookOpen },
                         ].map((tab) => (
                             <button
@@ -296,6 +299,8 @@ export default function AdminDashboard() {
                         setSelectedSubscribers={setSelectedSubscribers}
                     />
                 )}
+
+                {activeTab === 'health' && <HealthTab />}
 
                 {activeTab === 'guide' && <AdminGuide />}
 

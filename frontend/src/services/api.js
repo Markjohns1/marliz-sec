@@ -165,4 +165,11 @@ export const createManualArticle = async (articleData) => {
   return data;
 };
 
+
+// SEO
+export const getSeoHealth = async () => {
+  const { data } = await api.get('/health-check');
+  return data;
+};
+
 export default api;
