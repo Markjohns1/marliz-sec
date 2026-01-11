@@ -67,12 +67,13 @@ Allow: /
 Sitemap: {settings.BASE_URL}/sitemap.xml"""
     return Response(content=content, media_type="text/plain")
 
-@router.get("/api/health-check")
+@router.get("/health-check")
 async def check_seo_health(db: AsyncSession = Depends(get_db)):
     """
     Admin Diagnostic: Uses RAW SQL for guaranteed accuracy.
     """
     from sqlalchemy import text
+    from fastapi.responses import JSONResponse
     
     # RAW SQL - Same as terminal scripts (100% accurate)
     # 1. Count Active
@@ -106,7 +107,7 @@ async def check_seo_health(db: AsyncSession = Depends(get_db)):
                 "error": "Slug is marked ACTIVE but also exists in DELETED (410) table. This causes a conflict."
             })
     
-    return {
+    data = {
         "summary": {
             "total_active": total_active,
             "total_buried": total_buried,
@@ -116,3 +117,9 @@ async def check_seo_health(db: AsyncSession = Depends(get_db)):
         },
         "conflicts": conflicts_list
     }
+    
+    # Return with NO-CACHE headers
+    return JSONResponse(
+        content=data,
+        headers={"Cache-Control": "no-store, no-cache, must-revalidate, max-age=0"}
+    )
