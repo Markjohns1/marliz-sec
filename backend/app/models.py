@@ -136,3 +136,15 @@ class ViewLog(Base):
     viewed_at = Column(DateTime(timezone=True), server_default=func.now())
     
     article = relationship("Article")
+
+class DeletedArticle(Base):
+    """
+    Table to store slugs that have been permanently deleted and should return 410 Gone.
+    This helps remove them from Google Index faster.
+    """
+    __tablename__ = "deleted_articles"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    slug = Column(String(600), unique=True, nullable=False, index=True)
+    deleted_at = Column(DateTime(timezone=True), server_default=func.now())
+    reason = Column(String(200), default="Content cleanup")

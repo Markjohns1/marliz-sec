@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, desc, or_, func
 from sqlalchemy.orm import selectinload
@@ -438,6 +438,12 @@ async def get_article(slug: str, request: Request, db: AsyncSession = Depends(ge
         article = fallback_result.scalars().first()
 
     if not article:
+        # Check if it was permanently deleted (410 Gone)
+        stmt_deleted = select(models.DeletedArticle).filter_by(slug=slug)
+        res_deleted = await db.execute(stmt_deleted)
+        if res_deleted.scalars().first():
+            return Response(status_code=410, content="Gone: This article has been permanently removed.")
+
         raise HTTPException(status_code=404, detail="Article not found")
     
     # Track View Source
