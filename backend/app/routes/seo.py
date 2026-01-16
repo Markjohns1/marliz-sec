@@ -86,34 +86,6 @@ async def get_deleted_sitemap(db: AsyncSession = Depends(get_db)):
     xml_content.append('</urlset>')
     return Response(content="".join(xml_content), media_type="application/xml")
 
-@router.api_route("/sitemap-deleted.xml", methods=["GET", "HEAD"])
-async def get_deleted_sitemap(db: AsyncSession = Depends(get_db)):
-    """
-    Graveyard Sitemap: Lists all articles marked as 410 Gone.
-    Submitting this to Google Search Console forces them to crawl these links 
-    and remove them from the index much faster.
-    """
-    from app.models import DeletedArticle
-    stmt = select(DeletedArticle)
-    result = await db.execute(stmt)
-    deleted_articles = result.scalars().all()
-    
-    base_url = settings.BASE_URL
-    xml_content = ['<?xml version="1.0" encoding="UTF-8"?>']
-    xml_content.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
-    
-    for item in deleted_articles:
-        # Use the article path format
-        xml_content.append(f"""
-    <url>
-        <loc>{base_url}/article/{item.slug}</loc>
-        <changefreq>monthly</changefreq>
-        <priority>0.1</priority>
-    </url>""")
-        
-    xml_content.append('</urlset>')
-    return Response(content="".join(xml_content), media_type="application/xml")
-
 @router.api_route("/robots.txt", methods=["GET", "HEAD"])
 def get_robots():
     """Serve robots.txt"""
