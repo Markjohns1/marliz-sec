@@ -170,8 +170,8 @@ if os.path.exists(FRONTEND_DIST):
             from fastapi.responses import RedirectResponse
             return RedirectResponse(url="/", status_code=301)
 
-        # Explicitly ignore API paths so they don't get swallowed
-        if full_path.startswith("api"):
+        # Explicitly ignore API and SEO paths so they don't get swallowed
+        if full_path.startswith("api") or full_path.endswith(".xml") or full_path.endswith(".txt"):
             raise HTTPException(status_code=404, detail="Not Found")
 
         # 1. Serve specific file if it exists (favicon.ico, robots.txt)
