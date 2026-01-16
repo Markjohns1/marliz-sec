@@ -146,6 +146,27 @@ async def manual_simplify(
     return result
 
 # ==========================================
+# DYNAMIC SEO ROUTES (Sitemaps)
+# ==========================================
+from sqlalchemy import select
+from app.models import Article, ArticleStatus, DeletedArticle
+from app.database import get_db
+
+@app.api_route("/sitemap.xml", methods=["GET", "HEAD"])
+async def get_sitemap_xml(request: Request):
+    """Fallback for dynamic sitemap if router fails"""
+    from app.routes.seo import get_sitemap
+    async for db in get_db():
+        return await get_sitemap(db)
+
+@app.api_route("/sitemap-deleted.xml", methods=["GET", "HEAD"])
+async def get_deleted_sitemap_xml(request: Request):
+    """Ironclad route for deleted sitemap"""
+    from app.routes.seo import get_deleted_sitemap
+    async for db in get_db():
+        return await get_deleted_sitemap(db)
+
+# ==========================================
 # SERVE STATIC FILES (React Frontend)
 # ==========================================
 from fastapi.staticfiles import StaticFiles
