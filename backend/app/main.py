@@ -166,6 +166,12 @@ async def get_deleted_sitemap_xml(request: Request):
     async for db in get_db():
         return await get_deleted_sitemap(db)
 
+@app.api_route("/ads.txt", methods=["GET", "HEAD"])
+async def get_ads_txt_ironclad(request: Request):
+    """Ironclad route for ads.txt"""
+    from app.routes.seo import get_ads_txt
+    return get_ads_txt()
+
 # ==========================================
 # SERVE STATIC FILES (React Frontend)
 # ==========================================
