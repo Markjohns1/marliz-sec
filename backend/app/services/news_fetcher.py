@@ -52,8 +52,8 @@ class NewsFetcher:
         total_fetched = 0
         total_new = 0
         
-        # Limit per batch (User requested strictly 8 to ensure quality)
-        limit = 8
+        # Limit per batch (User requested strictly 4 to ensure high-quality 70b processing)
+        limit = 4
         
         async with httpx.AsyncClient(timeout=30.0) as client:
             # Pre-load categories

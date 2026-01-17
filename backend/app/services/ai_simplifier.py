@@ -37,7 +37,7 @@ class AISimplifier:
         """Process up to 10 RAW articles through AI simplification"""
         processed = 0
         failed = 0
-        BATCH_LIMIT = 5  # STRICT LIMIT: 5 articles per run to save API
+        BATCH_LIMIT = 4  # MATCHING FETCH LIMIT: 4 articles per run to ensure 70b quality
         
         # Use single async context manager
         async with get_db_context() as db:

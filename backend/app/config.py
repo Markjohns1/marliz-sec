@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     
     # AI Services (Groq)
     GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
-    AI_MODEL: str = "llama-3.1-8b-instant"
+    AI_MODEL: str = "llama-3.3-70b-versatile"
     
     # News Fetcher
     NEWSDATA_IO_KEY: str = os.getenv("NEWSDATA_IO_KEY", "")
