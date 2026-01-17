@@ -68,9 +68,9 @@ async def smart_refine():
                 
                 logger.info(f"🔄 REFINING: Article {article.id} - {article.title[:40]}...")
                 
-                # 3. EXECUTE: Call the simplifier
-                # The simplifier fetches raw content and overwrites with new prompt output
-                status = await ai_simplifier._simplify_article(db, article)
+                # 3. EXECUTE: Call the refiner (Append/Expand mode)
+                # Instead of overwriting everything, we just add the Assessment and expand Impact.
+                status = await ai_simplifier.refine_article(db, article)
                 
                 if status == "success":
                     logger.info(f"✅ SUCCESS: upgraded Article {article.id}.")

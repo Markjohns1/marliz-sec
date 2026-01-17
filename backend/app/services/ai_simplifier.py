@@ -242,6 +242,68 @@ class AISimplifier:
         except Exception as e:
             logger.error(f"Groq API processing error: {str(e)}")
             return "api_error"
+
+    async def refine_article(self, db: AsyncSession, article: Article) -> str:
+        """
+        Surgically adds Marliz Intel Strategic Assessment and expands Business Impact
+        WITHOUT overwriting the existing summary/title.
+        """
+        # 1. Get existing content
+        stmt = select(SimplifiedContent).filter_by(article_id=article.id)
+        result = await db.execute(stmt)
+        existing = result.scalars().first()
+        
+        if not existing:
+            # If it's totally empty, we fall back to a full simplify
+            return await self._simplify_article(db, article)
+
+        # 2. Build the "Refinement" Prompt
+        prompt = f"""You are 'Marliz Intel'. I have an existing cybersecurity article. 
+Your job is to ADD two specific, high-value sections to it. 
+
+EXISTING TITLE: {article.title}
+EXISTING SUMMARY: {existing.friendly_summary[:2000]}
+
+MANDATE:
+1. Create a section: ## Marliz Intel Strategic Assessment
+   - Write 200-300 words. Provide a unique, expert opinion, predictions, and trend analysis. 
+2. Create a section: ## Business & Operational Impact
+   - Write 150-250 words. Expand on the financial and operational fallout for organizations.
+
+OUTPUT RULES:
+- Return ONLY a JSON object with two keys: "assessment" and "impact".
+- No other text. Escape newlines as \\n.
+"""
+        try:
+            headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
+            data = {
+                "model": self.model,
+                "messages": [{"role": "system", "content": "You are a Senior Strategic Cyber Analyst."}, {"role": "user", "content": prompt}],
+                "response_format": { "type": "json_object" }
+            }
+            async with httpx.AsyncClient(timeout=120.0) as client:
+                resp = await client.post(self.base_url, headers=headers, json=data)
+                resp.raise_for_status()
+                res = resp.json()
+                content = json.loads(res["choices"][0]["message"]["content"])
+
+                # 3. APPEND to existing content instead of overwriting
+                # Check if it already has the assessment to prevent double-appending
+                if "Marliz Intel Strategic Assessment" not in (existing.friendly_summary or ""):
+                    new_summary = f"{existing.friendly_summary}\n\n{content['assessment']}"
+                    existing.friendly_summary = new_summary
+                
+                # Update the impact section with the new expanded version
+                existing.business_impact = content['impact']
+                
+                # Refresh timestamp for search engines
+                article.updated_at = datetime.utcnow()
+                
+                await db.commit()
+                return "success"
+        except Exception as e:
+            logger.error(f"Refinement failed for {article.id}: {e}")
+            return "api_error"
             
     def _build_prompt(self, article, content):
         """Build precise prompt for Groq AI with advanced SEO optimization and business-focused intelligence."""
