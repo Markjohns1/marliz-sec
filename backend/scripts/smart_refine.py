@@ -55,7 +55,7 @@ async def smart_refine():
                     # If length is < 2000 characters (approx 300 words), it's a BAD GENERATION.
                     # We must re-process it.
                     if "Marliz Intel Strategic Assessment" in full_text:
-                        if len(full_text) > 2000:
+                        if len(full_text) > 6000:  # 6000 chars = ~1000 words minimum
                             logger.info(f"⏭️  SKIP: Article {article.id} has assessment AND good length. Saving tokens.")
                             SKIPPED_COUNT += 1
                             continue
