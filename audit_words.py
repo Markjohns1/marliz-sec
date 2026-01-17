@@ -1,7 +1,9 @@
 import sqlite3
 import os
 
-db_path = 'cybersec_news.db'
+# Check common locations for the database
+db_paths = ['cybersec_news.db', 'backend/cybersec_news.db', './backend/cybersec_news.db']
+db_path = next((p for p in db_paths if os.path.exists(p)), None)
 
 def count_words(text):
     if not text:
