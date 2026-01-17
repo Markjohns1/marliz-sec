@@ -1,9 +1,19 @@
 import sqlite3
 import os
 
-# Check common locations for the database
-db_paths = ['cybersec_news.db', 'backend/cybersec_news.db', './backend/cybersec_news.db']
+# Prioritize backend/ location for server environments
+db_paths = [
+    'backend/cybersec_news.db', 
+    './backend/cybersec_news.db', 
+    'cybersec_news.db'
+]
 db_path = next((p for p in db_paths if os.path.exists(p)), None)
+
+if db_path:
+    print(f"--- Using database at: {db_path} ---")
+else:
+    print("Error: No database file found in standard locations.")
+    exit(1)
 
 def count_words(text):
     if not text:
