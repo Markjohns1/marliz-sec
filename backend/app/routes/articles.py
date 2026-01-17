@@ -12,6 +12,39 @@ import asyncio
 from datetime import datetime, timedelta
 from slugify import slugify
 
+# System Status Router
+@router.get("/system/status")
+async def get_system_status(db: AsyncSession = Depends(get_db)):
+    """Get the status of automated systems (scheduler, etc)"""
+    from app.models import SystemSettings
+    stmt = select(SystemSettings).filter_by(key="scheduler_enabled")
+    res = await db.execute(stmt)
+    setting = res.scalars().first()
+    
+    return {
+        "scheduler_enabled": setting.value.lower() == "true" if setting else True
+    }
+
+@router.post("/system/toggle-scheduler")
+async def toggle_scheduler(enabled: bool, api_key = Depends(verify_api_key), db: AsyncSession = Depends(get_db)):
+    """Enable or disable the background scheduler"""
+    from app.models import SystemSettings
+    stmt = select(SystemSettings).filter_by(key="scheduler_enabled")
+    res = await db.execute(stmt)
+    setting = res.scalars().first()
+    
+    val_str = "true" if enabled else "false"
+    
+    if setting:
+        setting.value = val_str
+    else:
+        new_setting = SystemSettings(key="scheduler_enabled", value=val_str)
+        db.add(new_setting)
+        
+    await db.commit()
+    return {"status": "success", "scheduler_enabled": enabled}
+
+
 router = APIRouter(prefix="/api/articles", tags=["articles"])
 
 def get_source_type(referer: str, user_agent: str = None, query_ref: str = None) -> str:

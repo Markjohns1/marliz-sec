@@ -148,6 +148,19 @@ export const triggerSimplify = async () => {
   return data;
 };
 
+// System Controls
+export const getSystemStatus = async () => {
+  const { data } = await api.get('/api/articles/system/status');
+  return data;
+};
+
+export const toggleScheduler = async (enabled) => {
+  const { data } = await api.post('/api/articles/system/toggle-scheduler', null, {
+    params: { enabled }
+  });
+  return data;
+};
+
 // Stats
 export const getDashboardStats = async () => {
   const { data } = await api.get('/api/articles/stats/dashboard');

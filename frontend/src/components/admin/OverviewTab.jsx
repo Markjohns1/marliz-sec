@@ -17,7 +17,9 @@ export default function OverviewTab({
     message,
     setViewingStats,
     setSharingArticle,
-    handleToggleProtection
+    handleToggleProtection,
+    systemStatus,
+    handleToggleScheduler
 }) {
     const [isTrafficExpanded, setIsTrafficExpanded] = React.useState(false);
 
@@ -189,6 +191,28 @@ export default function OverviewTab({
                     <Zap className="w-4 h-4 text-yellow-500" />
                     Operational Controls
                 </h3>
+
+                <div className="mb-6 flex items-center justify-between p-4 bg-slate-950/50 rounded-2xl border border-white/5">
+                    <div className="flex items-center gap-3">
+                        <div className={`p-2 rounded-lg ${systemStatus?.scheduler_enabled ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>
+                            {systemStatus?.scheduler_enabled ? <Shield className="w-4 h-4" /> : <ShieldOff className="w-4 h-4" />}
+                        </div>
+                        <div>
+                            <div className="text-[10px] font-black uppercase tracking-widest text-white">Automated Intelligence</div>
+                            <div className="text-[10px] text-slate-500 font-bold uppercase">{systemStatus?.scheduler_enabled ? 'System is LIVE & Harvesting' : 'System PAUSED (Manual Only)'}</div>
+                        </div>
+                    </div>
+
+                    <button
+                        onClick={handleToggleScheduler}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${systemStatus?.scheduler_enabled ? 'bg-emerald-600' : 'bg-slate-700'}`}
+                    >
+                        <span
+                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${systemStatus?.scheduler_enabled ? 'translate-x-6' : 'translate-x-1'}`}
+                        />
+                    </button>
+                </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <button
                         onClick={() => handleAction(triggerNewsFetch, 'News Fetch')}

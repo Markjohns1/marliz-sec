@@ -47,7 +47,9 @@ import {
     updateArticle,
     getArticleStats,
     getAdminArticles,
-    publishArticle
+    publishArticle,
+    getSystemStatus,
+    toggleScheduler
 } from '../services/api';
 
 import AdminGuide from '../components/AdminGuide';
@@ -82,6 +84,7 @@ export default function AdminDashboard() {
     const [artSearch, setArtSearch] = useState('');
     const [artSort, setArtSort] = useState('date');
     const [artPage, setArtPage] = useState(1);
+    const [systemStatus, setSystemStatus] = useState({ scheduler_enabled: true });
 
     // Fetch Stats
     const { data: stats, isLoading, refetch } = useQuery({
@@ -101,6 +104,19 @@ export default function AdminDashboard() {
         queryFn: () => getAdminArticles({ page: artPage, sort_by: artSort, search: artSearch }),
         enabled: activeTab === 'articles'
     });
+
+    // Fetch System Status
+    useEffect(() => {
+        const fetchStatus = async () => {
+            try {
+                const status = await getSystemStatus();
+                setSystemStatus(status);
+            } catch (error) {
+                console.error("Failed to fetch system status:", error);
+            }
+        };
+        fetchStatus();
+    }, []);
 
     const handleLogout = () => {
         logout();
@@ -149,6 +165,23 @@ export default function AdminDashboard() {
             clearInterval(progressInterval);
             setActionLoading(null);
             await refetch();
+        }
+    };
+
+    const handleToggleScheduler = async () => {
+        const newStatus = !systemStatus.scheduler_enabled;
+        try {
+            setActionLoading('System Config');
+            await toggleScheduler(newStatus);
+            setSystemStatus({ scheduler_enabled: newStatus });
+            setMessage({
+                type: 'success',
+                text: `✓ Automation ${newStatus ? 'ENABLED' : 'PAUSED'}. Background workers will ${newStatus ? 'now' : 'no longer'} process articles.`
+            });
+        } catch (error) {
+            setMessage({ type: 'error', text: `Failed to toggle automation: ${error.message}` });
+        } finally {
+            setActionLoading(null);
         }
     };
 
@@ -258,6 +291,8 @@ export default function AdminDashboard() {
                         setViewingStats={setViewingStats}
                         setSharingArticle={setSharingArticle}
                         handleToggleProtection={handleToggleProtection}
+                        systemStatus={systemStatus}
+                        handleToggleScheduler={handleToggleScheduler}
                     />
                 )}
 

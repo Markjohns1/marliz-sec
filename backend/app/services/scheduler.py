@@ -3,6 +3,7 @@ from apscheduler.triggers.interval import IntervalTrigger
 from datetime import datetime
 import os
 import logging
+from sqlalchemy import select
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -10,8 +11,32 @@ logger = logging.getLogger(__name__)
 # Initialize scheduler
 scheduler = AsyncIOScheduler()
 
+async def is_scheduler_enabled() -> bool:
+    """Check if the scheduler is enabled in the system settings database"""
+    from app.database import get_db_context
+    from app.models import SystemSettings
+    
+    try:
+        async with get_db_context() as db:
+            stmt = select(SystemSettings).filter_by(key="scheduler_enabled")
+            result = await db.execute(stmt)
+            setting = result.scalars().first()
+            
+            if setting:
+                return setting.value.lower() == "true"
+            
+            # Default to True if setting doesn't exist yet
+            return True
+    except Exception as e:
+        logger.error(f"Error checking scheduler status: {str(e)}")
+        return True # Fallback to enabled
+
 async def fetch_news_job():
     """Background job to fetch news"""
+    if not await is_scheduler_enabled():
+        logger.info("⏸️ News fetcher is currently PAUSED via System Settings.")
+        return
+
     from app.services.news_fetcher import news_fetcher
     
     logger.info("🔄 Starting news fetch job...")
@@ -28,6 +53,10 @@ async def fetch_news_job():
 
 async def simplify_articles_job():
     """Background job to simplify articles with AI"""
+    if not await is_scheduler_enabled():
+        logger.info("🤖 AI Processor is currently PAUSED via System Settings.")
+        return
+
     from app.services.ai_simplifier import ai_simplifier
     
     logger.info("🤖 Starting AI simplification job...")
@@ -39,6 +68,10 @@ async def simplify_articles_job():
 
 async def newsletter_digest_job():
     """Background job to send daily intelligence digest"""
+    if not await is_scheduler_enabled():
+        logger.info("📧 Newsletter Processor is currently PAUSED via System Settings.")
+        return
+
     from app.services.newsletter import newsletter_service
     
     logger.info("📧 Starting daily newsletter digest job...")
@@ -154,7 +187,7 @@ def start_scheduler():
     )
     
     scheduler.start()
-    logger.info("🚀 Scheduler STARTED. Automated news fetching and 'Supercharged' AI processing are now ACTIVE.")
+    logger.info("Scheduler STARTED. Automated news fetching and 'Supercharged' AI processing are now ACTIVE.")
 
 def stop_scheduler():
     """Stop scheduler gracefully"""

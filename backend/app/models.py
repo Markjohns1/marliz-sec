@@ -148,3 +148,14 @@ class DeletedArticle(Base):
     slug = Column(String(600), unique=True, nullable=False, index=True)
     deleted_at = Column(DateTime(timezone=True), server_default=func.now())
     reason = Column(String(200), default="Content cleanup")
+
+class SystemSettings(Base):
+    """
+    Persistent application settings stored in the database.
+    """
+    __tablename__ = "system_settings"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    key = Column(String(50), unique=True, index=True)  # e.g., 'scheduler_enabled'
+    value = Column(String(200)) # Store as string, parse as needed
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
