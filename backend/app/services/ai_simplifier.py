@@ -316,13 +316,19 @@ OUTPUT RULES:
                 # Update the impact section
                 existing.business_impact = str(impact_text).strip()
                 
+                # Refresh timestamp
                 article.updated_at = datetime.utcnow()
                 
+                # Final flush and commit
+                await db.flush()
                 await db.commit()
                 return "success"
         except Exception as e:
-            await db.rollback()  # CRITICAL FIX for PendingRollbackError
-            logger.error(f"Refinement failed for {article.id}: {e}")
+            try:
+                await db.rollback()
+            except:
+                pass
+            logger.error(f"Refinement failed for {article.id}: {str(e)}")
             return "api_error"
             
     def _build_prompt(self, article, content):
