@@ -285,23 +285,43 @@ OUTPUT RULES:
                 resp = await client.post(self.base_url, headers=headers, json=data)
                 resp.raise_for_status()
                 res = resp.json()
-                content = json.loads(res["choices"][0]["message"]["content"])
+                raw_content = res["choices"][0]["message"]["content"]
+                
+                # Robust JSON parsing
+                try:
+                    content = json.loads(raw_content)
+                except json.JSONDecodeError:
+                    # Fallback if AI didn't return perfect JSON
+                    logger.error(f"Fallen back on JSON error for {article.id}")
+                    return "api_error"
 
-                # 3. APPEND to existing content instead of overwriting
-                # Check if it already has the assessment to prevent double-appending
+                # 3. EXTRACT STRINGS (In case AI returned nested dicts)
+                assessment_text = content.get('assessment', "")
+                if isinstance(assessment_text, dict):
+                    assessment_text = next(iter(assessment_text.values()), str(assessment_text))
+                
+                impact_text = content.get('impact', "")
+                if isinstance(impact_text, dict):
+                    impact_text = next(iter(impact_text.values()), str(impact_text))
+
+                # 4. APPEND to existing content instead of overwriting
                 if "Marliz Intel Strategic Assessment" not in (existing.friendly_summary or ""):
-                    new_summary = f"{existing.friendly_summary}\n\n{content['assessment']}"
-                    existing.friendly_summary = new_summary
+                    # Clear formatting check
+                    clean_assessment = str(assessment_text).strip()
+                    if not clean_assessment.startswith("##"):
+                        clean_assessment = f"## Marliz Intel Strategic Assessment\n\n{clean_assessment}"
+                    
+                    existing.friendly_summary = f"{existing.friendly_summary}\n\n{clean_assessment}"
                 
-                # Update the impact section with the new expanded version
-                existing.business_impact = content['impact']
+                # Update the impact section
+                existing.business_impact = str(impact_text).strip()
                 
-                # Refresh timestamp for search engines
                 article.updated_at = datetime.utcnow()
                 
                 await db.commit()
                 return "success"
         except Exception as e:
+            await db.rollback()  # CRITICAL FIX for PendingRollbackError
             logger.error(f"Refinement failed for {article.id}: {e}")
             return "api_error"
             
