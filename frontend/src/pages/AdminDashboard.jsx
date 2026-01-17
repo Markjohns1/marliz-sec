@@ -264,7 +264,7 @@ export default function AdminDashboard() {
                                 key={tab.id}
                                 data-tab={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`flex items-center gap-2 px-6 h-full text-xs sm:text-sm font-bold opacity-90 transition-all border-b-2 whitespace-nowrap ${activeTab === tab.id
+                                className={`flex items-center gap-2 px-4 md:px-6 h-full text-xs sm:text-sm font-bold opacity-90 transition-all border-b-2 whitespace-nowrap ${activeTab === tab.id
                                     ? 'border-red-500 text-red-500 bg-red-500/5'
                                     : 'border-transparent text-slate-500 hover:text-slate-300 hover:bg-white/5'
                                     }`}
@@ -277,8 +277,8 @@ export default function AdminDashboard() {
                 </div>
             </div>
 
-            {/* Main Content - CRITICAL: High padding (pt-64) to clear the multi-layer fixed header on mobile */}
-            <div className="container mx-auto max-w-6xl px-4 pt-64 md:pt-44 pb-32">
+            {/* Main Content - Reduced mobile padding (pt-48) to reclaim space while still clearing fixed header */}
+            <div className="container mx-auto max-w-6xl px-4 pt-48 md:pt-44 pb-32">
 
                 {activeTab === 'overview' && (
                     <OverviewTab
