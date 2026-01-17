@@ -50,10 +50,17 @@ async def smart_refine():
                 if content:
                     # Check for the specific header or signature phrase
                     full_text = (content.friendly_summary or "") + (content.business_impact or "")
+                    
+                    # LOGIC UPDATE: Even if it has the header, checking length!
+                    # If length is < 2000 characters (approx 300 words), it's a BAD GENERATION.
+                    # We must re-process it.
                     if "Marliz Intel Strategic Assessment" in full_text:
-                        logger.info(f"⏭️  SKIP: Article {article.id} already has assessment. Saving tokens.")
-                        SKIPPED_COUNT += 1
-                        continue
+                        if len(full_text) > 2000:
+                            logger.info(f"⏭️  SKIP: Article {article.id} has assessment AND good length. Saving tokens.")
+                            SKIPPED_COUNT += 1
+                            continue
+                        else:
+                            logger.warning(f"♻️  REDO: Article {article.id} has assessment but is TOO SHORT ({len(full_text)} chars). Fixing...")
                 
                 # 2. PREPARE: Temporarily mark as PROCESSING so specific logic isn't triggered if any
                 # But actually, ai_simplifier handles the status update. 
