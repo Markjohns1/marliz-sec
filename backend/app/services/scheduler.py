@@ -95,35 +95,35 @@ def start_scheduler():
     
     # Fetch news twice daily: 7 AM and 7 PM EAT (East Africa Time = UTC+3)
     # 4 AM UTC = 7 AM EAT, 4 PM UTC = 7 PM EAT
-    scheduler.add_job(
-        fetch_news_job,
-        trigger="cron",
-        hour=4,
-        minute=0,
-        id="fetch_news_morning",
-        name="Morning news fetch (7 AM EAT)",
-        replace_existing=True
-    )
+    # PAUSED FOR MANUAL REFINEMENT
+    # scheduler.add_job(
+    #     fetch_news_job,
+    #     trigger="cron",
+    #     hour=4,
+    #     minute=0,
+    #     id="fetch_news_morning",
+    #     name="Morning news fetch (7 AM EAT)",
+    #     replace_existing=True
+    # )
     
-    scheduler.add_job(
-        fetch_news_job,
-        trigger="cron",
-        hour=16,
-        minute=0,
-        id="fetch_news_evening",
-        name="Evening news fetch (7 PM EAT)",
-        replace_existing=True
-    )
+    # scheduler.add_job(
+    #     fetch_news_job,
+    #     trigger="cron",
+    #     hour=16,
+    #     minute=0,
+    #     id="fetch_news_evening",
+    #     name="Evening news fetch (7 PM EAT)",
+    #     replace_existing=True
+    # )
     
-    # Simplify articles every 30 minutes - DISABLED
-    # Simplify articles every 30 minutes
-    scheduler.add_job(
-        simplify_articles_job,
-        trigger=IntervalTrigger(minutes=30),
-        id="simplify_articles",
-        name="Simplify articles with AI",
-        replace_existing=True
-    )
+    # Simplify articles every 30 minutes - PAUSED
+    # scheduler.add_job(
+    #     simplify_articles_job,
+    #     trigger=IntervalTrigger(minutes=30),
+    #     id="simplify_articles",
+    #     name="Simplify articles with AI",
+    #     replace_existing=True
+    # )
     
     # Cleanup every 24 hours at 3 AM
     scheduler.add_job(
@@ -160,7 +160,7 @@ def start_scheduler():
     # )
     
     scheduler.start()
-    logger.info("✓ Scheduler STARTED. Automation active.")
+    logger.info("⏸️ Scheduler STARTED (PAUSED Context). News Fetching and AI Processing are currently DISABLED for manual refinement.")
 
 def stop_scheduler():
     """Stop scheduler gracefully"""
