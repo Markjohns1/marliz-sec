@@ -262,15 +262,23 @@ class AISimplifier:
 Your job is to ADD two specific, high-value sections to it. 
 
 EXISTING TITLE: {article.title}
-EXISTING SUMMARY: {existing.friendly_summary[:2000]}
+EXISTING SUMMARY: {existing.friendly_summary[:1500]}
 
-MANDATE:
-1. Create a section: ## Marliz Intel Strategic Assessment
-   - Write 200-300 words. Provide a unique, expert opinion, predictions, and trend analysis. 
-2. Create a section: ## Business & Operational Impact
-   - Write 150-250 words. Expand on the financial and operational fallout for organizations.
+MANDATE (INTERNAL ANALYSIS):
+1. **Marliz Intel Strategic Assessment**:
+   - WRITE 300+ WORDS of PURE ANALYSIS.
+   - **DO NOT** repeat facts from the existing summary. 
+   - **DO NOT** use bullet points. Use deep, analytical paragraphs.
+   - YOU MUST PROVIDE:
+     a) A prediction of how this threat evolves in 2026.
+     b) A comparison to a similar historical breach (e.g. SolarWinds, MoveIT, etc).
+     c) A criticism of the current security "best practices" that failed here.
+2. **Business & Operational Impact**:
+   - WRITE 200+ WORDS.
+   - Focus on the "Downstream" costs: Insurance premium hikes, Class-Action litigation risks, and the cost of "Trust Erosion" in the specific sector (e.g. Healthcare, Finance).
 
-OUTPUT RULES:
+STRICT RULES:
+- ZERO REPETITION. If you repeat the existing summary, the task is a failure.
 - Return ONLY a JSON object with two keys: "assessment" and "impact".
 - No other text. Escape newlines as \\n.
 """
@@ -285,41 +293,44 @@ OUTPUT RULES:
                 resp = await client.post(self.base_url, headers=headers, json=data)
                 resp.raise_for_status()
                 res = resp.json()
-                raw_content = res["choices"][0]["message"]["content"]
-                
                 # Robust JSON parsing
                 try:
                     content = json.loads(raw_content)
                 except json.JSONDecodeError:
-                    # Fallback if AI didn't return perfect JSON
-                    logger.error(f"Fallen back on JSON error for {article.id}")
+                    logger.error(f"JSON Error for {article.id}")
                     return "api_error"
 
-                # 3. EXTRACT STRINGS (In case AI returned nested dicts)
+                # 3. EXTRACT AND CLEAN (Strictly ignore AI-generated headers to prevent doubling)
                 assessment_text = content.get('assessment', "")
                 if isinstance(assessment_text, dict):
                     assessment_text = next(iter(assessment_text.values()), str(assessment_text))
                 
+                # Strip any ## headers the AI might have accidentally returned
+                assessment_text = str(assessment_text).replace("## Marliz Intel Strategic Assessment", "").replace("## Strategic Assessment", "").strip()
+                
                 impact_text = content.get('impact', "")
                 if isinstance(impact_text, dict):
                     impact_text = next(iter(impact_text.values()), str(impact_text))
+                impact_text = str(impact_text).replace("## Business & Operational Impact", "").strip()
 
-                # 4. APPEND to existing content instead of overwriting
-                if "Marliz Intel Strategic Assessment" not in (existing.friendly_summary or ""):
-                    # Clear formatting check
-                    clean_assessment = str(assessment_text).strip()
-                    if not clean_assessment.startswith("##"):
-                        clean_assessment = f"## Marliz Intel Strategic Assessment\n\n{clean_assessment}"
-                    
-                    existing.friendly_summary = f"{existing.friendly_summary}\n\n{clean_assessment}"
+                # 4. SURGICAL CLEANUP (Remove any existing duplicated headers in the summary)
+                current_summary = existing.friendly_summary or ""
+                # If we already have a 'Strategic Assessment' header, we'll strip everything from that point on
+                # and replace it with the fresh, high-quality one.
+                if "## Marliz Intel Strategic Assessment" in current_summary:
+                    current_summary = current_summary.split("## Marliz Intel Strategic Assessment")[0].strip()
+
+                # 5. RE-ASSEMBLE with Deep Content
+                # Force a clean, single header and the new deep paragraph
+                new_assessment_block = f"\n\n## Marliz Intel Strategic Assessment\n\n{assessment_text}"
+                existing.friendly_summary = f"{current_summary}\n\n{new_assessment_block}"
                 
-                # Update the impact section
-                existing.business_impact = str(impact_text).strip()
+                # Update the impact section with the expanded text
+                existing.business_impact = impact_text
                 
                 # Refresh timestamp
                 article.updated_at = datetime.utcnow()
                 
-                # Final flush and commit
                 await db.flush()
                 await db.commit()
                 return "success"
