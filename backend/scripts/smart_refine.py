@@ -78,13 +78,12 @@ async def smart_refine():
                     
                     # 4. SLEEP: Wait 15 seconds to be kind to Groq API limits
                     # User requested we don't 'stop forever', but we must rate limit slightly
-                    logger.info("⏳ Waiting 45s for rate limits...")
-                    await asyncio.sleep(45)
+                    logger.info("⏳ Waiting 10s for rate limits...")
+                    await asyncio.sleep(10)
                     
                 elif status == "rate_limited":
-                    logger.warning("⚠️ Rate Limit Triggered. Pausing for 3 minutes...")
-                    await asyncio.sleep(180)
-                    FAILED_COUNT += 1
+                    logger.warning("🛑 RATE LIMITED. Stopping now. Run again in 5 minutes.")
+                    break  # Exit the loop, stop processing
                 else:
                     logger.error(f"❌ FAILED: Status {status}")
                     FAILED_COUNT += 1
