@@ -12,6 +12,8 @@ import asyncio
 from datetime import datetime, timedelta
 from slugify import slugify
 
+router = APIRouter(prefix="/api/articles", tags=["articles"])
+
 # System Status Router
 @router.get("/system/status")
 async def get_system_status(db: AsyncSession = Depends(get_db)):
@@ -43,9 +45,6 @@ async def toggle_scheduler(enabled: bool, api_key = Depends(verify_api_key), db:
         
     await db.commit()
     return {"status": "success", "scheduler_enabled": enabled}
-
-
-router = APIRouter(prefix="/api/articles", tags=["articles"])
 
 def get_source_type(referer: str, user_agent: str = None, query_ref: str = None) -> str:
     # 0. Bot Identification (AI & Crawlers)
