@@ -361,30 +361,29 @@ YOUR MANDATE:
 4. **ADVISE** specific stakeholders with technically accurate protocols.
 
 REQUIRED SECTIONS (Use Markdown ## headers):
-1. **Executive Intelligence**: A high-level synthesis of *what* happened and *why it matters* to a CTO/CISO.
-2. **Technical Deep Dive**: The "How". Explain the kill chain, CVEs, or exploit mechanics.
-3. **Marliz Intel Strategic Assessment**: **CRITICAL SECTION.** This must be YOUR unique voice. predicting future fallout, criticizing the failure, or connecting this to a larger pattern. Do NOT just repeat facts. Give an OPINION based on expertise.
-4. **Business Impact Analysis**: Financial, reputational, and operational costs. 
-5. **Mitigation Protocols**: A prioritized checklist for defense.
+1. **Executive Intelligence**: A high-level synthesis of *what* happened and *why it matters* to a CTO/CISO. (400+ words)
+2. **Technical Deep Dive**: The "How". Explain the kill chain, CVEs, or exploit mechanics. (400+ words)
+3. **Marliz Intel Strategic Assessment**: **CRITICAL SECTION.** Provide a unique voice, prediction, and historical comparison. (400+ words)
+4. **Business Impact Analysis**: Financial, reputational, and operational costs. (200+ words)
+5. **Mitigation Protocols**: A prioritized checklist for defense. (200+ words)
 
 STRICT CONTENT VOLUME RULES:
-- **EXPAND. EXPAND. EXPAND.**
-- Total output MUST be a minimum of 1200 words.
+- **TOTAL CONTENT TARGET: 1500+ WORDS.**
+- **NO EM-DASHES:** You are strictly forbidden from using the em-dash character (`—`). Use semicolons or hyphens instead.
 - If the source content is short, you MUST supplement it with:
-  1. Definitions of technical terms (e.g., "What is a Buffer Overflow?").
-  2. History of the attacker group (e.g., "LockBit's history since 2019...").
-  3. Industry context (e.g., "Why healthcare is a prime target...").
-- **NEVER** return a short summary. It is better to be repetitive than short.
-- The "Executive Intelligence" section alone should be 400 words.
+  1. Technical definitions and protocol mechanics.
+  2. Historical context of the threat group or vulnerability class.
+  3. Strategic analysis of the "Downstream" ripple effects.
+- **NEVER** return a short summary. 
 
 FIELD INSTRUCTIONS:
 - "is_relevant": Set to true if cybersecurity related, false if political/war content.
 - "category": Choose ONE from: ransomware, phishing, data-breach, malware, vulnerability, general
 - "seo_title": Create a compelling, urgent headline (60 chars max).
 - "meta_description": Write exactly 150-160 characters. Must be a "Click-Magnet" hook.
-- "summary": The combined text of "Executive Intelligence", "Marliz Intel Strategic Assessment", and "Technical Deep Dive". Total length 800-1500 words.
-- "attack_vector": Write a FULL PARAGRAPH (150-250 words) explaining HOW the attack happened. Include technical details, CVEs if applicable, and the step-by-step kill chain.
-- "impact": Write a FULL PARAGRAPH (150-250 words) explaining the business, financial, and reputational consequences. Include estimated costs if possible.
+- "summary": The combined text of "Executive Intelligence", "Technical Deep Dive", and "Marliz Intel Strategic Assessment".
+- "attack_vector": Write a FULL Technical Analysis (250+ words).
+- "impact": Write a FULL Business Impact Analysis (250+ words).
 - "actions": Provide 3-5 specific actionable steps as an array of strings.
 - "threat_level": Choose ONE from: low, medium, high, critical
 
@@ -394,7 +393,7 @@ CRITICAL OUTPUT RULES:
 3. Use \\n for newlines inside string values.
 4. **DO NOT SOUND LIKE A BOT.** Write with authority, edge, and professional confidence.
 
-NOW ANALYZE THE ARTICLE AND RETURN YOUR JSON RESPONSE:"""
+NOW PRODUCE THE 'SUPERCHARGED' INTELLIGENCE REPORT:"""
     
     def _parse_response(self, response_text: str) -> dict:
         """Parse Groq's JSON response with aggressive cleaning for control characters."""

@@ -95,35 +95,34 @@ def start_scheduler():
     
     # Fetch news twice daily: 7 AM and 7 PM EAT (East Africa Time = UTC+3)
     # 4 AM UTC = 7 AM EAT, 4 PM UTC = 7 PM EAT
-    # PAUSED FOR MANUAL REFINEMENT
-    # scheduler.add_job(
-    #     fetch_news_job,
-    #     trigger="cron",
-    #     hour=4,
-    #     minute=0,
-    #     id="fetch_news_morning",
-    #     name="Morning news fetch (7 AM EAT)",
-    #     replace_existing=True
-    # )
+    scheduler.add_job(
+        fetch_news_job,
+        trigger="cron",
+        hour=4,
+        minute=0,
+        id="fetch_news_morning",
+        name="Morning news fetch (7 AM EAT)",
+        replace_existing=True
+    )
     
-    # scheduler.add_job(
-    #     fetch_news_job,
-    #     trigger="cron",
-    #     hour=16,
-    #     minute=0,
-    #     id="fetch_news_evening",
-    #     name="Evening news fetch (7 PM EAT)",
-    #     replace_existing=True
-    # )
+    scheduler.add_job(
+        fetch_news_job,
+        trigger="cron",
+        hour=16,
+        minute=0,
+        id="fetch_news_evening",
+        name="Evening news fetch (7 PM EAT)",
+        replace_existing=True
+    )
     
-    # Simplify articles every 30 minutes - PAUSED
-    # scheduler.add_job(
-    #     simplify_articles_job,
-    #     trigger=IntervalTrigger(minutes=30),
-    #     id="simplify_articles",
-    #     name="Simplify articles with AI",
-    #     replace_existing=True
-    # )
+    # Simplify articles every 30 minutes
+    scheduler.add_job(
+        simplify_articles_job,
+        trigger=IntervalTrigger(minutes=30),
+        id="simplify_articles",
+        name="Simplify articles with AI",
+        replace_existing=True
+    )
     
     # Cleanup every 24 hours at 3 AM
     scheduler.add_job(
@@ -147,20 +146,15 @@ def start_scheduler():
         replace_existing=True
     )
     
-    # Run jobs immediately on startup - DISABLED TO SAVE API
-    # scheduler.add_job(
-    #     fetch_news_job,
-    #     id="startup_fetch",
-    #     name="Initial news fetch"
-    # )
-    # scheduler.add_job(
-    #     cleanup_job,
-    #     id="startup_cleanup",
-    #     name="Initial cleanup"
-    # )
+    # Run initial cleanup on startup
+    scheduler.add_job(
+        cleanup_job,
+        id="startup_cleanup",
+        name="Initial cleanup"
+    )
     
     scheduler.start()
-    logger.info("⏸️ Scheduler STARTED (PAUSED Context). News Fetching and AI Processing are currently DISABLED for manual refinement.")
+    logger.info("🚀 Scheduler STARTED. Automated news fetching and 'Supercharged' AI processing are now ACTIVE.")
 
 def stop_scheduler():
     """Stop scheduler gracefully"""
