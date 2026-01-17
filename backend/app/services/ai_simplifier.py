@@ -246,66 +246,44 @@ class AISimplifier:
     def _build_prompt(self, article, content):
         """Build precise prompt for Groq AI with advanced SEO optimization and business-focused intelligence."""
         
-        return f"""You are 'Marliz Intel', a Senior Cyber Threat Intelligence Analyst AND Strategic SEO Specialist.
-Your report MUST be authoritative, deep, and provide proprietary-grade value.
+        return f"""You are 'Marliz Intel', a Senior Strategic Cyber Analyst.
+Your goal is NOT to summarize news. Your goal is to PRODUCE PROPRIETARY INTELLIGENCE based on the news.
+To satisfy Google AdSense 'High Value Content' guidelines, you must add UNIQUE INSIGHTS, PREDICTIONS, and STRATEGIC CONTEXT that is likely missing from the source text.
 
-ARTICLE TO ANALYZE:
+ARTICLE DATA:
 Title: {article.title}
 Source: {article.source_name or 'Intelligence feed'}
-Content: {content[:10000]}
+Content: {content[:12000]}
 
-YOUR MISSION:
-1. TECHNICAL AUDIT: Analyze the mechanism (CVEs, tools, tactics).
-2. STRATEGIC REWRITE: Create a long-form Intel Report (Target: 1000-2200 words).
-3. ADAPTIVE SEO: Generate a high-conversion Title and Meta Description.
-4. ACTIONABLE PROTOCOLS: Provide clear, prioritized mitigation steps.
+YOUR MANDATE:
+1. **TRANSFORM** the raw news into a C-Level Intelligence Report.
+2. **SYNTHESIZE** the facts with broader industry trends (e.g., "This aligns with the rise in Q3 ransomware...").
+3. **PREDICT** the downstream consequences (e.g., "We expect regulatory fines to exceed...").
+4. **ADVISE** specific stakeholders with technically accurate protocols.
 
-CONTENT VOLUME REQUIREMENT:
-- You MUST write at least 6-8 comprehensive sections.
-- Every section must be deep and analytical.
-- Your TOTAL OUTPUT for summary + attack_vector + impact MUST be at least 6000-8000 characters (approx 1000-1500 words).
-- If the source news is short, you MUST supplement it with relevant threat intelligence history, technical definitions, and industry post-mortems.
+REQUIRED SECTIONS (Use Markdown ## headers):
+1. **Executive Intelligence**: A high-level synthesis of *what* happened and *why it matters* to a CTO/CISO.
+2. **Technical Deep Dive**: The "How". Explain the kill chain, CVEs, or exploit mechanics.
+3. **Marliz Intel Strategic Assessment**: **CRITICAL SECTION.** This must be YOUR unique voice. predicting future fallout, criticizing the failure, or connecting this to a larger pattern. Do NOT just repeat facts. Give an OPINION based on expertise.
+4. **Business Impact Analysis**: Financial, reputational, and operational costs. 
+5. **Mitigation Protocols**: A prioritized checklist for defense.
 
 FIELD INSTRUCTIONS:
 - "is_relevant": Set to true if cybersecurity related, false if political/war content.
 - "category": Choose ONE from: ransomware, phishing, data-breach, malware, vulnerability, general
-- "seo_title": Create a compelling headline like "Microsoft Breach: 30M Users Exposed – Update Now"
-- "meta_description": Write exactly 150-160 characters with a hook and call-to-action.
-- "summary": Write 800-1600 words of deep analysis. Use markdown headers (##) and paragraphs.
-- "attack_vector": Explain the technical mechanism in detail (CVEs, exploits, tools used).
-- "impact": Explain business/financial/reputational consequences for organizations.
-- "who_is_at_risk": List specific sectors, systems, or user types affected.
+- "seo_title": Create a compelling, urgent headline (60 chars max).
+- "meta_description": Write exactly 150-160 characters. Must be a "Click-Magnet" hook.
+- "summary": The combined text of "Executive Intelligence", "Marliz Intel Strategic Assessment", and "Technical Deep Dive". Total length 800-1500 words.
+- "attack_vector": A technical summary of the 'Deep Dive' section.
+- "impact": A summary of the 'Business Impact' section.
 - "actions": Provide 3-5 specific actionable steps as an array of strings.
 - "threat_level": Choose ONE from: low, medium, high, critical
-- "keywords": Provide 3-5 SEO keywords as an array of strings.
-
-CONTENT DEPTH REQUIREMENT:
-- MINIMUM 800 WORDS TOTAL across summary, attack_vector, and impact.
-- If source is short, EXPAND by explaining threat history, defining technical terms, and adding industry context.
 
 CRITICAL OUTPUT RULES:
-1. Return ONLY a valid JSON object. No markdown wrappers like ```json.
+1. Return ONLY a valid JSON object.
 2. Escape internal double quotes as \\"
 3. Use \\n for newlines inside string values.
-4. Fill in REAL content - do not copy these instructions.
-
-EXAMPLE OUTPUT (fill in with REAL analysis, not these placeholders):
-{{
-  "is_relevant": true,
-  "category": "data-breach",
-  "seo_title": "Company Name Breach: X Million Records Exposed – Take Action",
-  "meta_description": "A critical data breach at Company exposed X million records. Learn what happened and how to protect yourself now.",
-  "summary": "## Executive Summary\\n\\nYour detailed 800+ word analysis goes here...",
-  "attack_vector": "## Technical Analysis\\n\\nDetailed technical breakdown...",
-  "impact": "## Business Impact\\n\\nFinancial and operational consequences...",
-  "who_is_at_risk": "Healthcare organizations, financial institutions, and SMBs using affected software.",
-  "actions": ["Immediately rotate all credentials", "Apply security patch version X.X", "Enable MFA on all accounts", "Monitor logs for suspicious activity"],
-  "threat_level": "high",
-  "keywords": ["data breach", "cybersecurity", "credential theft"]
-}}
-
-ADSENSE COMPLIANCE:
-- If the article discusses war (Ukraine, Gaza, Israel), political propaganda, or violence, set "is_relevant": false.
+4. **DO NOT SOUND LIKE A BOT.** Write with authority, edge, and professional confidence.
 
 NOW ANALYZE THE ARTICLE AND RETURN YOUR JSON RESPONSE:"""
     
