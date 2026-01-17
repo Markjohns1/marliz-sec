@@ -268,6 +268,16 @@ REQUIRED SECTIONS (Use Markdown ## headers):
 4. **Business Impact Analysis**: Financial, reputational, and operational costs. 
 5. **Mitigation Protocols**: A prioritized checklist for defense.
 
+STRICT CONTENT VOLUME RULES:
+- **EXPAND. EXPAND. EXPAND.**
+- Total output MUST be a minimum of 1200 words.
+- If the source content is short, you MUST supplement it with:
+  1. Definitions of technical terms (e.g., "What is a Buffer Overflow?").
+  2. History of the attacker group (e.g., "LockBit's history since 2019...").
+  3. Industry context (e.g., "Why healthcare is a prime target...").
+- **NEVER** return a short summary. It is better to be repetitive than short.
+- The "Executive Intelligence" section alone should be 400 words.
+
 FIELD INSTRUCTIONS:
 - "is_relevant": Set to true if cybersecurity related, false if political/war content.
 - "category": Choose ONE from: ransomware, phishing, data-breach, malware, vulnerability, general
