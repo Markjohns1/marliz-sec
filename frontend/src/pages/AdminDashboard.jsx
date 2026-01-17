@@ -257,6 +257,7 @@ export default function AdminDashboard() {
                             { id: 'newsletter', label: 'Newsletter', icon: Mail },
                             { id: 'categories', label: 'Insights', icon: FolderOpen },
                             { id: 'health', label: 'Health', icon: Activity },
+                            { id: 'settings', label: 'Settings', icon: SettingsIcon },
                             { id: 'guide', label: 'Playbook', icon: BookOpen },
                         ].map((tab) => (
                             <button
@@ -322,7 +323,12 @@ export default function AdminDashboard() {
                     />
                 )}
 
-                {activeTab === 'settings' && <SettingsTab />}
+                {activeTab === 'settings' && (
+                    <SettingsTab
+                        systemStatus={systemStatus}
+                        handleToggleScheduler={handleToggleScheduler}
+                    />
+                )}
 
                 {activeTab === 'publish' && (
                     <QuickPublishTab onPublishSuccess={() => { refetch(); artRefetch(); }} />

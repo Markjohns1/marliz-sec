@@ -192,34 +192,14 @@ export default function OverviewTab({
                     Operational Controls
                 </h3>
 
-                <div className="mb-6 flex items-center justify-between p-4 bg-slate-950/50 rounded-2xl border border-white/5">
-                    <div className="flex items-center gap-3">
-                        <div className={`p-2 rounded-lg ${systemStatus?.scheduler_enabled ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>
-                            {systemStatus?.scheduler_enabled ? <Shield className="w-4 h-4" /> : <ShieldOff className="w-4 h-4" />}
-                        </div>
-                        <div>
-                            <div className="text-[10px] font-black uppercase tracking-widest text-white">Automated Intelligence</div>
-                            <div className="text-[10px] text-slate-500 font-bold uppercase">{systemStatus?.scheduler_enabled ? 'System is LIVE & Harvesting' : 'System PAUSED (Manual Only)'}</div>
-                        </div>
-                    </div>
-
-                    <button
-                        onClick={handleToggleScheduler}
-                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${systemStatus?.scheduler_enabled ? 'bg-emerald-600' : 'bg-slate-700'}`}
-                    >
-                        <span
-                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${systemStatus?.scheduler_enabled ? 'translate-x-6' : 'translate-x-1'}`}
-                        />
-                    </button>
-                </div>
-
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <button
                         onClick={() => handleAction(triggerNewsFetch, 'News Fetch')}
-                        disabled={actionLoading}
-                        className="flex items-center gap-4 p-5 rounded-2xl bg-slate-950 border border-slate-800 hover:border-primary-500/50 transition-all group"
+                        disabled={actionLoading || !systemStatus?.scheduler_enabled}
+                        className={`flex items-center gap-4 p-5 rounded-2xl bg-slate-950 border border-slate-800 transition-all group ${!systemStatus?.scheduler_enabled ? 'opacity-50 cursor-not-allowed' : 'hover:border-primary-500/50'}`}
+                        title={!systemStatus?.scheduler_enabled ? "Automation must be ENABLED in Settings to use this." : ""}
                     >
-                        <div className="p-3 bg-primary-900/30 rounded-xl text-primary-400 group-hover:bg-primary-500 group-hover:text-white transition-all">
+                        <div className={`p-3 rounded-xl transition-all ${!systemStatus?.scheduler_enabled ? 'bg-slate-800 text-slate-600' : 'bg-primary-900/30 text-primary-400 group-hover:bg-primary-500 group-hover:text-white'}`}>
                             <RefreshCw className={`w-5 h-5 ${actionLoading === 'News Fetch' ? 'animate-spin' : ''}`} />
                         </div>
                         <div className="text-left">
@@ -229,15 +209,16 @@ export default function OverviewTab({
                     </button>
                     <button
                         onClick={() => handleAction(triggerSimplify, 'Intel Processing')}
-                        disabled={actionLoading}
-                        className="relative flex items-center gap-4 p-5 rounded-2xl bg-slate-950 border border-slate-800 hover:border-purple-500/50 transition-all group overflow-hidden"
+                        disabled={actionLoading || !systemStatus?.scheduler_enabled}
+                        className={`relative flex items-center gap-4 p-5 rounded-2xl bg-slate-950 border border-slate-800 transition-all group overflow-hidden ${!systemStatus?.scheduler_enabled ? 'opacity-50 cursor-not-allowed' : 'hover:border-purple-500/50'}`}
+                        title={!systemStatus?.scheduler_enabled ? "Automation must be ENABLED in Settings to use this." : ""}
                     >
                         {stats?.pending > 0 && (
-                            <div className="absolute top-0 right-0 px-3 py-1 bg-purple-600 text-white text-[9px] font-black uppercase tracking-tighter rounded-bl-xl shadow-lg">
+                            <div className={`absolute top-0 right-0 px-3 py-1 text-white text-[9px] font-black uppercase tracking-tighter rounded-bl-xl shadow-lg ${!systemStatus?.scheduler_enabled ? 'bg-slate-700' : 'bg-purple-600'}`}>
                                 {stats.pending} QUEUED
                             </div>
                         )}
-                        <div className="p-3 bg-purple-900/30 rounded-xl text-purple-400 group-hover:bg-purple-500 group-hover:text-white transition-all">
+                        <div className={`p-3 rounded-xl transition-all ${!systemStatus?.scheduler_enabled ? 'bg-slate-800 text-slate-600' : 'bg-purple-900/30 text-purple-400 group-hover:bg-purple-500 group-hover:text-white'}`}>
                             <Zap className={`w-5 h-5 ${actionLoading === 'Intel Processing' ? 'animate-pulse' : ''}`} />
                         </div>
                         <div className="text-left">
