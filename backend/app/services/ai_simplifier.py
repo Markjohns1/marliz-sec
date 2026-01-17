@@ -284,8 +284,8 @@ FIELD INSTRUCTIONS:
 - "seo_title": Create a compelling, urgent headline (60 chars max).
 - "meta_description": Write exactly 150-160 characters. Must be a "Click-Magnet" hook.
 - "summary": The combined text of "Executive Intelligence", "Marliz Intel Strategic Assessment", and "Technical Deep Dive". Total length 800-1500 words.
-- "attack_vector": A technical summary of the 'Deep Dive' section.
-- "impact": A summary of the 'Business Impact' section.
+- "attack_vector": Write a FULL PARAGRAPH (150-250 words) explaining HOW the attack happened. Include technical details, CVEs if applicable, and the step-by-step kill chain.
+- "impact": Write a FULL PARAGRAPH (150-250 words) explaining the business, financial, and reputational consequences. Include estimated costs if possible.
 - "actions": Provide 3-5 specific actionable steps as an array of strings.
 - "threat_level": Choose ONE from: low, medium, high, critical
 

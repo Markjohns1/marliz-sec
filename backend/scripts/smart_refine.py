@@ -28,11 +28,11 @@ async def smart_refine():
     logger.info(f"🚀 Starting Smart Refiner (Target: Top {TARGET_COUNT} Articles)")
     
     async with get_db_context() as db:
-        # Get top 30 PUBLISHED or READY articles, ordered by newest first
-        # We want to fix the homepage first.
+        # Get NEXT 30 PUBLISHED or READY articles, ordered by newest first
+        # OFFSET 30 = Skip the first 30 (already done)
         stmt = select(Article).filter(
             Article.status.in_([ArticleStatus.PUBLISHED, ArticleStatus.READY])
-        ).order_by(desc(Article.published_at)).limit(TARGET_COUNT)
+        ).order_by(desc(Article.published_at)).offset(30).limit(TARGET_COUNT)
         
         result = await db.execute(stmt)
         articles = result.scalars().all()
