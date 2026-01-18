@@ -58,10 +58,5 @@ for row in rows:
 
 print("-" * 110)
 print(f"Total Active Articles: {len(rows)}")
-        # print(f"       Title: {title}")
-        # print("-" * 50)
-
-print("-" * 100)
-print(f"Total Thin Articles Found: {thin_count}")
 
 conn.close()
