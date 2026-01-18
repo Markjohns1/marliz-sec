@@ -36,7 +36,11 @@ query = """
     FROM articles a
     LEFT JOIN simplified_content sc ON a.id = sc.article_id
     WHERE a.status IN ('published', 'ready', 'edited')
-    ORDER BY a.id ASC
+    ORDER BY length(
+        COALESCE(sc.friendly_summary, '') || 
+        COALESCE(sc.attack_vector, '') || 
+        COALESCE(sc.business_impact, '')
+    ) ASC
 """
 
 cursor.execute(query)
