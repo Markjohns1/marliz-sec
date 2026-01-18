@@ -395,7 +395,8 @@ async def get_admin_articles(
     limit: int = Query(20, ge=1, le=100),
     category: Optional[str] = None,
     status: Optional[str] = None,
-    sort_by: Optional[str] = "date", # date, views, impressions, position
+    sort_by: Optional[str] = "date", # date, views, impressions, position, words
+    order: str = Query("desc"), # desc, asc
     search: Optional[str] = None,
     api_key = Depends(verify_api_key),
     db: AsyncSession = Depends(get_db)
@@ -415,15 +416,23 @@ async def get_admin_articles(
         search_term = f"%{search}%"
         query = query.filter(models.Article.title.ilike(search_term))
         
-    # Sorting
+    # Sorting logic
+    is_desc = order.lower() == "desc"
+    
     if sort_by == "views":
-        query = query.order_by(desc(models.Article.views))
+        query = query.order_by(desc(models.Article.views) if is_desc else models.Article.views.asc())
     elif sort_by == "impressions":
-        query = query.order_by(desc(models.Article.impressions))
+        query = query.order_by(desc(models.Article.impressions) if is_desc else models.Article.impressions.asc())
     elif sort_by == "position":
-        query = query.order_by(models.Article.position.asc())
+        query = query.order_by(models.Article.position.desc() if is_desc else models.Article.position.asc())
+    elif sort_by == "words":
+        # Sort by character length (SQL-only approximation)
+        word_sort = func.length(func.coalesce(models.SimplifiedContent.friendly_summary, '')) + \
+                    func.length(func.coalesce(models.SimplifiedContent.attack_vector, '')) + \
+                    func.length(func.coalesce(models.SimplifiedContent.business_impact, ''))
+        query = query.join(models.SimplifiedContent, isouter=True).order_by(desc(word_sort) if is_desc else word_sort.asc())
     else:
-        query = query.order_by(desc(models.Article.created_at))
+        query = query.order_by(desc(models.Article.created_at) if is_desc else models.Article.created_at.asc())
         
     # Count & Paginate
     count_query = select(func.count()).select_from(query.subquery())

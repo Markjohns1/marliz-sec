@@ -83,6 +83,7 @@ export default function AdminDashboard() {
     // Filter States for Articles Tab
     const [artSearch, setArtSearch] = useState('');
     const [artSort, setArtSort] = useState('date');
+    const [artOrder, setArtOrder] = useState('desc');
     const [artPage, setArtPage] = useState(1);
     const [systemStatus, setSystemStatus] = useState({ scheduler_enabled: true });
 
@@ -100,8 +101,13 @@ export default function AdminDashboard() {
 
     // Fetch Admin Articles List
     const { data: articleData, isLoading: artLoading, refetch: artRefetch } = useQuery({
-        queryKey: ['admin-articles', artPage, artSort, artSearch],
-        queryFn: () => getAdminArticles({ page: artPage, sort_by: artSort, search: artSearch }),
+        queryKey: ['admin-articles', artPage, artSort, artOrder, artSearch],
+        queryFn: () => getAdminArticles({
+            page: artPage,
+            sort_by: artSort,
+            order: artOrder,
+            search: artSearch
+        }),
         enabled: activeTab === 'articles'
     });
 
@@ -304,6 +310,8 @@ export default function AdminDashboard() {
                         setArtPage={setArtPage}
                         artSort={artSort}
                         setArtSort={setArtSort}
+                        artOrder={artOrder}
+                        setArtOrder={setArtOrder}
                         artLoading={artLoading}
                         articleData={articleData}
                         artPage={artPage}

@@ -43,9 +43,10 @@ export const getAdminArticles = async ({
   category = '',
   status = '',
   sort_by = 'date',
+  order = 'desc',
   search = ''
 } = {}) => {
-  const params = { page, limit, sort_by };
+  const params = { page, limit, sort_by, order };
   if (category) params.category = category;
   if (status) params.status = status;
   if (search) params.search = search;
