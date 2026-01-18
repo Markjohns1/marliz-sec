@@ -80,6 +80,15 @@ function AppContent() {
               </ProtectedRoute>
             }
           />
+          {/* Trap for broken 'undefined' links from old bugs */}
+          <Route path="*/undefined/*" element={
+            <div className="min-h-[60vh] flex flex-col items-center justify-center p-8 text-center">
+              <h1 className="text-6xl font-black text-slate-800 mb-4">410</h1>
+              <h2 className="text-2xl font-bold text-white mb-2">Content Permanently Removed</h2>
+              <p className="text-slate-400">The link you followed is broken and has been removed.</p>
+            </div>
+          } />
+
           {/* Catch-all route for broken/undefined links */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
