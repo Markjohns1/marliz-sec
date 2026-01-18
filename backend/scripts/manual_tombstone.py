@@ -26,8 +26,7 @@ if not db_path:
 
 # 2. THE GHOST LIST
 ghost_slugs = [
-    "chinese-hackers-use-anthropics-claude-ai-in-global-cyber-attack",
-    "cisa-loses-key-employee-behind-early-ransomware-warnings"
+    "cyberattack-at-kyowon-exposes-over-9-million-user-accounts-to-possible-breach"
 ]
 
 def bury_ghosts():
