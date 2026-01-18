@@ -1,20 +1,7 @@
-import sys
+import sqlite3
 import os
-from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker
 
-# 1. SETUP DATABASE CONNECTION
-# We use the sync driver for this maintenance script
-import sys
-# Add parent dir to path to import config if needed, though we will try to be standalone to avoid async issues
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-# Attempt to read the correct DB path from the environment or default to the file
-# On the server, the DB is likely at backend/cybersec_news.db relative to the project root
-# or adjacent to the app folder.
-DB_NAME = "cybersec_news.db"
-# We assume this script is run from the project root or backend/ folder.
-# Let's try to find the DB.
+# 1. FIND THE DATABASE
 candidate_paths = [
     "cybersec_news.db",
     "backend/cybersec_news.db",
@@ -29,17 +16,11 @@ for p in candidate_paths:
         break
 
 if not db_path:
-    # If not found (maybe first run on fresh deploy), default to the one in backend
+    # Fallback for server structure
     db_path = "backend/cybersec_news.db"
-    print(f"⚠️  Database not found locally, defaulting path to: {db_path} (Verify this explains why if running locally)")
+    print(f"⚠️  Database not found locally, defaulting to: {db_path}")
 
-# Standard SQLite URL
-DATABASE_URL = f"sqlite:///{db_path}"
-
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-# 2. THE GHOST LIST (URLs that are 404 but should be 410)
+# 2. THE GHOST LIST
 ghost_slugs = [
     "thailand-shifts-focus-on-border-disputes-targeting-cybercrime-syndicates",
     "chinese-hackers-use-anthropics-claude-ai-to-automate-90-of-cyber-espionage",
@@ -49,38 +30,34 @@ ghost_slugs = [
 ]
 
 def bury_ghosts():
-    db = SessionLocal()
-    print(f"\n👻 Attempting to bury {len(ghost_slugs)} ghosts...")
-    
-    count = 0
     try:
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        print(f"\n👻 Attempting to bury {len(ghost_slugs)} ghosts...")
+        
+        count = 0
         for slug in ghost_slugs:
-            # Check if likely already there
-            check_sql = text("SELECT count(*) FROM deleted_articles WHERE slug = :slug")
-            result = db.execute(check_sql, {"slug": slug}).scalar()
-            
-            if result > 0:
+            # Check if exists
+            cursor.execute("SELECT count(*) FROM deleted_articles WHERE slug = ?", (slug,))
+            if cursor.fetchone()[0] > 0:
                 print(f"   ⚰️  Already dead: {slug}")
                 continue
                 
-            # Insert into graveyard
-            # We use raw SQL to avoid model dependency issues with async/sync
-            insert_sql = text("""
+            # Insert
+            cursor.execute("""
                 INSERT INTO deleted_articles (slug, reason, deleted_at)
-                VALUES (:slug, 'Manual Cleanup of Old 404s', CURRENT_TIMESTAMP)
-            """)
-            db.execute(insert_sql, {"slug": slug})
+                VALUES (?, 'Manual Cleanup of Old 404s', DATE('now'))
+            """, (slug,))
+            
             print(f"   🔨 Buried: {slug}")
             count += 1
             
-        db.commit()
+        conn.commit()
         print(f"\n✅ SUCCESS: {count} ghosts converted to 410 Gone.")
+        conn.close()
         
     except Exception as e:
         print(f"\n❌ ERROR: {e}")
-        db.rollback()
-    finally:
-        db.close()
 
 if __name__ == "__main__":
     bury_ghosts()
