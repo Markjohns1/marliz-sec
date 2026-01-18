@@ -35,7 +35,7 @@ query = """
         COALESCE(sc.business_impact, '') as full_text
     FROM articles a
     LEFT JOIN simplified_content sc ON a.id = sc.article_id
-    WHERE a.status IN ('published', 'ready', 'edited')
+    WHERE UPPER(a.status) IN ('PUBLISHED', 'READY', 'EDITED')
     ORDER BY length(
         COALESCE(sc.friendly_summary, '') || 
         COALESCE(sc.attack_vector, '') || 
@@ -57,7 +57,7 @@ for row in rows:
     print(f"{id:<6} | {color}{word_count:<8}\033[0m | {status:<12} | {title[:60]}")
 
 print("-" * 110)
-print(f"Total Live Articles: {len(rows)}")
+print(f"Total Active Articles: {len(rows)}")
         # print(f"       Title: {title}")
         # print("-" * 50)
 
