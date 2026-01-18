@@ -118,7 +118,7 @@ def get_ads_txt():
     content = "google.com, pub-5581330887172926, DIRECT, f08c47fec0942fa0"
     return Response(content=content, media_type="text/plain")
 
-@router.get("/health-check")
+@router.get("/api/seo/health-check")
 async def check_seo_health(db: AsyncSession = Depends(get_db)):
     """
     Admin Diagnostic: Uses RAW SQL for guaranteed accuracy.
@@ -175,7 +175,7 @@ async def check_seo_health(db: AsyncSession = Depends(get_db)):
         headers={"Cache-Control": "no-store, no-cache, must-revalidate, max-age=0"}
     )
 
-@router.post("/request-indexing/{article_id}")
+@router.post("/api/seo/request-indexing/{article_id}")
 async def request_instant_indexing(
     article_id: int,
     db: AsyncSession = Depends(get_db),

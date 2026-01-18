@@ -183,7 +183,7 @@ export const createManualArticle = async (articleData) => {
 // SEO
 export const getSeoHealth = async () => {
   // Cache-bust to prevent CDN caching
-  const { data } = await api.get(`/health-check?_t=${Date.now()}`);
+  const { data } = await api.get(`/api/seo/health-check?_t=${Date.now()}`);
   return data;
 };
 
