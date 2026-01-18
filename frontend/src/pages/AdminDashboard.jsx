@@ -67,6 +67,7 @@ import SettingsTab from '../components/admin/SettingsTab';
 import QuickPublishTab from '../components/admin/QuickPublishTab';
 import NewsletterTab from '../components/admin/NewsletterTab';
 import HealthTab from '../components/admin/HealthTab';
+import IndexingTab from '../components/admin/IndexingTab';
 
 
 
@@ -267,6 +268,7 @@ export default function AdminDashboard() {
                             { id: 'publish', label: 'Publish', icon: PenLine },
                             { id: 'newsletter', label: 'Newsletter', icon: Mail },
                             { id: 'categories', label: 'Insights', icon: FolderOpen },
+                            { id: 'indexing', label: 'Global Indexing', icon: Globe },
                             { id: 'health', label: 'Health', icon: Activity },
                             { id: 'settings', label: 'Settings', icon: SettingsIcon },
                             { id: 'guide', label: 'Playbook', icon: BookOpen },
@@ -356,6 +358,8 @@ export default function AdminDashboard() {
 
                 {activeTab === 'health' && <HealthTab />}
 
+                {activeTab === 'indexing' && <IndexingTab stats={stats} />}
+
                 {activeTab === 'guide' && <AdminGuide />}
 
             </div>
@@ -392,11 +396,11 @@ export default function AdminDashboard() {
                         <span className="text-[8px] font-black uppercase">NewsL</span>
                     </button>
                     <button
-                        onClick={() => setActiveTab('categories')}
-                        className={`flex flex-col items-center justify-center space-y-1 ${activeTab === 'categories' ? 'text-primary-400' : 'text-slate-500'}`}
+                        onClick={() => setActiveTab('indexing')}
+                        className={`flex flex-col items-center justify-center space-y-1 ${activeTab === 'indexing' ? 'text-primary-400' : 'text-slate-500'}`}
                     >
-                        <FolderOpen className={`w-5 h-5 ${activeTab === 'categories' ? 'fill-current opacity-20' : ''}`} />
-                        <span className="text-[8px] font-black uppercase">Insight</span>
+                        <Globe className={`w-5 h-5 ${activeTab === 'indexing' ? 'fill-current opacity-20' : ''}`} />
+                        <span className="text-[8px] font-black uppercase">Indexing</span>
                     </button>
                     <button
                         onClick={() => setActiveTab('guide')}

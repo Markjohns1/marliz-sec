@@ -252,6 +252,7 @@ async def get_dashboard_stats(
         top_articles_list = [{"id": a[0], "title": a[1], "views": a[2], "slug": a[3]} for a in top_art_rows]
         
         categories_performance.append({
+            "id": cat_id,
             "name": cat_name,
             "count": count,
             "total_views": cat_views or 0,

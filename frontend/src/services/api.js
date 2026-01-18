@@ -193,5 +193,15 @@ export const requestIndexing = async (articleId) => {
   return data;
 };
 
+export const requestCategoryIndexing = async (categoryId) => {
+  const { data } = await api.post(`/api/seo/request-indexing-category/${categoryId}`);
+  return data;
+};
+
+export const requestStaticUrlIndexing = async (path) => {
+  const { data } = await api.post('/api/seo/request-indexing-url', null, { params: { path } });
+  return data;
+};
+
 
 export default api;

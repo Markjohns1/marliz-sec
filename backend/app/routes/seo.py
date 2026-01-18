@@ -2,7 +2,7 @@ from fastapi import APIRouter, Response, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.database import get_db
-from app.models import Article, ArticleStatus
+from app.models import Article, ArticleStatus, Category
 from app.config import settings
 from app.services.google_indexing import google_indexing
 from app.auth import verify_api_key
@@ -202,4 +202,32 @@ async def request_instant_indexing(
     result = await google_indexing.notify_url_update(url)
     
     return result
+
+@router.post("/api/seo/request-indexing-category/{category_id}")
+async def request_category_indexing(
+    category_id: int,
+    db: AsyncSession = Depends(get_db),
+    api_key_obj = Depends(verify_api_key)
+):
+    """Index a specific category aggregation page"""
+    stmt = select(Category).filter_by(id=category_id)
+    res = await db.execute(stmt)
+    category = res.scalar_one_or_none()
+    
+    if not category:
+        return {"status": "error", "message": "Category not found"}
+        
+    url = f"{settings.BASE_URL}/category/{category.slug}"
+    return await google_indexing.notify_url_update(url)
+
+@router.post("/api/seo/request-indexing-url")
+async def request_url_indexing(
+    path: str,
+    api_key_obj = Depends(verify_api_key)
+):
+    """Index a specific relative path (Home, Glossary, etc.)"""
+    # Ensure path starts with /
+    clean_path = path if path.startswith("/") else f"/{path}"
+    url = f"{settings.BASE_URL}{clean_path}"
+    return await google_indexing.notify_url_update(url)
 
