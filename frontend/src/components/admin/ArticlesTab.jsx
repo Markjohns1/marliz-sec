@@ -4,7 +4,7 @@ import { triggerNewsletterDigest } from '../../services/api';
 import {
     Clock, FileText, BarChart3, Share2,
     Edit3, ExternalLink, Send, CheckSquare, Square, X,
-    ArrowDownRight, ArrowUpRight
+    ArrowDown, ArrowUp
 } from 'lucide-react';
 
 export default function ArticlesTab({
@@ -54,6 +54,25 @@ export default function ArticlesTab({
         }
     };
 
+    const handleSort = (newSort) => {
+        if (artSort === newSort) {
+            // Toggle direction if same column
+            setArtOrder(prev => prev === 'desc' ? 'asc' : 'desc');
+        } else {
+            // New column: Default to "Best First" (DESC in our system now)
+            setArtSort(newSort);
+            setArtOrder('desc');
+        }
+        setArtPage(1);
+    };
+
+    const SortArrow = ({ column }) => {
+        if (artSort !== column) return null;
+        return artOrder === 'desc'
+            ? <ArrowDown className="w-3 h-3 text-blue-400" />
+            : <ArrowUp className="w-3 h-3 text-emerald-400" />;
+    };
+
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
             {targetAudience.length > 0 && (
@@ -87,7 +106,7 @@ export default function ArticlesTab({
                     />
                     <select
                         value={artSort}
-                        onChange={(e) => { setArtSort(e.target.value); setArtPage(1); }}
+                        onChange={(e) => handleSort(e.target.value)}
                         className="px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 text-sm font-bold outline-none focus:ring-2 focus:ring-primary-500 transition-all cursor-pointer hover:bg-slate-800"
                     >
                         <option value="date">Most Recent</option>
@@ -102,21 +121,50 @@ export default function ArticlesTab({
                         title={artOrder === 'desc' ? "Descending" : "Ascending"}
                     >
                         {artOrder === 'desc' ? (
-                            <ArrowDownRight className="w-5 h-5 text-blue-400" />
+                            <ArrowDown className="w-5 h-5 text-blue-400" />
                         ) : (
-                            <ArrowUpRight className="w-5 h-5 text-emerald-400" />
+                            <ArrowUp className="w-5 h-5 text-emerald-400" />
                         )}
                     </button>
                 </div>
             </div>
 
             <div className="card overflow-hidden bg-slate-900/50 border border-slate-800 rounded-2xl">
-                {/* Desktop Header */}
-                <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-4 bg-slate-900/80 border-b border-slate-800 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                {/* GSC-Style Desktop Header */}
+                <div className="hidden md:grid grid-cols-12 gap-1 px-6 py-4 bg-slate-900 border-b border-slate-800 text-[10px] font-black text-slate-500 uppercase tracking-widest">
                     <div className="col-span-1 text-center">#</div>
-                    <div className="col-span-5">Intelligence Report</div>
-                    <div className="col-span-3 text-center">Metrics</div>
-                    <div className="col-span-1 text-center">Status</div>
+                    <div
+                        className="col-span-5 flex items-center gap-1.5 cursor-pointer hover:text-slate-300 transition-colors"
+                        onClick={() => handleSort('date')}
+                    >
+                        Intelligence Report <SortArrow column="date" />
+                    </div>
+                    <div className="col-span-4 grid grid-cols-4">
+                        <div
+                            className="flex items-center justify-center gap-1.5 cursor-pointer hover:text-slate-300 transition-colors border-l border-slate-800/50"
+                            onClick={() => handleSort('views')}
+                        >
+                            Views <SortArrow column="views" />
+                        </div>
+                        <div
+                            className="flex items-center justify-center gap-1.5 cursor-pointer hover:text-slate-300 transition-colors border-l border-slate-800/50"
+                            onClick={() => handleSort('words')}
+                        >
+                            Words <SortArrow column="words" />
+                        </div>
+                        <div
+                            className="flex items-center justify-center gap-1.5 cursor-pointer hover:text-slate-300 transition-colors border-l border-slate-800/50"
+                            onClick={() => handleSort('impressions')}
+                        >
+                            SEO <SortArrow column="impressions" />
+                        </div>
+                        <div
+                            className="flex items-center justify-center gap-1.5 cursor-pointer hover:text-slate-300 transition-colors border-l border-slate-800/50"
+                            onClick={() => handleSort('position')}
+                        >
+                            Rank <SortArrow column="position" />
+                        </div>
+                    </div>
                     <div className="col-span-2 text-right">Actions</div>
                 </div>
 
@@ -173,19 +221,19 @@ export default function ArticlesTab({
                                 </div>
                             </div>
 
-                            {/* METRICS GRID: Space-saving layout for mobile */}
-                            <div className="col-span-3 grid grid-cols-3 md:flex md:items-center md:justify-center gap-4 md:gap-6 py-4 px-4 md:py-0 md:px-0 bg-slate-950/40 md:bg-transparent rounded-2xl my-2 md:my-0 border border-slate-800/50 md:border-0">
-                                <div className="text-center">
-                                    <div className="text-[8px] md:text-[9px] text-slate-500 font-black uppercase tracking-tighter mb-0.5">Views</div>
+                            {/* METRICS GRID: GSC Style 4-column layout */}
+                            <div className="col-span-4 grid grid-cols-4 md:flex md:items-center md:justify-center gap-2 md:gap-0 py-4 px-4 md:py-0 md:px-0 bg-slate-950/40 md:bg-transparent rounded-2xl my-2 md:my-0 border border-slate-800/50 md:border-0">
+                                <div className="text-center md:w-1/4 border-r border-slate-800/30">
+                                    <div className="md:hidden text-[8px] text-slate-500 font-black uppercase mb-0.5">Views</div>
                                     <div className="text-xs font-black text-blue-400">{(article.views || 0).toLocaleString()}</div>
                                 </div>
-                                <div className="text-center border-x border-slate-800/50 md:border-0 px-2">
-                                    <div className="text-[8px] md:text-[9px] text-slate-500 font-black uppercase tracking-tighter mb-0.5">Words</div>
+                                <div className="text-center md:w-1/4 border-r border-slate-800/30">
+                                    <div className="md:hidden text-[8px] text-slate-500 font-black uppercase mb-0.5">Words</div>
                                     <div className={`text-xs font-black ${(
                                         (article.simplified?.friendly_summary?.length || 0) +
                                         (article.simplified?.attack_vector?.length || 0) +
                                         (article.simplified?.business_impact?.length || 0)
-                                    ) >= 4800 ? 'text-emerald-400' : 'text-rose-400 opacity-80'}`}>
+                                    ) >= 6000 ? 'text-emerald-400' : 'text-rose-400 opacity-80'}`}>
                                         {Math.round((
                                             (article.simplified?.friendly_summary?.length || 0) +
                                             (article.simplified?.attack_vector?.length || 0) +
@@ -193,8 +241,12 @@ export default function ArticlesTab({
                                         ) / 6)}
                                     </div>
                                 </div>
-                                <div className="text-center">
-                                    <div className="text-[8px] md:text-[9px] text-slate-500 font-black uppercase tracking-tighter mb-0.5">Rank</div>
+                                <div className="text-center md:w-1/4 border-r border-slate-800/30">
+                                    <div className="md:hidden text-[8px] text-slate-500 font-black uppercase mb-0.5">SEO</div>
+                                    <div className="text-xs font-black text-slate-400">{(article.impressions || 0).toLocaleString()}</div>
+                                </div>
+                                <div className="text-center md:w-1/4">
+                                    <div className="md:hidden text-[8px] text-slate-500 font-black uppercase mb-0.5">Rank</div>
                                     <div className={`text-xs font-black ${article.position < 10 && article.position > 0 ? 'text-emerald-400' : 'text-slate-400'}`}>
                                         {article.position > 0 ? article.position.toFixed(1) : '-'}
                                     </div>

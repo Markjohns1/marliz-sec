@@ -416,24 +416,43 @@ async def get_admin_articles(
         search_term = f"%{search}%"
         query = query.filter(models.Article.title.ilike(search_term))
         
-    # Sorting logic
+    # Sorting logic with stable secondary sort
+    # GSC Paradigm: 'desc' (Arrow Down) always means "Best/Most Important First"
     is_desc = order.lower() == "desc"
     
     if sort_by == "views":
-        query = query.order_by(desc(models.Article.views) if is_desc else models.Article.views.asc())
+        primary_sort = desc(models.Article.views) if is_desc else models.Article.views.asc()
     elif sort_by == "impressions":
-        query = query.order_by(desc(models.Article.impressions) if is_desc else models.Article.impressions.asc())
+        primary_sort = desc(models.Article.impressions) if is_desc else models.Article.impressions.asc()
     elif sort_by == "position":
-        query = query.order_by(models.Article.position.desc() if is_desc else models.Article.position.asc())
+        # GSC Standard: Arrow Down (DESC) on Rank means 1.0, 2.0, 3.0...
+        # We also filter out 0.0 (unranked) to the bottom
+        from sqlalchemy import case
+        is_ranked = case((models.Article.position > 0, 1), else_=0)
+        
+        if is_desc:
+            # Best first: Ranked articles (1) then Ascending position (1.0, 1.1...)
+            query = query.order_by(desc(is_ranked), models.Article.position.asc(), models.Article.id.desc())
+        else:
+            # Worst first: Ranked articles (1) then Descending position (99.0, 98.0...)
+            query = query.order_by(desc(is_ranked), models.Article.position.desc(), models.Article.id.desc())
+        
+        # Primary sort is already applied above
+        primary_sort = None 
     elif sort_by == "words":
-        # Sort by character length (SQL-only approximation)
         word_sort = func.length(func.coalesce(models.SimplifiedContent.friendly_summary, '')) + \
                     func.length(func.coalesce(models.SimplifiedContent.attack_vector, '')) + \
                     func.length(func.coalesce(models.SimplifiedContent.business_impact, ''))
-        query = query.join(models.SimplifiedContent, isouter=True).order_by(desc(word_sort) if is_desc else word_sort.asc())
+        primary_sort = desc(word_sort) if is_desc else word_sort.asc()
+        query = query.join(models.SimplifiedContent, isouter=True)
     else:
-        query = query.order_by(desc(models.Article.created_at) if is_desc else models.Article.created_at.asc())
-        
+        # Default to date: Newest first for 'desc'
+        primary_sort = desc(models.Article.created_at) if is_desc else models.Article.created_at.asc()
+    
+    # Apply primary and secondary (stable) sort if not already applied by custom logic
+    if primary_sort is not None:
+        query = query.order_by(primary_sort, models.Article.id.desc())
+    
     # Count & Paginate
     count_query = select(func.count()).select_from(query.subquery())
     total = (await db.execute(count_query)).scalar_one()
