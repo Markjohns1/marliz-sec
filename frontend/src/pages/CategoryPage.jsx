@@ -6,8 +6,19 @@ import { Helmet } from 'react-helmet-async';
 import { ChevronDown } from 'lucide-react';
 import config from '../config';
 
+
+const SEO_DESCRIPTIONS = {
+  "data-breach": "Comprehensive monitoring of global data breaches, focusing on unauthorized access to Personally Identifiable Information (PII), corporate trade secrets, and government databases. We track leaks from the initial dark web sale to the final public disclosure.",
+  "ransomware": "Real-time intelligence on active ransomware campaigns, double-extortion tactics, and ransomware-as-a-service (RaaS) groups. Our analysis covers encryption methods, ransom demands, and decryption availability for major families.",
+  "vulnerability": "Critical alerts on Zero-Day exploits (0-day) and Common Vulnerabilities and Exposures (CVEs). We prioritize patch management intelligence, detailing proof-of-concept (PoC) exploits and active wild exploitation.",
+  "phishing": "Deep dives into advanced social engineering campaigns, Business Email Compromise (BEC), and credential harvesting attacks. We analyze current phishing lures and malicious attachments targeting corporate inboxes.",
+  "malware": "Technical breakdown of emerging malware strains, including banking trojans, spyware, info-stealers, and botnets. We provide indicators of compromise (IoCs) and C2 infrastructure tracking.",
+  "general": "Broad spectrum cybersecurity news covering industry trends, regulatory shifts, and fundamental security practices for risk management."
+};
+
 export default function CategoryPage() {
   const { slug } = useParams();
+  const seoDescription = SEO_DESCRIPTIONS[slug];
 
   const { data: category, isLoading: categoryLoading } = useQuery({
     queryKey: ['category', slug],
@@ -54,7 +65,7 @@ export default function CategoryPage() {
     <>
       <Helmet>
         <title>{category.name} Security News | {config.SITE_NAME}</title>
-        <meta name="description" content={category.description} />
+        <meta name="description" content={seoDescription || category.description} />
         <link rel="canonical" href={`${config.CANONICAL_BASE}/category/${slug}`} />
       </Helmet>
 
@@ -69,7 +80,7 @@ export default function CategoryPage() {
                   {category.name}
                 </h1>
                 <p className="text-lg text-slate-400 mt-2">
-                  {category.description}
+                  {seoDescription || category.description}
                 </p>
               </div>
             </div>
