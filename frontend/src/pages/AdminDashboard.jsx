@@ -230,25 +230,30 @@ export default function AdminDashboard() {
                         </div>
                     </div>
 
-                    <div className="hidden sm:flex items-center gap-4">
+                    <div className="hidden sm:flex items-center gap-3">
                         <a
                             href="/"
                             target="_blank"
                             rel="noreferrer"
-                            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 transition-all border border-slate-700 text-xs font-bold text-slate-300"
+                            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800/50 hover:bg-slate-800 transition-all border border-slate-800 text-xs font-bold text-slate-400 hover:text-white"
                         >
                             <ExternalLink className="w-4 h-4" />
-                            Site
+                            <span>Preview Site</span>
                         </a>
+
+                        <div className="h-8 w-px bg-slate-800 mx-1"></div>
+
                         <button
                             onClick={handleLogout}
-                            className="flex items-center gap-2 group px-3 py-1.5 rounded-xl hover:bg-slate-800 transition-all border border-slate-800"
+                            className="flex items-center gap-4 group pl-4 pr-3 py-1.5 rounded-xl hover:bg-red-500/5 transition-all border border-transparent hover:border-red-500/20"
                         >
-                            <div className="text-right hidden sm:block">
-                                <p className="text-[10px] text-slate-500 font-bold leading-none">SIGN OUT</p>
-                                <p className="text-xs font-bold text-slate-300 truncate max-w-[80px]">Admin</p>
+                            <div className="text-right">
+                                <p className="text-[9px] text-slate-500 font-extrabold uppercase tracking-[0.15em] leading-none mb-1 group-hover:text-red-400/80 transition-colors">Sign Out</p>
+                                <p className="text-xs font-black text-slate-200 group-hover:text-white transition-colors">Admin User</p>
                             </div>
-                            <LogOut className="w-4 h-4 text-slate-500 group-hover:text-red-400 transition-colors" />
+                            <div className="p-2 bg-slate-800 group-hover:bg-red-500/20 rounded-lg text-slate-500 group-hover:text-red-400 transition-all">
+                                <LogOut className="w-4 h-4" />
+                            </div>
                         </button>
                     </div>
                 </div>
