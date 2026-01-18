@@ -20,16 +20,15 @@ print(f"✅ Target Database: {db_path}")
 conn = sqlite3.connect(db_path)
 cursor = conn.cursor()
 
-print("\n📊 CONTENT HEALTH REPORT")
-print(f"{'ID':<6} | {'WORDS':<8} | {'STATUS':<10} | {'TITLE'}")
+print("\n🚨 THIN CONTENT REPORT (< 300 Words)")
+print(f"{'ID':<6} | {'WORDS':<8} | {'SLUG'}")
 print("-" * 100)
 
-# Join articles with simplified_content to get the text fields
 query = """
     SELECT 
         a.id, 
-        a.title, 
-        a.status,
+        a.slug,
+        a.title,
         COALESCE(sc.friendly_summary, '') || ' ' || 
         COALESCE(sc.attack_vector, '') || ' ' || 
         COALESCE(sc.business_impact, '') as full_text
@@ -40,38 +39,19 @@ query = """
 
 cursor.execute(query)
 rows = cursor.fetchall()
-word_counts = []
-thin_count = 0
-ok_count = 0
-rich_count = 0
 
+thin_count = 0
 for row in rows:
-    id, title, status, full_text = row
-    
-    # Calculate word count from the aggregated text fields
+    id, slug, title, full_text = row
     word_count = len(full_text.split()) if full_text else 0
-    word_counts.append(word_count)
     
-    color = ""
     if word_count < 300:
         thin_count += 1
-        color = "\033[91m" # RED
-    elif word_count > 1000:
-        rich_count += 1
-        color = "\033[92m" # GREEN
-    else:
-        ok_count += 1
-        
-    print(f"{id:<6} | {color}{word_count:<8}\033[0m | {status:<10} | {title[:60]}")
+        print(f"{id:<6} | \033[91m{word_count:<8}\033[0m | https://marlizintel.com/article/{slug}")
+        # print(f"       Title: {title}")
+        # print("-" * 50)
 
 print("-" * 100)
-avg_words = sum(word_counts) / len(word_counts) if word_counts else 0
-
-print(f"\n📈 STATISTICS:")
-print(f"   Total Articles: {len(rows)}")
-print(f"   Avg Word Count: {int(avg_words)}")
-print(f"   🔴 Thin (<300): {thin_count}  (Action: EXPAND)")
-print(f"   ⚪ OK (300-1k): {ok_count}   (Action: MAINTAIN)")
-print(f"   🟢 Rich (>1k):  {rich_count}   (Action: PROMOTE)")
+print(f"Total Thin Articles Found: {thin_count}")
 
 conn.close()
