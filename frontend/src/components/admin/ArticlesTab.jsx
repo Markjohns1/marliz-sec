@@ -95,15 +95,36 @@ export default function ArticlesTab({
                 </div>
             )}
 
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
                 <h2 className="text-2xl font-black text-white tracking-tight">Article Management</h2>
-                <div className="flex items-center gap-2 w-full sm:w-auto">
+                <div className="flex flex-col sm:flex-row items-center gap-2 w-full lg:w-auto">
                     <QuickSearch
                         placeholder="Quick search..."
-                        className="flex-1 sm:w-64"
+                        className="w-full lg:w-64"
                         initialValue={artSearch}
                         onSearch={(val) => { setArtSearch(val); setArtPage(1); }}
                     />
+
+                    {/* Mobile-Only Sort Toolbar */}
+                    <div className="flex items-center gap-2 w-full sm:w-auto md:hidden">
+                        <select
+                            value={artSort}
+                            onChange={(e) => handleSort(e.target.value)}
+                            className="flex-1 px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 text-[11px] font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary-500 transition-all cursor-pointer"
+                        >
+                            <option value="date">Sort: Recent</option>
+                            <option value="views">Sort: Views</option>
+                            <option value="words">Sort: Words</option>
+                            <option value="impressions">Sort: SEO</option>
+                            <option value="position">Sort: Rank</option>
+                        </select>
+                        <button
+                            onClick={() => { setArtOrder(prev => prev === 'desc' ? 'asc' : 'desc'); setArtPage(1); }}
+                            className="p-2.5 bg-slate-900 border border-slate-800 rounded-xl text-slate-400 hover:text-white transition-all min-w-[45px] flex items-center justify-center"
+                        >
+                            {artOrder === 'desc' ? <ArrowDown className="w-5 h-5 text-blue-400" /> : <ArrowUp className="w-5 h-5 text-emerald-400" />}
+                        </button>
+                    </div>
                 </div>
             </div>
 
