@@ -187,4 +187,11 @@ export const getSeoHealth = async () => {
   return data;
 };
 
+// SEO & Indexing
+export const requestIndexing = async (articleId) => {
+  const { data } = await api.post(`/api/seo/request-indexing/${articleId}`);
+  return data;
+};
+
+
 export default api;

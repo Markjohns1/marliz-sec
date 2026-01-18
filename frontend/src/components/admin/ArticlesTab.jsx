@@ -1,10 +1,10 @@
 import QuickSearch from '../QuickSearch';
 import { useState } from 'react';
-import { triggerNewsletterDigest } from '../../services/api';
+import { triggerNewsletterDigest, requestIndexing } from '../../services/api';
 import {
     Clock, FileText, BarChart3, Share2,
     Edit3, ExternalLink, Send, CheckSquare, Square, X,
-    ArrowDown, ArrowUp
+    ArrowDown, ArrowUp, Globe
 } from 'lucide-react';
 
 export default function ArticlesTab({
@@ -17,6 +17,7 @@ export default function ArticlesTab({
     const [selectedArticles, setSelectedArticles] = useState([]);
     const [customNote, setCustomNote] = useState('');
     const [isDeploying, setIsDeploying] = useState(false);
+    const [indexingId, setIndexingId] = useState(null);
 
     const toggleSelection = (id) => {
         if (selectedArticles.includes(id)) {
@@ -72,6 +73,26 @@ export default function ArticlesTab({
             ? <ArrowDown className="w-3 h-3 text-blue-400" />
             : <ArrowUp className="w-3 h-3 text-emerald-400" />;
     };
+
+    const handleRequestIndexing = async (articleId) => {
+        setIndexingId(articleId);
+        try {
+            const res = await requestIndexing(articleId);
+            if (res.status === 'success') {
+                alert("✓ Indexing request sent to Google! URL should be crawled shortly.");
+            } else if (res.status === 'skipped') {
+                alert("⚠ Google Indexing API is not configured. Please upload your Service Account Key to activate this feature.");
+            } else {
+                alert("❌ Indexing request failed: " + (res.message || "Unknown error"));
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Failed to connect to Indexing Service.");
+        } finally {
+            setIndexingId(null);
+        }
+    };
+
 
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -133,7 +154,7 @@ export default function ArticlesTab({
                 <div className="hidden md:grid grid-cols-12 gap-1 px-6 py-4 bg-slate-900 border-b border-slate-800 text-[10px] font-black text-slate-500 uppercase tracking-widest">
                     <div className="col-span-1 text-center">#</div>
                     <div
-                        className="col-span-5 flex items-center gap-1.5 cursor-pointer hover:text-slate-300 transition-colors"
+                        className="col-span-4 flex items-center gap-1.5 cursor-pointer hover:text-slate-300 transition-colors"
                         onClick={() => handleSort('date')}
                     >
                         Intelligence Report <SortArrow column="date" />
@@ -164,6 +185,7 @@ export default function ArticlesTab({
                             Rank <SortArrow column="position" />
                         </div>
                     </div>
+                    <div className="col-span-1 text-center">Status</div>
                     <div className="col-span-2 text-right">Actions</div>
                 </div>
 
@@ -205,16 +227,16 @@ export default function ArticlesTab({
                             </div>
 
                             {/* MAIN INFO: Title & Meta */}
-                            <div className="col-span-5 flex flex-col justify-center">
-                                <span className="text-sm md:text-[13px] font-bold text-white group-hover:text-blue-400 transition-colors leading-snug">
+                            <div className="col-span-4 flex flex-col justify-center">
+                                <span className="text-sm md:text-[13px] font-bold text-white group-hover:text-blue-400 transition-colors leading-snug truncate">
                                     {article.title}
                                 </span>
-                                <div className="flex items-center gap-3 mt-2.5">
-                                    <span className="px-2 py-0.5 rounded-md bg-slate-950 text-[9px] font-black text-slate-500 border border-slate-800 uppercase tracking-widest">
+                                <div className="flex items-center gap-3 mt-1.5">
+                                    <span className="px-1.5 py-0.5 rounded-md bg-slate-950 text-[8px] font-black text-slate-500 border border-slate-800 uppercase tracking-widest whitespace-nowrap">
                                         {article.category?.name || 'General'}
                                     </span>
-                                    <span className="flex items-center gap-1.5 text-[10px] text-slate-500 font-bold">
-                                        <Clock className="w-3 h-3 text-slate-600" />
+                                    <span className="flex items-center gap-1 text-[9px] text-slate-500 font-bold whitespace-nowrap">
+                                        <Clock className="w-2.5 h-2.5 text-slate-600" />
                                         {article.published_at ? new Date(article.published_at).toLocaleDateString([], { month: 'short', day: 'numeric' }) : 'Pending'}
                                     </span>
                                 </div>
@@ -266,40 +288,51 @@ export default function ArticlesTab({
                                 )}
                             </div>
 
-                            {/* ACTIONS: Premium toolbar */}
+                            {/* ACTIONS: Unified toolbar */}
                             <div className="col-span-2 flex items-center justify-between md:justify-end gap-1 mt-2 md:mt-0 pt-3 md:pt-0 border-t md:border-0 border-slate-800/30">
                                 <div className="flex items-center gap-1">
                                     <button
+                                        onClick={() => handleRequestIndexing(article.id)}
+                                        disabled={indexingId === article.id}
+                                        className={`p-2 rounded-lg transition-all border ${indexingId === article.id
+                                            ? 'bg-blue-600/20 border-blue-500/30 text-blue-400 animate-pulse'
+                                            : 'bg-slate-800/40 border-slate-800 text-slate-500 hover:text-blue-400 hover:border-blue-500/30'
+                                            }`}
+                                        title="Instant Indexing"
+                                    >
+                                        <Globe className={`w-4 h-4 ${indexingId === article.id ? 'animate-spin-slow' : ''}`} />
+                                    </button>
+                                    <button
                                         onClick={() => setViewingStats(article)}
-                                        className="p-2.5 text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-all border border-slate-800 md:border-transparent"
+                                        className="p-2 text-slate-500 hover:text-emerald-400 hover:bg-emerald-500/5 rounded-lg transition-all"
                                         title="Analytics"
                                     >
-                                        <BarChart3 className="w-5 h-5 md:w-4 md:h-4" />
+                                        <BarChart3 className="w-4 h-4" />
                                     </button>
                                     <button
                                         onClick={() => setSharingArticle(article)}
-                                        className="p-2.5 text-blue-400 hover:bg-blue-500/10 rounded-xl transition-all border border-slate-800 md:border-transparent"
+                                        className="p-2 text-slate-500 hover:text-blue-400 hover:bg-blue-500/5 rounded-lg transition-all"
                                         title="Share"
                                     >
-                                        <Share2 className="w-5 h-5 md:w-4 md:h-4" />
+                                        <Share2 className="w-4 h-4" />
                                     </button>
                                     <button
                                         onClick={() => setEditingArticle(article)}
-                                        className="p-2.5 text-orange-400 hover:bg-orange-500/10 rounded-xl transition-all border border-slate-800 md:border-transparent"
-                                        title="Edit Intelligence"
+                                        className="p-2 text-slate-500 hover:text-orange-400 hover:bg-orange-500/5 rounded-lg transition-all"
+                                        title="Edit"
                                     >
-                                        <Edit3 className="w-5 h-5 md:w-4 md:h-4" />
+                                        <Edit3 className="w-4 h-4" />
                                     </button>
+                                    <a
+                                        href={`/article/${article.slug}`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="p-2 text-slate-500 hover:text-white hover:bg-white/5 rounded-lg transition-all"
+                                        title="View Live"
+                                    >
+                                        <ExternalLink className="w-4 h-4" />
+                                    </a>
                                 </div>
-                                <a
-                                    href={`/article/${article.slug}`}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="p-2.5 text-slate-400 hover:bg-white/5 rounded-xl transition-all flex items-center gap-2 group/btn"
-                                >
-                                    <span className="md:hidden text-[10px] font-black uppercase tracking-widest">Preview</span>
-                                    <ExternalLink className="w-5 h-5 md:w-4 md:h-4 group-hover/btn:text-blue-400" />
-                                </a>
                             </div>
                         </div>
                     ))}

@@ -4,6 +4,8 @@ from sqlalchemy import select
 from app.database import get_db
 from app.models import Article, ArticleStatus
 from app.config import settings
+from app.services.google_indexing import google_indexing
+from app.auth import verify_api_key
 
 router = APIRouter()
 
@@ -172,3 +174,32 @@ async def check_seo_health(db: AsyncSession = Depends(get_db)):
         content=data,
         headers={"Cache-Control": "no-store, no-cache, must-revalidate, max-age=0"}
     )
+
+@router.post("/request-indexing/{article_id}")
+async def request_instant_indexing(
+    article_id: int,
+    db: AsyncSession = Depends(get_db),
+    api_key_obj = Depends(verify_api_key)
+):
+    """
+    Manually push an article URL to Google Indexing API.
+    """
+    # 1. Get the article
+    stmt = select(Article).filter_by(id=article_id)
+    res = await db.execute(stmt)
+    article = res.scalar_one_or_none()
+    
+    if not article:
+        return {"status": "error", "message": "Article not found"}
+        
+    if article.status not in [ArticleStatus.PUBLISHED, ArticleStatus.READY, ArticleStatus.EDITED]:
+        return {"status": "error", "message": "Only public articles can be indexed"}
+
+    # 2. Construct the absolute URL
+    url = f"{settings.BASE_URL}/article/{article.slug}"
+    
+    # 3. Trigger Google Indexing API
+    result = await google_indexing.notify_url_update(url)
+    
+    return result
+
