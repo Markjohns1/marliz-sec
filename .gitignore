@@ -37,3 +37,17 @@ Thumbs.db
 # Database
 *.sqlite
 *.db
+
+# Temporary Data & Reports
+*.xlsx
+*.csv
+*.txt
+*.log
+
+# Temporary Audit/Analysis Scripts
+analyze_*.py
+audit_*.py
+extract_*.py
+list_sheets.py
+coverage_report.txt
+
