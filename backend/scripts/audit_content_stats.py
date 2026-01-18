@@ -24,11 +24,18 @@ print("\n📊 CONTENT HEALTH REPORT")
 print(f"{'ID':<6} | {'WORDS':<8} | {'STATUS':<10} | {'TITLE'}")
 print("-" * 100)
 
+# Join articles with simplified_content to get the text fields
 query = """
-    SELECT id, title, content, status 
-    FROM articles 
-    WHERE status != 'deleted'
-    ORDER BY length(content) ASC
+    SELECT 
+        a.id, 
+        a.title, 
+        a.status,
+        COALESCE(sc.friendly_summary, '') || ' ' || 
+        COALESCE(sc.attack_vector, '') || ' ' || 
+        COALESCE(sc.business_impact, '') as full_text
+    FROM articles a
+    LEFT JOIN simplified_content sc ON a.id = sc.article_id
+    WHERE a.status != 'deleted'
 """
 
 cursor.execute(query)
@@ -39,8 +46,10 @@ ok_count = 0
 rich_count = 0
 
 for row in rows:
-    id, title, content, status = row
-    word_count = len(content.split()) if content else 0
+    id, title, status, full_text = row
+    
+    # Calculate word count from the aggregated text fields
+    word_count = len(full_text.split()) if full_text else 0
     word_counts.append(word_count)
     
     color = ""
