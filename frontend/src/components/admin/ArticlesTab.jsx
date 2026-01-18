@@ -104,28 +104,6 @@ export default function ArticlesTab({
                         initialValue={artSearch}
                         onSearch={(val) => { setArtSearch(val); setArtPage(1); }}
                     />
-                    <select
-                        value={artSort}
-                        onChange={(e) => handleSort(e.target.value)}
-                        className="px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 text-sm font-bold outline-none focus:ring-2 focus:ring-primary-500 transition-all cursor-pointer hover:bg-slate-800"
-                    >
-                        <option value="date">Most Recent</option>
-                        <option value="views">High Traffic</option>
-                        <option value="words">Word Count</option>
-                        <option value="impressions">SEO Impressions</option>
-                        <option value="position">GSC Visibility</option>
-                    </select>
-                    <button
-                        onClick={() => { setArtOrder(prev => prev === 'desc' ? 'asc' : 'desc'); setArtPage(1); }}
-                        className="p-2.5 bg-slate-900 border border-slate-800 rounded-xl text-slate-400 hover:text-white transition-all flex items-center justify-center min-w-[45px]"
-                        title={artOrder === 'desc' ? "Descending" : "Ascending"}
-                    >
-                        {artOrder === 'desc' ? (
-                            <ArrowDown className="w-5 h-5 text-blue-400" />
-                        ) : (
-                            <ArrowUp className="w-5 h-5 text-emerald-400" />
-                        )}
-                    </button>
                 </div>
             </div>
 
