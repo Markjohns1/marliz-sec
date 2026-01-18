@@ -20,8 +20,8 @@ print(f"✅ Target Database: {db_path}")
 conn = sqlite3.connect(db_path)
 cursor = conn.cursor()
 
-print("\n🚨 THIN CONTENT REPORT (< 300 Words) [LIVE ARTICLES ONLY]")
-print(f"{'ID':<6} | {'WORDS':<8} | {'STATUS':<12} | {'SLUG'}")
+print("\n✅ LIVE CONTENT AUDIT (ALL ACTIVE ARTICLES)")
+print(f"{'ID':<6} | {'WORDS':<8} | {'STATUS':<12} | {'TITLE'}")
 print("-" * 110)
 
 query = """
@@ -36,19 +36,24 @@ query = """
     FROM articles a
     LEFT JOIN simplified_content sc ON a.id = sc.article_id
     WHERE a.status IN ('published', 'ready', 'edited')
+    ORDER BY a.id ASC
 """
 
 cursor.execute(query)
 rows = cursor.fetchall()
 
-thin_count = 0
 for row in rows:
     id, slug, title, status, full_text = row
     word_count = len(full_text.split()) if full_text else 0
     
-    if word_count < 300:
-        thin_count += 1
-        print(f"{id:<6} | \033[91m{word_count:<8}\033[0m | {status:<12} | https://marlizintel.com/article/{slug}")
+    color = "\033[92m" # GREEN
+    if word_count < 500: color = "\033[93m" # YELLOW
+    if word_count < 300: color = "\033[91m" # RED
+    
+    print(f"{id:<6} | {color}{word_count:<8}\033[0m | {status:<12} | {title[:60]}")
+
+print("-" * 110)
+print(f"Total Live Articles: {len(rows)}")
         # print(f"       Title: {title}")
         # print("-" * 50)
 
