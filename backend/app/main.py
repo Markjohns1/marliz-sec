@@ -193,9 +193,10 @@ if os.path.exists(FRONTEND_DIST):
             raise HTTPException(status_code=403, detail="Forbidden")
 
         # 0. Catch broken 'undefined' URLs (Common SEO issue)
+        # Return 410 Gone to tell Google to permanently de-index these URLs
         if "undefined" in full_path:
-            from fastapi.responses import RedirectResponse
-            return RedirectResponse(url="/", status_code=301)
+            logger.info(f"410 GONE: Blocking broken 'undefined' URL: {full_path}")
+            raise HTTPException(status_code=410, detail="Gone: This page has been permanently removed.")
 
         # Explicitly ignore API and SEO paths so they don't get swallowed
         if full_path.startswith("api") or full_path.endswith(".xml") or full_path.endswith(".txt"):
