@@ -32,6 +32,8 @@ async def check_prod_stats():
         db_url = db_url.replace("postgres://", "postgresql+asyncpg://")
     elif db_url.startswith("postgresql://"):
         db_url = db_url.replace("postgresql://", "postgresql+asyncpg://")
+    elif "sqlite:///" in db_url and "aiosqlite" not in db_url:
+        db_url = db_url.replace("sqlite:///", "sqlite+aiosqlite:///")
 
     print(f" Connecting to database...")
     
