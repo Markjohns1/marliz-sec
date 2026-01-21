@@ -16,7 +16,7 @@ Usage:
 """
 import asyncio
 from sqlalchemy import select
-from app.database import async_session
+from app.database import AsyncSessionLocal
 from app.models import DeletedArticle
 
 # List of broken slugs from Google Search Console (Jan 21, 2026)
@@ -43,7 +43,7 @@ async def bury_undefined_urls():
     print(" GRAVEYARD: Burying Broken 'undefined' URLs")
     print("=" * 60)
     
-    async with async_session() as db:
+    async with AsyncSessionLocal() as db:
         added_count = 0
         already_buried_count = 0
         
