@@ -117,7 +117,7 @@ class AISimplifier:
                         "content": prompt
                     }
                 ],
-                "temperature": 0.3, # Slightly higher for creative expansion
+                "temperature": 0.65, # Increased to allow deep analysis and historical context expansion
                 "max_completion_tokens": 8192, # Allow for massive long-form output
                 "top_p": 1,
                 "stream": False,
@@ -207,7 +207,12 @@ class AISimplifier:
             if article.status not in [ArticleStatus.EDITED, ArticleStatus.PUBLISHED]:
                 article.status = ArticleStatus.READY
             
-            article.keywords = self._extract_keywords(result)
+            # Use AI-generated keywords if available, otherwise fall back to extraction
+            if result.get("seo_keywords") and isinstance(result["seo_keywords"], list):
+                # meaningful limit of 10 keywords
+                article.keywords = ", ".join(result["seo_keywords"][:10])
+            else:
+                article.keywords = self._extract_keywords(result)
             
             # UPDATE TITLE with SEO-optimized version from AI
             # BUT: If it's already PUBLISHED or EDITED, do NOT change the title further
@@ -270,11 +275,11 @@ MANDATE (INTERNAL ANALYSIS):
    - **DO NOT** repeat facts from the existing summary. 
    - **DO NOT** use bullet points. Use deep, analytical paragraphs.
    - YOU MUST PROVIDE:
-     a) A prediction of how this threat evolves in 2026.
-     b) A comparison to a similar historical breach (e.g. SolarWinds, MoveIT, etc).
+     a) A prediction of how this threat evolves in 2026 or currrrent year, eg if we go to 2027, the year mentioned will be 2027.
+     b) A comparison to a similar historical breach (e.g. SolarWinds, MoveIT, etc). You are not limited to one comparison.
      c) A criticism of the current security "best practices" that failed here.
 2. **Business & Operational Impact**:
-   - WRITE 200+ WORDS.
+   - WRITE 250+ WORDS.
    - Focus on the "Downstream" costs: Insurance premium hikes, Class-Action litigation risks, and the cost of "Trust Erosion" in the specific sector (e.g. Healthcare, Finance).
 
 STRICT RULES:
@@ -346,58 +351,83 @@ STRICT RULES:
         """Build precise prompt for Groq AI with advanced SEO optimization and business-focused intelligence."""
         
         return f"""You are 'Marliz Intel', a Senior Strategic Cyber Analyst.
-Your goal is NOT to summarize news. Your goal is to PRODUCE PROPRIETARY INTELLIGENCE based on the news.
-To satisfy Google AdSense 'High Value Content' guidelines, you must add UNIQUE INSIGHTS, PREDICTIONS, and STRATEGIC CONTEXT that is likely missing from the source text.
+Your goal is to write a PREMIUM, HIGH-VALUE cybersecurity report that satisfies Google's "High Value Content" standards.
+You must NOT simply summarize the text. You must EXPAND, ANALYZE, and TEACH.
 
-ARTICLE DATA:
+ARTICLE CONTEXT:
 Title: {article.title}
-Source: {article.source_name or 'Intelligence feed'}
-Content: {content[:12000]}
+Source: {article.source_name or 'Intelligence Field Feed'}
+Raw Content: {content[:15000]}
 
-YOUR MANDATE:
-1. **TRANSFORM** the raw news into a C-Level Intelligence Report.
-2. **SYNTHESIZE** the facts with broader industry trends (e.g., "This aligns with the rise in Q3 ransomware...").
-3. **PREDICT** the downstream consequences (e.g., "We expect regulatory fines to exceed...").
-4. **ADVISE** specific stakeholders with technically accurate protocols.
+MANDATE:
+Produce a massive, deep-dive report (Total 2000+ Words) that reads like a human expert wrote it.
+Avoid robotic traits (repetitive transitions, "in conclusion", etc.). Use professional, sharp, and authoritative language.
+You are writing for C-Level executives and Security Professionals who need DEPTH.
 
-REQUIRED SECTIONS (Use Markdown ## headers):
-1. **Executive Intelligence**: A high-level synthesis of *what* happened and *why it matters* to a CTO/CISO. (400+ words)
-2. **Technical Deep Dive**: The "How". Explain the kill chain, CVEs, or exploit mechanics. (400+ words)
-3. **Marliz Intel Strategic Assessment**: **CRITICAL SECTION.** Provide a unique voice, prediction, and historical comparison. (400+ words)
-4. **Business Impact Analysis**: Financial, reputational, and operational costs. (200+ words)
-5. **Mitigation Protocols**: A prioritized checklist for defense. (200+ words)
+REQUIRED JSON OUTPUT STRUCTURE (Must be exactly these keys):
 
-STRICT CONTENT VOLUME RULES:
-- **TOTAL CONTENT TARGET: 1500+ WORDS.**
-- **NO EM-DASHES:** You are strictly forbidden from using the em-dash character (`—`). Use semicolons or hyphens instead.
-- If the source content is short, you MUST supplement it with:
-  1. Technical definitions and protocol mechanics.
-  2. Historical context of the threat group or vulnerability class.
-  3. Strategic analysis of the "Downstream" ripple effects.
-- **NEVER** return a short summary. 
+1. "summary" (TARGET: 1200-1500 WORDS)
+   - This is the CORE of the article.
+   - It MUST start with an **Executive Summary** that synthesizes the event.
+   - It **MUST** include a dedicated subsection titled "**Marliz Intel Strategic Assessment**" within it.
+   - Content for Strategic Assessment:
+     *   Predict future evolutions of this threat (2026 outlook).
+     *   Compare this to historical breaches (e.g., SolarWinds, log4j) to provide context.
+     *   Critique the security failures involved.
+   - If the source text is short, you MUST use your internal knowledge to explain the CONCEPTS, DEFINITIONS, and HISTORY related to this topic to meet the text volume requirement.
+   - Do not fluff; add value. Explain "Why this matters" to a Board of Directors.
 
-FIELD INSTRUCTIONS:
-- "is_relevant": Set to true if cybersecurity related, false if political/war content.
-- "category": Choose ONE from: ransomware, phishing, data-breach, malware, vulnerability, general
-- "seo_title": Create a compelling, urgent headline (60 chars max).
-- "meta_description": Write exactly 150-160 characters. Must be a "Click-Magnet" hook.
-- "summary": The combined text of "Executive Intelligence", "Technical Deep Dive", and "Marliz Intel Strategic Assessment".
-- "attack_vector": Write a FULL Technical Analysis (250+ words).
-- "impact": Write a FULL Business Impact Analysis (250+ words).
-- "actions": Provide 3-5 specific actionable steps as an array of strings.
-- "threat_level": Choose ONE from: low, medium, high, critical
+2. "attack_vector" (TARGET: 250+ WORDS)
+   - A technical "Threat Vector" analysis.
+   - Explain the "Kill Chain". How did they get in? What CVEs? What techniques (MITRE ATT&CK)?
+   - If specific technical details are missing, describe the *typical* attack path for this type of threat.
 
-CRITICAL OUTPUT RULES:
-1. Return ONLY a valid JSON object.
-2. Escape internal double quotes as \\"
-3. Use \\n for newlines inside string values.
-4. **DO NOT SOUND LIKE A BOT.** Write with authority, edge, and professional confidence.
+3. "impact" (TARGET: 300+ WORDS)
+   - "Business & Operational Impact".
+   - Detailed analysis of "Downstream" costs:
+     *   Regulatory fines (GDPR, CCPA, SEC).
+     *   Cyber Insurance premium hikes.
+     *   Class-action litigation risks.
+     *   Brand reputation and "Trust Erosion".
 
-NOW PRODUCE THE 'SUPERCHARGED' INTELLIGENCE REPORT:"""
+4. "actions" (Array of strings)
+   - 3-5 specific, technical mitigation steps.
+
+5. "seo_title" (String)
+   - **STRICT SEO RULE**: Length MUST be 50-60 characters.
+   - **NEVER** return short 2-3 word titles.
+   - MUST include the Main Keyword + The Impact/Action.
+   - Bad: "Android Security Update" (Too short, weak).
+   - Good: "Android Sideloading Verification 2026: Critical Security Analysis" (Strong, specific).
+
+6. "meta_description" (String)
+   - Max 160 chars.
+   - Must contain the Primary Keyword from the title.
+   - Must be a "Click-Magnet" (high CTR) teasing the Strategic Assessment.
+
+7. "seo_keywords" (Array of strings)
+   - List 6-10 specific, high-traffic long-tail keywords relevant to this article.
+
+8. "threat_level" (String)
+   - One of: low, medium, high, critical.
+
+9. "category" (String)
+   - One of: ransomware, phishing, data-breach, malware, vulnerability, general.
+
+CRITICAL RULES:
+- **WORD COUNT IS MANDATORY**. If you return short content, you fail. EXPAND on every point, every section, no thin sections allowed.
+- **TONE**: Senior Analyst. Serious, somewhat dark but professional.
+- **FORMAT**: Use Markdown for headers (##) and bolding (**).
+- **NO ROBOTIC FILLER**: Do not start with "In the rapidly evolving landscape...". Jump straight into the heavy analysis.
+
+PRODUCE THE JSON NOW."""
     
     def _parse_response(self, response_text: str) -> dict:
         """Parse Groq's JSON response with aggressive cleaning for control characters."""
         try:
+            # 0. STRICT POLICY: Remove AI-style Em-Dashes/En-Dashes
+            response_text = response_text.replace("—", "-").replace("–", "-")
+
             # 1. Strip whitespace
             cleaned = response_text.strip()
             
