@@ -197,17 +197,35 @@ if os.path.exists(FRONTEND_DIST):
         if "undefined" in full_path:
             logger.info(f"410 GONE: Blocking broken 'undefined' URL: {full_path}")
             raise HTTPException(status_code=410, detail="Gone: This page has been permanently removed.")
+            
+        # 1. SEO HARD STOP: Check Graveyard for Soft 404 Prevention
+        if full_path.startswith("article/"):
+            slug = full_path.split("/")[-1]
+            try:
+                # Use a new DB session since we are in a catch-all route not an API route
+                async for db in get_db():
+                    # Check Graveyard (DeletedArticle)
+                    stmt = select(models.DeletedArticle).filter_by(slug=slug)
+                    res = await db.execute(stmt)
+                    if res.scalar():
+                        logger.info(f"410 GONE: Hard Stop for Buried Article: {slug}")
+                        raise HTTPException(status_code=410, detail="Gone: This page has been permanently removed.")
+                    break # We only need one check
+            except HTTPException:
+                raise # Re-raise the 410
+            except Exception as e:
+                logger.error(f"Failed to check graveyard for {slug}: {e}")
 
         # Explicitly ignore API and SEO paths so they don't get swallowed
         if full_path.startswith("api") or full_path.endswith(".xml") or full_path.endswith(".txt"):
             raise HTTPException(status_code=404, detail="Not Found")
 
-        # 1. Serve specific file if it exists (favicon.ico, robots.txt)
+        # 2. Serve specific file if it exists (favicon.ico, robots.txt)
         file_path = os.path.join(FRONTEND_DIST, full_path)
         if os.path.exists(file_path) and os.path.isfile(file_path):
             return FileResponse(file_path)
         
-        # 2. Otherwise serve index.html (Client-side routing)
+        # 3. Otherwise serve index.html (Client-side routing)
         # BOT VIEW CAPTURE: If this is an article path and User-Agent is a bot, track it now.
         if full_path.startswith("article/"):
             ua = request.headers.get("user-agent", "").lower()
