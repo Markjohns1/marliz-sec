@@ -40,6 +40,8 @@ export default function QuickPublishTab({ onPublishSuccess }) {
     const [actionSteps, setActionSteps] = useState(['', '']);
     const [sourceUrl, setSourceUrl] = useState('');
     const [imageUrl, setImageUrl] = useState('');
+    const [metaDescription, setMetaDescription] = useState('');
+    const [keywords, setKeywords] = useState('');
 
     // Fetch categories
     const { data: categories } = useQuery({
@@ -96,6 +98,8 @@ export default function QuickPublishTab({ onPublishSuccess }) {
         setActionSteps(['', '']);
         setSourceUrl('');
         setImageUrl('');
+        setMetaDescription('');
+        setKeywords('');
         setStep(1);
         setPublishedSlug(null);
     };
@@ -122,6 +126,8 @@ export default function QuickPublishTab({ onPublishSuccess }) {
                 action_steps: filledSteps,
                 original_url: sourceUrl || null,
                 image_url: imageUrl || null,
+                meta_description: metaDescription || null,
+                keywords: keywords || null,
                 source_name: 'Marliz Intel Staff',
                 admin_secret: localStorage.getItem('admin_api_key')
             };
@@ -305,103 +311,139 @@ export default function QuickPublishTab({ onPublishSuccess }) {
                         </div>
                     )}
 
-                    {/* Step 6: Action Steps */}
+                    {/* Step 6: Final Review - Actions, SEO, and Publishing */}
                     {step >= 6 && (
-                        <div className="p-6 border-b border-slate-800 animate-fade-in">
-                            <label className="flex items-center gap-2 text-sm font-bold text-slate-300 mb-3">
-                                <span className="w-6 h-6 bg-emerald-600 rounded-full flex items-center justify-center text-xs text-white">6</span>
-                                What Should People Do? (Action Steps)
-                            </label>
-                            <div className="space-y-3">
-                                {actionSteps.map((step, index) => (
-                                    <div key={index} className="flex items-center gap-2">
-                                        <span className="text-emerald-400 font-bold text-sm w-6">{index + 1}.</span>
+                        <div className="animate-fade-in divide-y divide-slate-800/50">
+                            {/* Actions Part */}
+                            <div className="p-6">
+                                <label className="flex items-center gap-2 text-sm font-bold text-slate-300 mb-3">
+                                    <span className="w-6 h-6 bg-emerald-600 rounded-full flex items-center justify-center text-xs text-white">6</span>
+                                    Recommended Action Steps
+                                </label>
+                                <div className="space-y-4 mb-4">
+                                    {actionSteps.map((step, index) => (
+                                        <div key={index} className="flex items-center gap-2">
+                                            <span className="text-emerald-400 font-bold text-sm w-4">{index + 1}.</span>
+                                            <input
+                                                type="text"
+                                                value={step}
+                                                onChange={(e) => updateActionStep(index, e.target.value)}
+                                                placeholder={`Action step ${index + 1}...`}
+                                                className="flex-1 px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+                                            />
+                                            {actionSteps.length > 2 && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeActionStep(index)}
+                                                    className="p-2 text-slate-500 hover:text-red-400"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            )}
+                                        </div>
+                                    ))}
+                                    {actionSteps.length < 5 && (
+                                        <button
+                                            type="button"
+                                            onClick={addActionStep}
+                                            className="text-sm text-blue-400 hover:text-blue-300 flex items-center gap-1 mt-2"
+                                        >
+                                            <Plus className="w-4 h-4" />
+                                            Add Step
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* SEO Part */}
+                            <div className="p-6 space-y-6 bg-slate-950/30">
+                                <label className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">
+                                    <Zap className="w-3 h-3 text-blue-500" />
+                                    SEO & Meta Configuration
+                                </label>
+
+                                <div className="grid sm:grid-cols-2 gap-4">
+                                    <div className="space-y-1.5">
+                                        <label className="text-[9px] font-black text-slate-600 uppercase tracking-tighter ml-1">Original Source URL</label>
+                                        <input
+                                            type="url"
+                                            value={sourceUrl}
+                                            onChange={(e) => setSourceUrl(e.target.value)}
+                                            placeholder="https://..."
+                                            className="w-full px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-slate-600 text-xs"
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="text-[9px] font-black text-slate-600 uppercase tracking-tighter ml-1">Featured Image URL</label>
+                                        <input
+                                            type="url"
+                                            value={imageUrl}
+                                            onChange={(e) => setImageUrl(e.target.value)}
+                                            placeholder="https://..."
+                                            className="w-full px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-slate-600 text-xs"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div className="space-y-1.5">
+                                        <label className="flex justify-between items-center text-[9px] font-black text-slate-600 uppercase tracking-tighter px-1">
+                                            <span>Meta Description</span>
+                                            <span className={`${metaDescription.length > 165 ? 'text-red-400' : 'text-slate-700'}`}>{metaDescription.length}/160</span>
+                                        </label>
+                                        <textarea
+                                            value={metaDescription}
+                                            onChange={(e) => setMetaDescription(e.target.value)}
+                                            rows={2}
+                                            className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-slate-600 text-xs resize-none leading-relaxed"
+                                            placeholder="High-converting summary for Google..."
+                                        />
+                                    </div>
+
+                                    <div className="space-y-1.5">
+                                        <label className="block text-[9px] font-black text-slate-600 uppercase tracking-tighter px-1">Keywords</label>
                                         <input
                                             type="text"
-                                            value={step}
-                                            onChange={(e) => updateActionStep(index, e.target.value)}
-                                            placeholder={`Action step ${index + 1}...`}
-                                            className="flex-1 px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+                                            value={keywords}
+                                            onChange={(e) => setKeywords(e.target.value)}
+                                            className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-slate-600 text-xs font-bold"
+                                            placeholder="cybersecurity, data breach, protection..."
                                         />
-                                        {actionSteps.length > 2 && (
-                                            <button
-                                                type="button"
-                                                onClick={() => removeActionStep(index)}
-                                                className="p-2 text-slate-500 hover:text-red-400"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
-                                        )}
                                     </div>
-                                ))}
-                                {actionSteps.length < 5 && (
-                                    <button
-                                        type="button"
-                                        onClick={addActionStep}
-                                        className="text-sm text-blue-400 hover:text-blue-300 flex items-center gap-1"
-                                    >
-                                        <Plus className="w-4 h-4" />
-                                        Add Step
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Step 7: Optional Fields */}
-                    {step >= 6 && (
-                        <div className="p-6 border-b border-slate-800 animate-fade-in">
-                            <label className="flex items-center gap-2 text-sm font-bold text-slate-400 mb-3">
-                                <span className="w-6 h-6 bg-slate-700 rounded-full flex items-center justify-center text-xs text-white">+</span>
-                                Optional Fields
-                            </label>
-                            <div className="grid sm:grid-cols-2 gap-4">
-                                <input
-                                    type="url"
-                                    value={sourceUrl}
-                                    onChange={(e) => setSourceUrl(e.target.value)}
-                                    placeholder="Original Source URL (optional)"
-                                    className="px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-slate-600 text-sm"
-                                />
-                                <input
-                                    type="url"
-                                    value={imageUrl}
-                                    onChange={(e) => setImageUrl(e.target.value)}
-                                    placeholder="Image URL (optional)"
-                                    className="px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-slate-600 text-sm"
-                                />
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Submit */}
-                    {step >= 6 && (
-                        <div className="p-6 bg-slate-900/80">
-                            {message && (
-                                <div className={`mb-4 p-3 rounded-lg text-sm ${message.type === 'error' ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'}`}>
-                                    {message.text}
                                 </div>
-                            )}
-                            <button
-                                onClick={handleSubmit}
-                                disabled={!isFormValid || isSubmitting}
-                                className={`w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 transition-all ${isFormValid && !isSubmitting
-                                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white shadow-lg shadow-blue-900/30'
-                                    : 'bg-slate-800 text-slate-500 cursor-not-allowed'
-                                    }`}
-                            >
-                                {isSubmitting ? (
-                                    <>
-                                        <Loader2 className="w-5 h-5 animate-spin" />
-                                        Publishing...
-                                    </>
-                                ) : (
-                                    <>
-                                        <Zap className="w-5 h-5" />
-                                        Publish Article Now
-                                    </>
+                            </div>
+
+                            {/* Final Submission */}
+                            <div className="p-8 bg-slate-900/60 flex flex-col items-center">
+                                {message && (
+                                    <div className={`w-full mb-6 p-4 rounded-xl text-sm font-bold text-center ${message.type === 'error' ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'}`}>
+                                        {message.text}
+                                    </div>
                                 )}
-                            </button>
+                                <div className="max-w-md w-full">
+                                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em] text-center mb-6">Article Ready for Deployment</p>
+                                    <button
+                                        onClick={handleSubmit}
+                                        disabled={!isFormValid || isSubmitting}
+                                        className={`w-full py-5 rounded-2xl font-black text-lg flex items-center justify-center gap-4 transition-all active:scale-[0.98] ${isFormValid && !isSubmitting
+                                            ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-2xl shadow-blue-500/20'
+                                            : 'bg-slate-800 text-slate-600 cursor-not-allowed border border-slate-700/50'
+                                            }`}
+                                    >
+                                        {isSubmitting ? (
+                                            <>
+                                                <Loader2 className="w-6 h-6 animate-spin" />
+                                                Deploying Intel...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Zap className="w-5 h-5 fill-current" />
+                                                Push Article Live Now
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     )}
                 </div>

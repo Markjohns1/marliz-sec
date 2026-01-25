@@ -111,6 +111,8 @@ class ManualArticleCreate(BaseModel):
     original_url: Optional[str] = None
     source_name: Optional[str] = "Staff Writer"
     image_url: Optional[str] = None
+    meta_description: Optional[str] = None
+    keywords: Optional[str] = None
     admin_secret: str
 
 class ManualNewsletterTrigger(BaseModel):

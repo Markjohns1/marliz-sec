@@ -573,6 +573,8 @@ async def create_manual_article(
         image_url=article_data.image_url,
         category_id=article_data.category_id,
         status=ArticleStatus.PUBLISHED,
+        meta_description=article_data.meta_description,
+        keywords=article_data.keywords,
         is_edited=True,
         edited_by="admin",
         edited_at=datetime.now()
