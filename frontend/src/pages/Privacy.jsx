@@ -87,7 +87,7 @@ const Privacy = () => {
 
                     <section className="pt-8 border-t border-slate-800">
                         <p className="text-sm text-slate-500">
-                            Last Updated: December 27, 2025. For any privacy-related concerns, please contact our data officer at <span className="text-blue-400">admin@marlizintel.com</span>.
+                            Last Updated: January 20, 2026. For any privacy-related concerns, please contact our data officer at <span className="text-blue-400">admin@marlizintel.com</span>.
                         </p>
                     </section>
                 </div>

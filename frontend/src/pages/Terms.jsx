@@ -5,14 +5,14 @@ export default function Terms() {
     return (
         <>
             <Helmet>
-                <title>Terms and Conditions | Marliz Security</title>
-                <meta name="description" content="Terms and Conditions for using Marliz Security News." />
+                <title>Terms and Conditions | Marliz Intel</title>
+                <meta name="description" content="Terms and Conditions for using Marliz Intel." />
             </Helmet>
 
             <div className="bg-slate-950 min-h-screen text-slate-300 py-20 px-4">
                 <div className="max-w-4xl mx-auto bg-slate-900/50 rounded-2xl border border-slate-800 p-8 sm:p-12">
                     <h1 className="text-3xl sm:text-4xl font-bold text-white mb-8">Terms and Conditions</h1>
-                    <p className="text-sm text-slate-500 mb-8">Last Updated: December 20, 2025</p>
+                    <p className="text-sm text-slate-500 mb-8">Last Updated: January 20, 2026</p>
 
                     <div className="space-y-8">
                         <section>
@@ -32,7 +32,7 @@ export default function Terms() {
                         <section>
                             <h2 className="text-xl font-semibold text-white mb-4">3. Intellectual Property Rights</h2>
                             <p>
-                                All content, including text, graphics, logos, software, and threat analysis code, is the exclusive property of Marliz Security and is protected by international copyright and intellectual property laws. You may not reproduce, distribute, display, or create derivative works of this content without explicit written permission from Marliz Security.
+                                All content, including text, graphics, logos, software, and threat analysis code, is the exclusive property of Marliz Intel and is protected by international copyright and intellectual property laws. You may not reproduce, distribute, display, or create derivative works of this content without explicit written permission from Marliz Intel.
                             </p>
                         </section>
 
@@ -46,21 +46,21 @@ export default function Terms() {
                         <section>
                             <h2 className="text-xl font-semibold text-white mb-4">5. AdSense & Third-Party Advertisements</h2>
                             <p>
-                                This website utilizes Google AdSense to serve advertisements. These advertisements are automated and do not constitute an endorsement by Marliz Security. We are not responsible for the content, privacy practices, or availability of third-party websites linked through these advertisements. Your interaction with third-party ads is solely between you and the advertiser.
+                                This website utilizes Google AdSense to serve advertisements. These advertisements are automated and do not constitute an endorsement by Marliz Intel. We are not responsible for the content, privacy practices, or availability of third-party websites linked through these advertisements. Your interaction with third-party ads is solely between you and the advertiser.
                             </p>
                         </section>
 
                         <section>
                             <h2 className="text-xl font-semibold text-white mb-4">6. Disclaimer of Warranties</h2>
                             <p>
-                                The services are provided "as is" and "as available" without any warranties of any kind, express or implied. Marliz Security disclaims all warranties, including merchantability, fitness for a particular purpose, and non-infringement. We do not warrant that the service will be uninterrupted, secure, or free from viruses.
+                                The services are provided "as is" and "as available" without any warranties of any kind, express or implied. Marliz Intel disclaims all warranties, including merchantability, fitness for a particular purpose, and non-infringement. We do not warrant that the service will be uninterrupted, secure, or free from viruses.
                             </p>
                         </section>
 
                         <section>
                             <h2 className="text-xl font-semibold text-white mb-4">7. Limitation of Liability</h2>
                             <p>
-                                In no event shall Marliz Security or its affiliates be liable for any direct, indirect, incidental, special, or consequential damages resulting from the use or inability to use the service, including but not limited to damages for loss of profits, data, or other intangibles, even if we have been advised of the possibility of such damages.
+                                In no event shall Marliz Intel or its affiliates be liable for any direct, indirect, incidental, special, or consequential damages resulting from the use or inability to use the service, including but not limited to damages for loss of profits, data, or other intangibles, even if we have been advised of the possibility of such damages.
                             </p>
                         </section>
 

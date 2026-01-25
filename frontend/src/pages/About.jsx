@@ -6,8 +6,8 @@ export default function About() {
   return (
     <>
       <Helmet>
-        <title>About Us - Cybersecurity News for Small Business | Marliz Sec</title>
-        <meta name="description" content="Learn how Marliz Sec News helps small businesses stay protected by translating complex cyber threats into simple, actionable advice." />
+        <title>About Us - Cybersecurity Intelligence for Small Business | Marliz Intel</title>
+        <meta name="description" content="Learn how Marliz Intel helps small businesses stay protected by translating complex cyber threats into simple, actionable advice." />
       </Helmet>
 
       <div className="bg-slate-950 text-slate-200 min-h-screen">
@@ -43,7 +43,7 @@ export default function About() {
                     In the current digital landscape, high-grade threat intelligence is locked behind $50k/year corporate paywalls. This leaves small businesses, community organizations, and everyday users vulnerable to sophisticated ransomware and social engineering.
                   </p>
                   <p>
-                    <strong className="text-slate-200">Marliz Sec</strong> was founded on a singular radical idea: <span className="text-slate-100 italic">Security intelligence should be a public utility, not a luxury good.</span>
+                    <strong className="text-slate-200">Marliz Intel</strong> was founded on a singular radical idea: <span className="text-slate-100 italic">Security intelligence should be a public utility, not a luxury good.</span>
                   </p>
                   <p>
                     We cut through the "Security Theater" and marketing fluff. Our analysts dive deep into raw exploit data, black-market leaks, and technical research to extract the only thing that matters: <strong className="text-white">What is the risk, and how do you stop it?</strong>
