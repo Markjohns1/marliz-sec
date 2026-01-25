@@ -238,7 +238,7 @@ export default function QuickPublishTab({ onPublishSuccess }) {
                             </div>
                             <div>
                                 <label className="text-sm font-bold text-slate-300 mb-3 block">Threat Level</label>
-                                <div className="grid grid-cols-2 gap-2">
+                                <div className="grid grid-cols-1 min-[450px]:grid-cols-2 gap-2">
                                     {THREAT_LEVELS.map(level => (
                                         <button
                                             key={level.value}
@@ -425,7 +425,7 @@ export default function QuickPublishTab({ onPublishSuccess }) {
                                     <button
                                         onClick={handleSubmit}
                                         disabled={!isFormValid || isSubmitting}
-                                        className={`w-full py-5 rounded-2xl font-black text-lg flex items-center justify-center gap-4 transition-all active:scale-[0.98] ${isFormValid && !isSubmitting
+                                        className={`w-full py-4 sm:py-5 rounded-2xl font-black text-base sm:text-lg flex items-center justify-center gap-4 transition-all active:scale-[0.98] ${isFormValid && !isSubmitting
                                             ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-2xl shadow-blue-500/20'
                                             : 'bg-slate-800 text-slate-600 cursor-not-allowed border border-slate-700/50'
                                             }`}
