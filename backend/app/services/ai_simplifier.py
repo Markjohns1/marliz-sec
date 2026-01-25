@@ -418,6 +418,8 @@ CRITICAL RULES:
 - **WORD COUNT IS MANDATORY**. If you return short content, you fail. EXPAND on every point, every section, no thin sections allowed.
 - **TONE**: Senior Analyst. Serious, somewhat dark but professional.
 - **FORMAT**: Use Markdown for headers (##) and bolding (**).
+- **CRITICAL: NO INDENTATION**: NEVER start a line with leading spaces or tabs. Standard text must be flush-left. Indented text is interpreted as "Code Blocks" and will be rejected.
+- **NO TRIPLE BACKTICKS**: Never wrap your analysis in ``` or code blocks. It must be clean, professional prose.
 - **NO ROBOTIC FILLER**: Do not start with "In the rapidly evolving landscape...". Jump straight into the heavy analysis.
 
 PRODUCE THE JSON NOW."""
