@@ -104,6 +104,7 @@ class ManualArticleCreate(BaseModel):
     title: str = Field(..., min_length=10, max_length=500)
     category_id: int
     friendly_summary: str = Field(..., min_length=50)
+    attack_vector: Optional[str] = None
     business_impact: str = Field(..., min_length=30)
     action_steps: List[str] = Field(..., min_items=2, max_items=5)
     threat_level: ThreatLevel

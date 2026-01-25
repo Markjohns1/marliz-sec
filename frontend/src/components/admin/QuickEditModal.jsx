@@ -8,6 +8,8 @@ export default function QuickEditModal({ article, onClose, onSave }) {
     const [draftTitle, setDraftTitle] = useState(article.draft_title || article.title);
     const [draftMeta, setDraftMeta] = useState(article.draft_meta_description || article.meta_description || '');
     const [draftKeywords, setDraftKeywords] = useState(article.draft_keywords || article.keywords || '');
+    const [imageUrl, setImageUrl] = useState(article.image_url || '');
+    const [originalUrl, setOriginalUrl] = useState(article.original_url || '');
 
     // Content States
     const [summary, setSummary] = useState(article.simplified?.friendly_summary || '');
@@ -41,6 +43,8 @@ export default function QuickEditModal({ article, onClose, onSave }) {
                 threat_level: threatLevel,
 
                 publish_now: isPublish,
+                image_url: imageUrl,
+                original_url: originalUrl,
                 edited_by: 'admin'
             });
             if (isPublish) {
@@ -138,6 +142,29 @@ export default function QuickEditModal({ article, onClose, onSave }) {
                                     placeholder="cybersecurity, data breach, protection..."
                                 />
                             </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div className="space-y-2">
+                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">Featured Image URL</label>
+                                    <input
+                                        type="text"
+                                        value={imageUrl}
+                                        onChange={(e) => setImageUrl(e.target.value)}
+                                        className="w-full px-5 py-3 rounded-xl bg-slate-950 border border-slate-800 focus:ring-2 focus:ring-primary-500 outline-none transition-all text-xs font-bold text-slate-400"
+                                        placeholder="https://..."
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">Original Source URL</label>
+                                    <input
+                                        type="text"
+                                        value={originalUrl}
+                                        onChange={(e) => setOriginalUrl(e.target.value)}
+                                        className="w-full px-5 py-3 rounded-xl bg-slate-950 border border-slate-800 focus:ring-2 focus:ring-primary-500 outline-none transition-all text-xs font-bold text-slate-400"
+                                        placeholder="https://..."
+                                    />
+                                </div>
+                            </div>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 gap-8 animate-in fade-in slide-in-from-right-4 duration-300">
@@ -196,7 +223,7 @@ export default function QuickEditModal({ article, onClose, onSave }) {
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div className="space-y-2">
-                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">How it Happened (Vector)</label>
+                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">Technical Analysis & Mechanics</label>
                                     <textarea
                                         value={vector}
                                         onChange={(e) => setVector(e.target.value)}

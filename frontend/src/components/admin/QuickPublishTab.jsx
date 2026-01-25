@@ -35,6 +35,7 @@ export default function QuickPublishTab({ onPublishSuccess }) {
     const [categoryId, setCategoryId] = useState('');
     const [threatLevel, setThreatLevel] = useState('medium');
     const [summary, setSummary] = useState('');
+    const [vector, setVector] = useState('');
     const [impact, setImpact] = useState('');
     const [actionSteps, setActionSteps] = useState(['', '']);
     const [sourceUrl, setSourceUrl] = useState('');
@@ -63,6 +64,10 @@ export default function QuickPublishTab({ onPublishSuccess }) {
         if (impact.length > 30 && step === 4) setStep(5);
     }, [impact]);
 
+    useEffect(() => {
+        if (vector.length > 50 && step === 5) setStep(6);
+    }, [vector]);
+
     const addActionStep = () => {
         if (actionSteps.length < 5) {
             setActionSteps([...actionSteps, '']);
@@ -86,6 +91,7 @@ export default function QuickPublishTab({ onPublishSuccess }) {
         setCategoryId('');
         setThreatLevel('medium');
         setSummary('');
+        setVector('');
         setImpact('');
         setActionSteps(['', '']);
         setSourceUrl('');
@@ -111,6 +117,7 @@ export default function QuickPublishTab({ onPublishSuccess }) {
                 category_id: parseInt(categoryId),
                 threat_level: threatLevel,
                 friendly_summary: summary,
+                attack_vector: vector,
                 business_impact: impact,
                 action_steps: filledSteps,
                 original_url: sourceUrl || null,
@@ -130,7 +137,7 @@ export default function QuickPublishTab({ onPublishSuccess }) {
         }
     };
 
-    const isFormValid = title.length >= 10 && categoryId && summary.length >= 50 && impact.length >= 30 && actionSteps.filter(s => s.trim()).length >= 2;
+    const isFormValid = title.length >= 10 && categoryId && summary.length >= 50 && impact.length >= 30 && vector.length >= 50 && actionSteps.filter(s => s.trim()).length >= 2;
 
     return (
         <div className="space-y-6">
@@ -232,8 +239,8 @@ export default function QuickPublishTab({ onPublishSuccess }) {
                                             type="button"
                                             onClick={() => setThreatLevel(level.value)}
                                             className={`px-3 py-2 rounded-lg border text-sm font-medium flex items-center gap-2 transition-all ${threatLevel === level.value
-                                                    ? `${level.bg} border-current ${level.color}`
-                                                    : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600'
+                                                ? `${level.bg} border-current ${level.color}`
+                                                : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600'
                                                 }`}
                                         >
                                             <level.icon className="w-4 h-4" />
@@ -280,11 +287,29 @@ export default function QuickPublishTab({ onPublishSuccess }) {
                         </div>
                     )}
 
-                    {/* Step 5: Action Steps */}
+                    {/* Step 5: Technical Analysis */}
                     {step >= 5 && (
                         <div className="p-6 border-b border-slate-800 animate-fade-in">
                             <label className="flex items-center gap-2 text-sm font-bold text-slate-300 mb-3">
-                                <span className="w-6 h-6 bg-emerald-600 rounded-full flex items-center justify-center text-xs text-white">5</span>
+                                <span className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-xs text-white">5</span>
+                                Technical Analysis & Mechanics
+                            </label>
+                            <textarea
+                                value={vector}
+                                onChange={(e) => setVector(e.target.value)}
+                                placeholder="Provide the technical deep-dive. Kill chain, CVEs, or complex mechanics..."
+                                rows={4}
+                                className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 resize-none"
+                            />
+                            <p className="text-xs text-slate-500 mt-2">{vector.length} characters (min 50)</p>
+                        </div>
+                    )}
+
+                    {/* Step 6: Action Steps */}
+                    {step >= 6 && (
+                        <div className="p-6 border-b border-slate-800 animate-fade-in">
+                            <label className="flex items-center gap-2 text-sm font-bold text-slate-300 mb-3">
+                                <span className="w-6 h-6 bg-emerald-600 rounded-full flex items-center justify-center text-xs text-white">6</span>
                                 What Should People Do? (Action Steps)
                             </label>
                             <div className="space-y-3">
@@ -323,8 +348,8 @@ export default function QuickPublishTab({ onPublishSuccess }) {
                         </div>
                     )}
 
-                    {/* Step 6: Optional Fields */}
-                    {step >= 5 && (
+                    {/* Step 7: Optional Fields */}
+                    {step >= 6 && (
                         <div className="p-6 border-b border-slate-800 animate-fade-in">
                             <label className="flex items-center gap-2 text-sm font-bold text-slate-400 mb-3">
                                 <span className="w-6 h-6 bg-slate-700 rounded-full flex items-center justify-center text-xs text-white">+</span>
@@ -350,7 +375,7 @@ export default function QuickPublishTab({ onPublishSuccess }) {
                     )}
 
                     {/* Submit */}
-                    {step >= 5 && (
+                    {step >= 6 && (
                         <div className="p-6 bg-slate-900/80">
                             {message && (
                                 <div className={`mb-4 p-3 rounded-lg text-sm ${message.type === 'error' ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'}`}>
@@ -361,8 +386,8 @@ export default function QuickPublishTab({ onPublishSuccess }) {
                                 onClick={handleSubmit}
                                 disabled={!isFormValid || isSubmitting}
                                 className={`w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 transition-all ${isFormValid && !isSubmitting
-                                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white shadow-lg shadow-blue-900/30'
-                                        : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white shadow-lg shadow-blue-900/30'
+                                    : 'bg-slate-800 text-slate-500 cursor-not-allowed'
                                     }`}
                             >
                                 {isSubmitting ? (
@@ -385,7 +410,7 @@ export default function QuickPublishTab({ onPublishSuccess }) {
             {/* Progress Indicator */}
             {!publishedSlug && (
                 <div className="flex items-center justify-center gap-2">
-                    {[1, 2, 3, 4, 5].map(s => (
+                    {[1, 2, 3, 4, 5, 6].map(s => (
                         <div
                             key={s}
                             className={`w-2 h-2 rounded-full transition-all ${step >= s ? 'bg-blue-500' : 'bg-slate-700'}`}

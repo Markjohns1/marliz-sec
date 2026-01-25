@@ -416,6 +416,9 @@ REQUIRED JSON OUTPUT STRUCTURE (Must be exactly these keys):
 
 CRITICAL RULES:
 - **WORD COUNT IS MANDATORY**. If you return short content, you fail. EXPAND on every point, every section, no thin sections allowed.
+- **PROSE STYLE**: Write in **LONG, DENSE PARAGRAPHS**. Each paragraph should be 150-200 words of deep analysis. 
+- **NO CHOPPY TEXT**: Avoid short, 1-2 sentence paragraphs. That is a trait of low-quality AI.
+- **NO BULLET POINTS IN ANALYSIS**: Do not use bullet points or numbered lists in the 'summary', 'attack_vector', or 'impact' sections. Use cohesive, flowing prose. Lists are only allowed in the 'actions' array.
 - **TONE**: Senior Analyst. Serious, somewhat dark but professional.
 - **FORMAT**: Use Markdown for headers (##) and bolding (**).
 - **CRITICAL: NO INDENTATION**: NEVER start a line with leading spaces or tabs. Standard text must be flush-left. Indented text is interpreted as "Code Blocks" and will be rejected.

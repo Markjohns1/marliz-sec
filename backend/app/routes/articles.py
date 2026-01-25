@@ -583,6 +583,7 @@ async def create_manual_article(
     simplified = models.SimplifiedContent(
         article_id=article.id,
         friendly_summary=article_data.friendly_summary,
+        attack_vector=article_data.attack_vector,
         business_impact=article_data.business_impact,
         action_steps=json.dumps(article_data.action_steps),
         threat_level=article_data.threat_level

@@ -369,7 +369,7 @@ export default function ArticleDetail() {
                     <div className="p-2 bg-slate-800 rounded-lg mr-3 border border-slate-700">
                       <Zap className="w-5 h-5 text-blue-400" />
                     </div>
-                    How The Attack Happened
+                    Technical Analysis & Mechanics
                   </h2>
                   <div className="prose prose-invert prose-blue max-w-none text-slate-300 leading-relaxed text-base">
                     <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
