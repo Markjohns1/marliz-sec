@@ -1,4 +1,4 @@
-﻿from fastapi import FastAPI, HTTPException, Depends, Request
+﻿from fastapi import FastAPI, HTTPException, Depends, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -152,25 +152,29 @@ from sqlalchemy import select
 from app.models import Article, ArticleStatus, DeletedArticle
 from app.database import get_db
 
-@app.api_route("/sitemap.xml", methods=["GET", "HEAD"])
-async def get_sitemap_xml(request: Request):
-    """Fallback for dynamic sitemap if router fails"""
+@app.get("/sitemap.xml", response_class=Response)
+async def get_sitemap_xml(db: AsyncSession = Depends(get_db)):
+    """Ironclad route for sitemap"""
     from app.routes.seo import get_sitemap
-    async for db in get_db():
-        return await get_sitemap(db)
+    return await get_sitemap(db)
 
-@app.api_route("/sitemap-deleted.xml", methods=["GET", "HEAD"])
-async def get_deleted_sitemap_xml(request: Request):
+@app.get("/sitemap-deleted.xml", response_class=Response)
+async def get_deleted_sitemap_xml(db: AsyncSession = Depends(get_db)):
     """Ironclad route for deleted sitemap"""
     from app.routes.seo import get_deleted_sitemap
-    async for db in get_db():
-        return await get_deleted_sitemap(db)
+    return await get_deleted_sitemap(db)
 
-@app.api_route("/ads.txt", methods=["GET", "HEAD"])
-async def get_ads_txt_ironclad(request: Request):
-    """Ironclad route for ads.txt"""
+@app.get("/ads.txt", response_class=Response)
+async def ads_txt_ironclad():
+    """High-priority ads.txt route for AdSense"""
     from app.routes.seo import get_ads_txt
     return get_ads_txt()
+
+@app.get("/robots.txt", response_class=Response)
+async def robots_txt_ironclad():
+    """High-priority robots.txt route"""
+    from app.routes.seo import get_robots
+    return get_robots()
 
 # ==========================================
 # SERVE STATIC FILES (React Frontend)
@@ -193,12 +197,23 @@ if os.path.exists(FRONTEND_DIST):
             raise HTTPException(status_code=403, detail="Forbidden")
 
         # 0. Catch broken 'undefined' URLs (Common SEO issue)
-        # Return 410 Gone to tell Google to permanently de-index these URLs
         if "undefined" in full_path:
             logger.info(f"410 GONE: Blocking broken 'undefined' URL: {full_path}")
             raise HTTPException(status_code=410, detail="Gone: This page has been permanently removed.")
             
-        # 1. SEO HARD STOP: Check Graveyard for Soft 404 Prevention
+        # 1. ALLOW SYSTEM FILES (ads.txt, robots.txt, sitemaps)
+        # We handle these explicitly before the catch-all, but if they fall through,
+        # we check if they exist physically in the dist folder.
+        system_files = ["ads.txt", "robots.txt", "sitemap.xml", "sitemap-deleted.xml"]
+        if full_path in system_files:
+            file_path = os.path.join(FRONTEND_DIST, full_path)
+            if os.path.exists(file_path):
+                return FileResponse(file_path)
+            # If not in dist, don't let it fall through to index.html (Soft 404)
+            # Instead, we let the specific routes above handle it or return 404.
+            raise HTTPException(status_code=404)
+
+        # 2. SEO HARD STOP: Check Graveyard for Soft 404 Prevention
         if full_path.startswith("article/"):
             slug = full_path.split("/")[-1]
             try:
@@ -216,8 +231,8 @@ if os.path.exists(FRONTEND_DIST):
             except Exception as e:
                 logger.error(f"Failed to check graveyard for {slug}: {e}")
 
-        # Explicitly ignore API and SEO paths so they don't get swallowed
-        if full_path.startswith("api") or full_path.endswith(".xml") or full_path.endswith(".txt"):
+        # Explicitly ignore API and unexpected system paths so they don't get swallowed by React
+        if full_path.startswith("api"):
             raise HTTPException(status_code=404, detail="Not Found")
 
         # 2. Serve specific file if it exists (favicon.ico, robots.txt)
