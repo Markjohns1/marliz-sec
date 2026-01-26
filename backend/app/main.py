@@ -11,6 +11,7 @@ from app import models, auth
 from app.routes import articles, categories, subscribers, seo
 from app.routes.articles import track_view
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from app.services.scheduler import start_scheduler, stop_scheduler
 from app.auth import verify_api_key
 
