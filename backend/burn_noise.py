@@ -5,7 +5,7 @@ import os
 TITLES_TO_KEEP = [
     "Coupang Data Breach: 33M Accounts Exposed",
     "AI-Powered Hacking: Vibe Hacking",
-    "Ann & Robert H. Lurie Children's Hospital",
+    "Lurie Children",
     "React Vulnerability 2025",
     "Microsoft Data Breach: Maharashtra",
     "Commvault Confirms 'Salt Typhoon'",
