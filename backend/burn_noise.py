@@ -34,12 +34,10 @@ def burn_the_noise():
 
     try:
         # 1. Identify IDs and Slugs of the "Diamonds"
-        query_parts = []
-        for t in TITLES_TO_KEEP:
-            query_parts.append(f"title LIKE '%{t}%'")
+        query_params = [f"%{t}%" for t in TITLES_TO_KEEP]
+        where_clause = " OR ".join(["title LIKE ?" for _ in TITLES_TO_KEEP])
         
-        where_clause = " OR ".join(query_parts)
-        cursor.execute(f"SELECT id, title FROM articles WHERE {where_clause}")
+        cursor.execute(f"SELECT id, title FROM articles WHERE {where_clause}", query_params)
         diamonds = cursor.fetchall()
         
         print("\n[STEP 1] VERIFY THE ARTICLES TO BE SAVED:")
