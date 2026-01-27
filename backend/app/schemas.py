@@ -62,6 +62,8 @@ class ArticleUpdate(BaseModel):
     draft_title: Optional[str] = None
     draft_meta_description: Optional[str] = None
     draft_keywords: Optional[str] = None
+    draft_content_markdown: Optional[str] = None
+    content_markdown: Optional[str] = None
     publish_now: Optional[bool] = False
 
 class Article(ArticleBase):
@@ -82,6 +84,8 @@ class Article(ArticleBase):
     draft_title: Optional[str] = None
     draft_meta_description: Optional[str] = None
     draft_keywords: Optional[str] = None
+    draft_content_markdown: Optional[str] = None
+    content_markdown: Optional[str] = None
     has_draft: bool = False
     impressions: Optional[int] = 0
     position: Optional[float] = 0.0
@@ -107,6 +111,7 @@ class ManualArticleCreate(BaseModel):
     attack_vector: Optional[str] = None
     business_impact: str = Field(..., min_length=30)
     action_steps: List[str] = Field(..., min_items=2, max_items=5)
+    content_markdown: Optional[str] = None # Support unified markdown in manual creation
     threat_level: ThreatLevel
     original_url: Optional[str] = None
     source_name: Optional[str] = "Staff Writer"

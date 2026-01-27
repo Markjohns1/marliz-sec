@@ -56,6 +56,9 @@ class Article(Base):
     category_id = Column(Integer, ForeignKey("categories.id"))
     status = Column(SQLEnum(ArticleStatus), default=ArticleStatus.RAW, index=True)
     
+    # Core Content (Unified Markdown)
+    content_markdown = Column(Text)
+    
     # SEO fields
     meta_description = Column(String(160))
     keywords = Column(Text)  # comma-separated
@@ -64,6 +67,7 @@ class Article(Base):
     draft_title = Column(String(500))
     draft_meta_description = Column(String(160))
     draft_keywords = Column(Text)
+    draft_content_markdown = Column(Text)
     has_draft = Column(Boolean, default=False)
     
     # NEW: SEO Performance Metrics

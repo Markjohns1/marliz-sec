@@ -577,7 +577,8 @@ async def create_manual_article(
         keywords=article_data.keywords,
         is_edited=True,
         edited_by="admin",
-        edited_at=datetime.now()
+        edited_at=datetime.now(),
+        content_markdown=article_data.content_markdown
     )
     db.add(article)
     await db.flush()
@@ -637,8 +638,10 @@ async def update_article(
     if updates.draft_title is not None: article.draft_title = updates.draft_title
     if updates.draft_meta_description is not None: article.draft_meta_description = updates.draft_meta_description
     if updates.draft_keywords is not None: article.draft_keywords = updates.draft_keywords
+    if updates.content_markdown is not None: article.content_markdown = updates.content_markdown
+    if updates.draft_content_markdown is not None: article.draft_content_markdown = updates.draft_content_markdown
     
-    if any([updates.draft_title, updates.draft_meta_description, updates.draft_keywords]):
+    if any([updates.draft_title, updates.draft_meta_description, updates.draft_keywords, updates.draft_content_markdown]):
         article.has_draft = True
         article.last_edited_at = datetime.now()
         article.last_edited_by = updates.edited_by
@@ -648,6 +651,7 @@ async def update_article(
         if article.draft_title: article.title = article.draft_title
         if article.draft_meta_description: article.meta_description = article.draft_meta_description
         if article.draft_keywords: article.keywords = article.draft_keywords
+        if article.draft_content_markdown: article.content_markdown = article.draft_content_markdown
         
         article.has_draft = False
         article.is_edited = True

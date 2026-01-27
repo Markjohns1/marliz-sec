@@ -24,6 +24,8 @@ export default function QuickEditModal({ article, onClose, onSave }) {
         }
     });
 
+    const [markdownContent, setMarkdownContent] = useState(article.draft_content_markdown || article.content_markdown || '');
+
     const [saving, setSaving] = useState(false);
 
     const handleAction = async (isPublish) => {
@@ -41,6 +43,9 @@ export default function QuickEditModal({ article, onClose, onSave }) {
                 attack_vector: vector,
                 action_steps: JSON.stringify(actionSteps.filter(s => s.trim())),
                 threat_level: threatLevel,
+
+                // NEW: Unified Markdown
+                draft_content_markdown: markdownContent,
 
                 publish_now: isPublish,
                 image_url: imageUrl,
@@ -207,90 +212,70 @@ export default function QuickEditModal({ article, onClose, onSave }) {
 
                             <div className="space-y-2">
                                 <label className="flex justify-between items-center text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">
-                                    <span>Main Intelligence Summary (The depth)</span>
-                                    <span className={`font-black uppercase ${wordCount(summary) < 800 ? 'text-amber-500' : 'text-emerald-500'}`}>
-                                        Words: {wordCount(summary)}
+                                    <span>Intelligence Report (Markdown)</span>
+                                    <span className={`font-black uppercase ${wordCount(markdownContent) < 1000 ? 'text-amber-500' : 'text-emerald-500'}`}>
+                                        Words: {wordCount(markdownContent)}
                                     </span>
                                 </label>
                                 <textarea
-                                    value={summary}
-                                    onChange={(e) => setSummary(e.target.value)}
-                                    rows={10}
-                                    className="w-full px-6 py-5 rounded-[2rem] bg-slate-950 border border-slate-800 focus:ring-2 focus:ring-blue-500 outline-none transition-all text-base text-slate-300 leading-relaxed"
-                                    placeholder="Explain the technical details here..."
+                                    value={markdownContent}
+                                    onChange={(e) => setMarkdownContent(e.target.value)}
+                                    rows={20}
+                                    className="w-full px-6 py-5 rounded-2xl bg-slate-950 border border-slate-800 focus:ring-2 focus:ring-blue-500 outline-none transition-all text-base text-slate-300 font-mono leading-relaxed"
+                                    placeholder="Write your strategic intelligence report in Markdown..."
                                 />
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div className="space-y-2">
-                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">Technical Analysis & Mechanics</label>
-                                    <textarea
-                                        value={vector}
-                                        onChange={(e) => setVector(e.target.value)}
-                                        rows={4}
-                                        className="w-full px-5 py-4 rounded-2xl bg-slate-950 border border-slate-800 focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm text-slate-400"
-                                        placeholder="Phishing, Zero-day, Credential theft..."
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">Impact & Risks</label>
-                                    <textarea
-                                        value={impact}
-                                        onChange={(e) => setImpact(e.target.value)}
-                                        rows={4}
-                                        className="w-full px-5 py-4 rounded-2xl bg-slate-950 border border-slate-800 focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm text-slate-400"
-                                        placeholder="Financial loss, data theft..."
-                                    />
-                                </div>
+                            {/* LEGAY SECTIONS - HIDDEN BUT PRESERVED FOR REFERENCE IF NEEDED */}
+                            <div className="hidden opacity-0 pointer-events-none h-0 overflow-hidden">
+                                <textarea value={summary} onChange={(e) => setSummary(e.target.value)} />
+                                <textarea value={vector} onChange={(e) => setVector(e.target.value)} />
+                                <textarea value={impact} onChange={(e) => setImpact(e.target.value)} />
                             </div>
-
-                            <div className="space-y-4">
-                                <label className="flex justify-between items-center text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">
-                                    <span>What to Do RIGHT NOW (Action Steps)</span>
-                                    <button
-                                        onClick={() => setActionSteps([...actionSteps, ''])}
-                                        className="text-primary-400 hover:text-primary-300 transition-colors"
+                            onClick={() => setActionSteps([...actionSteps, ''])}
+                            className="text-primary-400 hover:text-primary-300 transition-colors"
                                     >
-                                        <Plus className="w-4 h-4" />
-                                    </button>
+                            <Plus className="w-4 h-4" />
+                        </button>
                                 </label>
-                                <div className="space-y-3">
-                                    {actionSteps.map((step, idx) => (
-                                        <div key={idx} className="flex gap-4">
-                                            <div className="flex-1 relative">
-                                                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-600">
-                                                    {idx + 1}
-                                                </div>
-                                                <input
-                                                    type="text"
-                                                    value={step}
-                                                    onChange={(e) => {
-                                                        const newSteps = [...actionSteps];
-                                                        newSteps[idx] = e.target.value;
-                                                        setActionSteps(newSteps);
-                                                    }}
-                                                    className="w-full pl-10 pr-12 py-3 rounded-xl bg-slate-950 border border-slate-800 focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-sm text-slate-300"
-                                                    placeholder="Enter mitigation step..."
-                                                />
-                                                {actionSteps.length > 1 && (
-                                                    <button
-                                                        onClick={() => setActionSteps(actionSteps.filter((_, i) => i !== idx))}
-                                                        className="absolute right-3 top-1/2 -translate-y-1/2 p-2 hover:text-red-400 text-slate-600 transition-colors"
-                                                    >
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </div>
-                                    ))}
+                <div className="space-y-3">
+                    {actionSteps.map((step, idx) => (
+                        <div key={idx} className="flex gap-4">
+                            <div className="flex-1 relative">
+                                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-600">
+                                    {idx + 1}
                                 </div>
+                                <input
+                                    type="text"
+                                    value={step}
+                                    onChange={(e) => {
+                                        const newSteps = [...actionSteps];
+                                        newSteps[idx] = e.target.value;
+                                        setActionSteps(newSteps);
+                                    }}
+                                    className="w-full pl-10 pr-12 py-3 rounded-xl bg-slate-950 border border-slate-800 focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-sm text-slate-300"
+                                    placeholder="Enter mitigation step..."
+                                />
+                                {actionSteps.length > 1 && (
+                                    <button
+                                        onClick={() => setActionSteps(actionSteps.filter((_, i) => i !== idx))}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 p-2 hover:text-red-400 text-slate-600 transition-colors"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                )}
                             </div>
                         </div>
-                    )}
+                    ))}
                 </div>
+            </div>
+        </div>
+    )
+}
+                </div >
 
-                {/* Footer */}
-                <div className="px-8 py-6 bg-slate-950 border-t border-slate-800 flex flex-wrap gap-4 items-center justify-between">
+    {/* Footer */ }
+    < div className = "px-8 py-6 bg-slate-950 border-t border-slate-800 flex flex-wrap gap-4 items-center justify-between" >
                     <div className="flex items-center gap-3">
                         <div className={`w-3 h-3 rounded-full ${article.has_draft ? 'bg-amber-500 animate-pulse shadow-lg shadow-amber-500/20' : 'bg-emerald-500 shadow-lg shadow-emerald-500/20'}`} />
                         <span className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">
@@ -314,8 +299,8 @@ export default function QuickEditModal({ article, onClose, onSave }) {
                             Commit Changes & Push Live
                         </button>
                     </div>
-                </div>
-            </div>
-        </div>
+                </div >
+            </div >
+        </div >
     );
 }
