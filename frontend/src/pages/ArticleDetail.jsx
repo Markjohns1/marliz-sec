@@ -347,105 +347,117 @@ export default function ArticleDetail() {
 
             {/* Main Content */}
             <div className="prose prose-lg max-w-none">
-              {/* Summary */}
-              <section className="mb-12">
-                <div className="inline-block px-2 py-0.5 rounded-md bg-blue-900/20 border border-blue-500/20 text-blue-400 text-[10px] font-bold uppercase tracking-widest mb-4">
-                  Executive Summary
-                </div>
-                <h2 className="text-2xl font-bold text-white mb-4">
-                  What You Need to Know Right Now
-                </h2>
-                <div className="prose prose-invert prose-blue max-w-none text-lg text-slate-300 leading-relaxed font-light">
+              {article.content_markdown ? (
+                /* NEW UNIFIED JOURNAL FORMAT */
+                <div className="prose prose-invert prose-blue max-w-none text-slate-300 leading-relaxed font-light">
                   <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
-                    {formatAIContent(article.simplified?.friendly_summary)}
+                    {article.content_markdown}
                   </ReactMarkdown>
                 </div>
-              </section>
-
-              {/* Technical Details - Attack Vector */}
-              {article.simplified?.attack_vector && (
-                <section className="mb-12 p-6 rounded-xl border border-slate-800 bg-slate-900/50">
-                  <h2 className="text-xl font-bold text-slate-100 mb-6 flex items-center">
-                    <div className="p-2 bg-slate-800 rounded-lg mr-3 border border-slate-700">
-                      <Zap className="w-5 h-5 text-blue-400" />
+              ) : (
+                /* LEGACY FRAGMENTED FORMAT (Fallback) */
+                <>
+                  {/* Summary */}
+                  <section className="mb-12">
+                    <div className="inline-block px-2 py-0.5 rounded-md bg-blue-900/20 border border-blue-500/20 text-blue-400 text-[10px] font-bold uppercase tracking-widest mb-4">
+                      Executive Summary
                     </div>
-                    Technical Analysis & Mechanics
-                  </h2>
-                  <div className="prose prose-invert prose-blue max-w-none text-slate-300 leading-relaxed text-base">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
-                      {formatAIContent(article.simplified?.attack_vector)}
-                    </ReactMarkdown>
-                  </div>
-                </section>
-              )}
+                    <h2 className="text-2xl font-bold text-white mb-4">
+                      What You Need to Know Right Now
+                    </h2>
+                    <div className="prose prose-invert prose-blue max-w-none text-lg text-slate-300 leading-relaxed font-light">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+                        {formatAIContent(article.simplified?.friendly_summary)}
+                      </ReactMarkdown>
+                    </div>
+                  </section>
 
-              {/* MOBILE AD PLACEMENT (Visible only on mobile/tablet) */}
-              <div className="xl:hidden">
-                <AdUnit format="rectangle" />
-              </div>
-
-              {/* Business Impact */}
-              <section className="mb-12 p-6 rounded-xl border border-slate-800 bg-slate-900/50">
-                <h2 className="text-xl font-bold text-slate-100 mb-6 flex items-center">
-                  <div className="p-2 bg-slate-800 rounded-lg mr-3 border border-slate-700">
-                    <Shield className="w-5 h-5 text-red-400" />
-                  </div>
-                  Business & Operational Impact
-                </h2>
-                <div className="prose prose-invert prose-blue max-w-none text-slate-300 leading-relaxed text-base">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
-                    {formatAIContent(article.simplified?.business_impact)}
-                  </ReactMarkdown>
-                </div>
-              </section>
-
-              {/* Action Steps */}
-              <section className="bg-slate-900/50 rounded-xl p-8 border border-slate-800 mb-8">
-                <h2 className="text-2xl font-bold text-white mb-6">
-                  What to Do RIGHT NOW to Protect Yourself and your business
-                </h2>
-                <div className="space-y-4">
-                  {/* Handle if actionSteps is an Array of Strings (Old format) */}
-                  {Array.isArray(actionSteps) && actionSteps.every(s => typeof s === 'string') && actionSteps.map((step, index) => (
-                    <div
-                      key={index}
-                      className="p-5 bg-slate-800/40 rounded-xl border border-slate-700/50 hover:border-emerald-500/30 transition-colors mb-4"
-                    >
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="p-1.5 bg-emerald-500/10 rounded-full text-emerald-500 border border-emerald-500/10">
-                          <CheckCircle2 className="w-4 h-4" />
+                  {/* Technical Details - Attack Vector */}
+                  {article.simplified?.attack_vector && (
+                    <section className="mb-12 p-6 rounded-xl border border-slate-800 bg-slate-900/50">
+                      <h2 className="text-xl font-bold text-slate-100 mb-6 flex items-center">
+                        <div className="p-2 bg-slate-800 rounded-lg mr-3 border border-slate-700">
+                          <Zap className="w-5 h-5 text-blue-400" />
                         </div>
-                        <div className="px-2 py-0.5 bg-emerald-900/30 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold rounded uppercase tracking-widest">
-                          Recommended
-                        </div>
+                        Technical Analysis & Mechanics
+                      </h2>
+                      <div className="prose prose-invert prose-blue max-w-none text-slate-300 leading-relaxed text-base">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+                          {formatAIContent(article.simplified?.attack_vector)}
+                        </ReactMarkdown>
                       </div>
-                      <p className="text-slate-200 font-medium leading-relaxed pl-1">
-                        {step}
-                      </p>
-                    </div>
-                  ))}
-
-                  {/* Handle if actionSteps is an Object/Dict (New categorized format) */}
-                  {!Array.isArray(actionSteps) && typeof actionSteps === 'object' && Object.entries(actionSteps).map(([key, value], index) => (
-                    <div key={index} className="flex items-start p-4 bg-slate-800/40 rounded-lg border border-slate-700/50 hover:border-emerald-500/30 transition-colors mb-4 last:mb-0">
-                      <div className="mt-0.5 mr-4 p-1 bg-emerald-500/10 rounded-full">
-                        <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                      </div>
-                      <div>
-                        <h3 className="text-emerald-400 font-bold uppercase text-xs tracking-wider mb-1">
-                          {key.replace(/_/g, ' ')}
-                        </h3>
-                        <p className="text-slate-200 font-medium leading-relaxed">{value}</p>
-                      </div>
-                    </div>
-                  ))}
-
-                  {/* Handle Empty State */}
-                  {(!actionSteps || (Array.isArray(actionSteps) && actionSteps.length === 0)) && (
-                    <p className="text-slate-500 italic">No specific action steps provided for this report.</p>
+                    </section>
                   )}
-                </div>
-              </section>
+
+                  {/* MOBILE AD PLACEMENT (Visible only on mobile/tablet) */}
+                  <div className="xl:hidden">
+                    <AdUnit format="rectangle" />
+                  </div>
+
+                  {/* Business Impact */}
+                  <section className="mb-12 p-6 rounded-xl border border-slate-800 bg-slate-900/50">
+                    <h2 className="text-xl font-bold text-slate-100 mb-6 flex items-center">
+                      <div className="p-2 bg-slate-800 rounded-lg mr-3 border border-slate-700">
+                        <Shield className="w-5 h-5 text-red-400" />
+                      </div>
+                      Business & Operational Impact
+                    </h2>
+                    <div className="prose prose-invert prose-blue max-w-none text-slate-300 leading-relaxed text-base">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+                        {formatAIContent(article.simplified?.business_impact)}
+                      </ReactMarkdown>
+                    </div>
+                  </section>
+
+                  {/* Action Steps */}
+                  <section className="bg-slate-900/50 rounded-xl p-8 border border-slate-800 mb-8">
+                    <h2 className="text-2xl font-bold text-white mb-6">
+                      What to Do RIGHT NOW to Protect Yourself and your business
+                    </h2>
+                    <div className="space-y-4">
+                      {/* Handle if actionSteps is an Array of Strings (Old format) */}
+                      {Array.isArray(actionSteps) && actionSteps.every(s => typeof s === 'string') && actionSteps.map((step, index) => (
+                        <div
+                          key={index}
+                          className="p-5 bg-slate-800/40 rounded-xl border border-slate-700/50 hover:border-emerald-500/30 transition-colors mb-4"
+                        >
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className="p-1.5 bg-emerald-500/10 rounded-full text-emerald-500 border border-emerald-500/10">
+                              <CheckCircle2 className="w-4 h-4" />
+                            </div>
+                            <div className="px-2 py-0.5 bg-emerald-900/30 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold rounded uppercase tracking-widest">
+                              Recommended
+                            </div>
+                          </div>
+                          <p className="text-slate-200 font-medium leading-relaxed pl-1">
+                            {step}
+                          </p>
+                        </div>
+                      ))}
+
+                      {/* Handle if actionSteps is an Object/Dict (New categorized format) */}
+                      {!Array.isArray(actionSteps) && typeof actionSteps === 'object' && Object.entries(actionSteps).map(([key, value], index) => (
+                        <div key={index} className="flex items-start p-4 bg-slate-800/40 rounded-lg border border-slate-700/50 hover:border-emerald-500/30 transition-colors mb-4 last:mb-0">
+                          <div className="mt-0.5 mr-4 p-1 bg-emerald-500/10 rounded-full">
+                            <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                          </div>
+                          <div>
+                            <h3 className="text-emerald-400 font-bold uppercase text-xs tracking-wider mb-1">
+                              {key.replace(/_/g, ' ')}
+                            </h3>
+                            <p className="text-slate-200 font-medium leading-relaxed">{value}</p>
+                          </div>
+                        </div>
+                      ))}
+
+                      {/* Handle Empty State */}
+                      {(!actionSteps || (Array.isArray(actionSteps) && actionSteps.length === 0)) && (
+                        <p className="text-slate-500 italic">No specific action steps provided for this report.</p>
+                      )}
+                    </div>
+                  </section>
+                </>
+              )}
 
               {/* SECONDARY MOBILE AD */}
               <div className="xl:hidden">
