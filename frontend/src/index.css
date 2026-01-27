@@ -79,7 +79,7 @@ body::before {
 }
 
 .prose h3 {
-  @apply text-blue-400 font-bold text-xl mt-10 mb-4 pl-4 border-l-4 border-blue-500/50 flex items-center;
+  @apply text-blue-400 font-bold text-xl mt-10 mb-4 flex items-center;
 }
 
 .prose p {
