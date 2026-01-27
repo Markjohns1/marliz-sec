@@ -12,7 +12,7 @@ TITLES_TO_KEEP = [
     "Apple Expands App Distribution Choices in Japan"
 ]
 
-# Path to the database on the server (inside Docker container)
+# Path to the database
 DB_PATH = "cybersec_news.db" 
 
 def burn_the_noise():
