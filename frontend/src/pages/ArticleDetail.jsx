@@ -295,10 +295,12 @@ export default function ArticleDetail() {
                 </span>
               </div>
 
-              {/* Title */}
-              <h1 className="text-3xl md:text-5xl font-black text-white mb-6 leading-tight tracking-tight">
-                {article.title}
-              </h1>
+              {/* Title (Only show if NOT using unified markdown, or if markdown doesn't have its own H1) */}
+              {!article.content_markdown?.startsWith('# ') && (
+                <h1 className="text-3xl md:text-5xl font-black text-white mb-6 leading-tight tracking-tight">
+                  {article.title}
+                </h1>
+              )}
 
               {/* Meta Row */}
               {/* Meta Row */}
