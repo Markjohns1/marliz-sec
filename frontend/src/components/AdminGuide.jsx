@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, Target, Clock, Users, BarChart3, HelpCircle } from 'lucide-react';
+import { ChevronDown, Target, Clock, Users, BarChart3, Zap, PenLine, Shield } from 'lucide-react';
 
 export default function AdminGuide() {
     const [openSection, setOpenSection] = useState(0);
@@ -37,65 +37,11 @@ export default function AdminGuide() {
                             <ul className="mt-2 text-xs text-slate-400 space-y-1 list-disc pl-4">
                                 <li><span className="text-emerald-400">1-3:</span> Winning. Don't touch.</li>
                                 <li><span className="text-yellow-400">4-10:</span> THE STRIKE ZONE (Optimize immediately).</li>
-                                <li><span className="text-red-400">&gt; 10:</span> Needs more content/keywords.</li>
+                                <li><span className="text-red-400">{' > '} 10:</span> Needs more content/keywords.</li>
                             </ul>
                         </div>
                     </div>
                 </div>
-            )
-        },
-        {
-            title: "Strategic Workflows (The Strike Zone)",
-            icon: Target,
-            color: "text-red-400",
-            content: (
-                <div className="space-y-4">
-                    <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-lg">
-                        <h4 className="font-bold text-red-400 mb-2">Goal: Move Page 2 Articles to Page 1</h4>
-                        <ol className="list-decimal pl-4 space-y-2 text-sm text-slate-300">
-                            <li>Go to the <strong>Articles Tab</strong>.</li>
-                            <li>Sort by <strong>Position</strong>.</li>
-                            <li>Look for articles with Position <strong>4.0 to 12.0</strong>.</li>
-                            <li><strong>Action:</strong> Open "Quick Edit". Add 1-2 paragraphs of recent news. Tweak the meta-description to be a question.</li>
-                            <li><strong>Result:</strong> This often pushes them into the Top 3 positions.</li>
-                        </ol>
-                    </div>
-                    <div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-lg">
-                        <h4 className="font-bold text-blue-400 mb-2">The "Hook Fix" (Low Clicks)</h4>
-                        <p className="text-sm text-slate-300 mb-2">If you have high impressions but low views, your title is boring.</p>
-                        <div className="text-xs bg-slate-900 p-3 rounded">
-                            <span className="text-red-400 line-through">Before: "Update on Cisco Router Vulnerability"</span><br />
-                            <span className="text-emerald-400">After: "Cisco Warning: 50,000 Routers at Risk - Patch Now"</span>
-                        </div>
-                    </div>
-                </div>
-            )
-        },
-        {
-            title: "Daily Routine for the Editor",
-            icon: Clock,
-            color: "text-purple-400",
-            content: (
-                <ul className="space-y-3 text-sm text-slate-300">
-                    <li className="flex gap-3">
-                        <span className="font-bold text-white">1.</span>
-                        <span>
-                            <strong>Check "Overview":</strong> Is Weekly Growth green? If red, you need a "Hit" article today. Check "All Threats".
-                        </span>
-                    </li>
-                    <li className="flex gap-3">
-                        <span className="font-bold text-white">2.</span>
-                        <span>
-                            <strong>Check "Pending AI":</strong> Review drafts. Use the Draft → Publish workflow. Quality &gt; Quantity.
-                        </span>
-                    </li>
-                    <li className="flex gap-3">
-                        <span className="font-bold text-white">3.</span>
-                        <span>
-                            <strong>Verify "Live":</strong> Click the Globe icon on your mobile bar to ensure the site looks perfect.
-                        </span>
-                    </li>
-                </ul>
             )
         },
         {
@@ -117,87 +63,76 @@ export default function AdminGuide() {
             )
         },
         {
-            title: "Pro-Formatting & Visual Mastery",
-            icon: Edit3,
-            color: "text-blue-400",
+            title: "60-Second Editorial Mastery",
+            icon: Zap,
+            color: "text-amber-400",
             content: (
                 <div className="space-y-6">
-                    <p className="text-slate-300 text-sm">Follow this guide to turn a plain AI draft into a world-class Intelligence Dispatch. No development skills required.</p>
+                    <p className="text-slate-400 text-xs font-bold uppercase tracking-widest bg-slate-800/50 p-2 border-l-2 border-amber-500 inline-block">Quick Reference for Editors</p>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {/* Column 1: Core Markdown */}
-                        <div className="space-y-4">
-                            <div className="bg-slate-800/50 p-4 rounded border border-slate-700">
-                                <h5 className="text-blue-400 font-bold text-xs mb-3 uppercase tracking-wider border-b border-slate-700 pb-2">1. Structural Hierarchy</h5>
-                                <ul className="text-[11px] text-slate-400 space-y-2 font-mono">
-                                    <li><code className="text-blue-300">## Major Heading</code> (H2)</li>
-                                    <li><code className="text-blue-300">### Sub-Section</code> (H3)</li>
-                                    <li><code className="text-blue-300">#### Detail Level</code> (H4)</li>
-                                    <li><code className="text-blue-300">---</code> (Horizontal Divider Line)</li>
-                                </ul>
-                            </div>
-                            <div className="bg-slate-800/50 p-4 rounded border border-slate-700">
-                                <h5 className="text-emerald-400 font-bold text-xs mb-3 uppercase tracking-wider border-b border-slate-700 pb-2">2. Data & Citation</h5>
-                                <ul className="text-[11px] text-slate-400 space-y-2 font-mono">
-                                    <li><code className="text-emerald-300">- Bullet List</code></li>
-                                    <li><code className="text-emerald-300">1. Numbered List</code></li>
-                                    <li><code className="text-emerald-300">[Source Title](https://...)</code></li>
-                                    <li><code className="text-emerald-300">| Table | Head |</code><br /><code>|---|---|</code><br /><code>| Row | Data |</code></li>
-                                </ul>
+                        {/* THE ESSENTIALS */}
+                        <div className="bg-slate-900 border border-slate-700 rounded-lg p-4">
+                            <h5 className="text-blue-400 font-bold text-[10px] uppercase mb-3 tracking-widest">1. Structure (Markdown)</h5>
+                            <div className="space-y-3 font-mono text-[11px]">
+                                <div className="flex justify-between items-center bg-black/20 p-2 rounded">
+                                    <span className="text-slate-500">Big Title</span>
+                                    <code className="text-blue-300">## Heading</code>
+                                </div>
+                                <div className="flex justify-between items-center bg-black/20 p-2 rounded">
+                                    <span className="text-slate-500">Sub Section</span>
+                                    <code className="text-blue-300">### Sub-Head</code>
+                                </div>
+                                <div className="flex justify-between items-center bg-black/20 p-2 rounded">
+                                    <span className="text-slate-500">Emphasis</span>
+                                    <code className="text-blue-300">**Bold Text**</code>
+                                </div>
+                                <div className="flex justify-between items-center bg-black/20 p-2 rounded">
+                                    <span className="text-slate-500">Section Line</span>
+                                    <code className="text-blue-300">---</code>
+                                </div>
                             </div>
                         </div>
 
-                        {/* Column 2: HTML Hacks */}
-                        <div className="space-y-4">
-                            <div className="bg-slate-900/80 p-4 rounded border border-blue-500/20">
-                                <h5 className="text-amber-400 font-bold text-xs mb-3 uppercase tracking-wider border-b border-slate-700 pb-2 font-sans">3. Visual "Hacks" (Copy & Paste)</h5>
-                                <div className="space-y-4">
-                                    <div>
-                                        <p className="text-[10px] text-slate-500 uppercase mb-1 font-sans font-bold">Color a single word or phrase:</p>
-                                        <code className="text-[11px] block bg-black/40 p-2 rounded border border-slate-800 text-red-400">
-                                            &lt;span style="color:#ef4444"&gt;CRITICAL&lt;/span&gt;
-                                        </code>
-                                    </div>
-                                    <div>
-                                        <p className="text-[10px] text-slate-500 uppercase mb-1 font-sans font-bold">Highlight text (Marker effect):</p>
-                                        <code className="text-[11px] block bg-black/40 p-2 rounded border border-slate-800 text-blue-300">
-                                            &lt;span style="background:rgba(59,130,246,0.2)"&gt;Target Info&lt;/span&gt;
-                                        </code>
-                                    </div>
-                                    <div>
-                                        <p className="text-[10px] text-slate-500 uppercase mb-1 font-sans font-bold">Force a manual Line Break:</p>
-                                        <code className="text-[11px] block bg-black/40 p-2 rounded border border-slate-800 text-slate-400">
-                                            &lt;br /&gt;
-                                        </code>
-                                    </div>
+                        {/* PREMIUM HACKS */}
+                        <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 shadow-xl">
+                            <h5 className="text-amber-400 font-bold text-[10px] uppercase mb-3 tracking-widest">2. Pro Visuals (Copy & Paste)</h5>
+                            <div className="space-y-4">
+                                <div>
+                                    <p className="text-[9px] text-slate-500 mb-1">Color a word <span className="text-red-500 font-bold">RED</span> (Critical):</p>
+                                    <code className="block bg-black p-2 rounded text-[10px] text-red-400 select-all border border-red-900/30">
+                                        &lt;span style="color:#ef4444"&gt;TEXT&lt;/span&gt;
+                                    </code>
+                                </div>
+                                <div>
+                                    <p className="text-[9px] text-slate-500 mb-1">Marker <span className="bg-blue-500/20 px-1 text-blue-300">HIGHLIGHT</span> (Important):</p>
+                                    <code className="block bg-black p-2 rounded text-[10px] text-blue-300 select-all border border-blue-900/30">
+                                        &lt;span style="background:rgba(59,130,246,0.2)"&gt;TEXT&lt;/span&gt;
+                                    </code>
                                 </div>
                             </div>
-                            <div className="bg-slate-800/50 p-4 rounded border border-slate-700">
-                                <h5 className="text-purple-400 font-bold text-xs mb-3 uppercase tracking-wider border-b border-slate-700 pb-2">4. Code & Evidence</h5>
-                                <ul className="text-[11px] text-slate-400 space-y-2 font-mono">
-                                    <li><code className="text-purple-300">`Small Code`</code> (Inline)</li>
-                                    <li><code className="text-purple-300">```<br />Code Block<br />```</code></li>
-                                </ul>
-                            </div>
                         </div>
+                    </div>
+
+                    <div className="p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-lg">
+                        <h5 className="text-emerald-400 font-bold text-[10px] uppercase mb-2">The "Diamond" Prompt:</h5>
+                        <p className="text-xs text-slate-400 italic">"Read AI draft -&gt; Add Verdict in a <strong>&gt; Quote block</strong> -&gt; Highlight critical in <strong>RED</strong> -&gt; Publish."</p>
                     </div>
                 </div>
             )
         },
         {
-            title: "Hiring Guide: For the Next Admin",
+            title: "Hiring Guide: Success Metrics",
             icon: Users,
             color: "text-purple-400",
             content: (
                 <div className="space-y-4">
-                    <p className="text-slate-300 italic">"Your job isn't just to post news. Your job is to manage the Green Numbers."</p>
+                    <p className="text-slate-300 italic text-sm">"Your job is to manage the Green Numbers, not just post text."</p>
                     <div className="bg-purple-900/20 p-4 rounded-lg border border-purple-500/20">
-                        <h4 className="font-bold text-white mb-2">The Success Checklist</h4>
-                        <ul className="space-y-2 text-sm text-slate-300">
-                            <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div> Keep Weekly Growth positive.</li>
-                            <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div> Verify every 410 Gone link in Search Console.</li>
-                            <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div> Spend 15 minutes manually editing every AI draft.</li>
-                            <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div> Never let a High-Impression article sit with a boring title.</li>
+                        <ul className="space-y-3 text-sm text-slate-300 font-medium">
+                            <li className="flex items-center gap-3"><Clock className="w-4 h-4 text-purple-400" /> Spend 15 mins/day editing AI drafts.</li>
+                            <li className="flex items-center gap-3"><Target className="w-4 h-4 text-purple-400" /> Move "Page 2" articles to "Page 1".</li>
+                            <li className="flex items-center gap-3"><Shield className="w-4 h-4 text-purple-400" /> Verify 410 Gone links monthly.</li>
                         </ul>
                     </div>
                 </div>
@@ -226,14 +161,12 @@ export default function AdminGuide() {
                                 <span className="font-bold text-slate-200 text-sm sm:text-base">{section.title}</span>
                             </div>
                             <ChevronDown
-                                className={`w-5 h-5 text-slate-500 transition-transform duration-300 ${openSection === idx ? 'rotate-180 text-blue-400' : ''
-                                    }`}
+                                className={`w-5 h-5 text-slate-500 transition-transform duration-300 ${openSection === idx ? 'rotate-180 text-blue-400' : ''}`}
                             />
                         </button>
 
                         <div
-                            className={`transition-all duration-300 ease-in-out ${openSection === idx ? 'max-h-[1000px] overflow-y-auto opacity-100' : 'max-h-0 overflow-hidden opacity-0'
-                                }`}
+                            className={`transition-all duration-300 ease-in-out ${openSection === idx ? 'max-h-[1000px] overflow-y-auto opacity-100' : 'max-h-0 overflow-hidden opacity-0'}`}
                         >
                             <div className="p-5 pt-0 border-t border-slate-800/50">
                                 <div className="pt-4">
