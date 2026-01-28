@@ -117,43 +117,68 @@ export default function AdminGuide() {
             )
         },
         {
-            title: "Markdown & Pro-Formatting Guide",
+            title: "Pro-Formatting & Visual Mastery",
             icon: Edit3,
             color: "text-blue-400",
             content: (
-                <div className="space-y-4">
-                    <p className="text-slate-300 text-sm">Use these standard Markdown codes to structure your 1,800-word reports. This is the global standard for digital journals.</p>
-                    <div className="grid gap-3">
-                        <div className="bg-slate-800/50 p-4 rounded border border-slate-700">
-                            <h5 className="text-blue-400 font-bold text-xs mb-3 uppercase tracking-wider border-b border-slate-700 pb-2">Structure & Depth</h5>
-                            <ul className="text-xs text-slate-400 space-y-3">
-                                <li><code className="text-blue-300">## Section Header</code> - Use for major report chapters.</li>
-                                <li><code className="text-blue-300">### Sub-Header</code> - Use for specific technical points.</li>
-                                <li><code className="text-blue-300">- Bullet points</code> - For listing technical specs or IoCs.</li>
-                                <li><code className="text-blue-300">1. Numbered list</code> - For step-by-step mitigation guides.</li>
-                                <li><code className="text-blue-300">[Text](https://link.com)</code> - To cite professional sources.</li>
-                            </ul>
+                <div className="space-y-6">
+                    <p className="text-slate-300 text-sm">Follow this guide to turn a plain AI draft into a world-class Intelligence Dispatch. No development skills required.</p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Column 1: Core Markdown */}
+                        <div className="space-y-4">
+                            <div className="bg-slate-800/50 p-4 rounded border border-slate-700">
+                                <h5 className="text-blue-400 font-bold text-xs mb-3 uppercase tracking-wider border-b border-slate-700 pb-2">1. Structural Hierarchy</h5>
+                                <ul className="text-[11px] text-slate-400 space-y-2 font-mono">
+                                    <li><code className="text-blue-300">## Major Heading</code> (H2)</li>
+                                    <li><code className="text-blue-300">### Sub-Section</code> (H3)</li>
+                                    <li><code className="text-blue-300">#### Detail Level</code> (H4)</li>
+                                    <li><code className="text-blue-300">---</code> (Horizontal Divider Line)</li>
+                                </ul>
+                            </div>
+                            <div className="bg-slate-800/50 p-4 rounded border border-slate-700">
+                                <h5 className="text-emerald-400 font-bold text-xs mb-3 uppercase tracking-wider border-b border-slate-700 pb-2">2. Data & Citation</h5>
+                                <ul className="text-[11px] text-slate-400 space-y-2 font-mono">
+                                    <li><code className="text-emerald-300">- Bullet List</code></li>
+                                    <li><code className="text-emerald-300">1. Numbered List</code></li>
+                                    <li><code className="text-emerald-300">[Source Title](https://...)</code></li>
+                                    <li><code className="text-emerald-300">| Table | Head |</code><br /><code>|---|---|</code><br /><code>| Row | Data |</code></li>
+                                </ul>
+                            </div>
                         </div>
-                        <div className="bg-slate-800/50 p-4 rounded border border-slate-700 font-mono">
-                            <h5 className="text-emerald-400 font-bold text-xs mb-3 uppercase tracking-wider border-b border-slate-700 pb-2 font-sans">Emphasis & Highlights</h5>
-                            <ul className="text-xs text-slate-400 space-y-3">
-                                <li><code className="text-emerald-300">**Bold Text**</code> - Use for "Key Takeaways."</li>
-                                <li><code className="text-emerald-300">*Italic Text*</code> - Use for context or "By our staff" notes.</li>
-                                <li><code className="text-emerald-300">&gt; Quote Block</code> - Use for Analyst Verdicts or Expert quotes.</li>
-                            </ul>
-                        </div>
-                        <div className="bg-slate-800/50 p-4 rounded border border-slate-700">
-                            <h5 className="text-amber-400 font-bold text-xs mb-3 uppercase tracking-wider border-b border-slate-700 pb-2">Premium HTML Hacks</h5>
-                            <ul className="text-xs text-slate-400 space-y-3">
-                                <li>
-                                    <p className="mb-1"><strong>Color Text:</strong> Best for "CRITICAL" or "PATCH NOW".</p>
-                                    <code className="bg-slate-900 border border-slate-700 p-1 block">&lt;span style="color: #ef4444"&gt;RED TEXT HERE&lt;/span&gt;</code>
-                                </li>
-                                <li>
-                                    <p className="mb-1"><strong>Text Highlight:</strong> Like a marker pen for key phrases.</p>
-                                    <code className="bg-slate-900 border border-slate-700 p-1 block">&lt;span style="background: rgba(59,130,246,0.2)"&gt;HIGHLIGHT&lt;/span&gt;</code>
-                                </li>
-                            </ul>
+
+                        {/* Column 2: HTML Hacks */}
+                        <div className="space-y-4">
+                            <div className="bg-slate-900/80 p-4 rounded border border-blue-500/20">
+                                <h5 className="text-amber-400 font-bold text-xs mb-3 uppercase tracking-wider border-b border-slate-700 pb-2 font-sans">3. Visual "Hacks" (Copy & Paste)</h5>
+                                <div className="space-y-4">
+                                    <div>
+                                        <p className="text-[10px] text-slate-500 uppercase mb-1 font-sans font-bold">Color a single word or phrase:</p>
+                                        <code className="text-[11px] block bg-black/40 p-2 rounded border border-slate-800 text-red-400">
+                                            &lt;span style="color:#ef4444"&gt;CRITICAL&lt;/span&gt;
+                                        </code>
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] text-slate-500 uppercase mb-1 font-sans font-bold">Highlight text (Marker effect):</p>
+                                        <code className="text-[11px] block bg-black/40 p-2 rounded border border-slate-800 text-blue-300">
+                                            &lt;span style="background:rgba(59,130,246,0.2)"&gt;Target Info&lt;/span&gt;
+                                        </code>
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] text-slate-500 uppercase mb-1 font-sans font-bold">Force a manual Line Break:</p>
+                                        <code className="text-[11px] block bg-black/40 p-2 rounded border border-slate-800 text-slate-400">
+                                            &lt;br /&gt;
+                                        </code>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="bg-slate-800/50 p-4 rounded border border-slate-700">
+                                <h5 className="text-purple-400 font-bold text-xs mb-3 uppercase tracking-wider border-b border-slate-700 pb-2">4. Code & Evidence</h5>
+                                <ul className="text-[11px] text-slate-400 space-y-2 font-mono">
+                                    <li><code className="text-purple-300">`Small Code`</code> (Inline)</li>
+                                    <li><code className="text-purple-300">```<br />Code Block<br />```</code></li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -162,17 +187,17 @@ export default function AdminGuide() {
         {
             title: "Hiring Guide: For the Next Admin",
             icon: Users,
-            color: "text-emerald-400",
+            color: "text-purple-400",
             content: (
                 <div className="space-y-4">
                     <p className="text-slate-300 italic">"Your job isn't just to post news. Your job is to manage the Green Numbers."</p>
-                    <div className="bg-emerald-900/20 p-4 rounded-lg border border-emerald-500/20">
+                    <div className="bg-purple-900/20 p-4 rounded-lg border border-purple-500/20">
                         <h4 className="font-bold text-white mb-2">The Success Checklist</h4>
                         <ul className="space-y-2 text-sm text-slate-300">
-                            <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> Keep Weekly Growth positive.</li>
-                            <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> Verify every 410 Gone link in Search Console.</li>
-                            <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> Spend 15 minutes manually editing every AI draft.</li>
-                            <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> Never let a High-Impression article sit with a boring title.</li>
+                            <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div> Keep Weekly Growth positive.</li>
+                            <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div> Verify every 410 Gone link in Search Console.</li>
+                            <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div> Spend 15 minutes manually editing every AI draft.</li>
+                            <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div> Never let a High-Impression article sit with a boring title.</li>
                         </ul>
                     </div>
                 </div>
