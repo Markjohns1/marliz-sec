@@ -221,25 +221,27 @@ if os.path.exists(FRONTEND_DIST):
             if len(parts) >= 2:
                 slug = parts[1]
                 try:
-                # Use a new DB session
-                async for db in get_db():
-                    # Check for exact slug OR suffix match (handles old 'undefined/article/slug' pattern)
-                    stmt = select(models.DeletedArticle).filter(
-                        or_(
-                            models.DeletedArticle.slug == slug,
-                            models.DeletedArticle.slug.ilike(f"%{slug}")
+                    # Use a new DB session
+                    async for db in get_db():
+                        # Check for exact slug OR suffix match (handles old 'undefined/article/slug' pattern)
+                        stmt = select(models.DeletedArticle).filter(
+                            or_(
+                                models.DeletedArticle.slug == slug,
+                                models.DeletedArticle.slug.ilike(f"%{slug}")
+                            )
                         )
-                    )
-                    res = await db.execute(stmt)
-                    if res.scalars().first():
-                        logger.info(f"410 GONE (Hard Stop): {slug}")
-                        raise HTTPException(
-                            status_code=410, 
-                            detail="Gone: This page has been permanently removed."
-                        )
-                    break 
-            except Exception as e:
-                logger.error(f"Failed to check graveyard for {slug}: {e}")
+                        res = await db.execute(stmt)
+                        if res.scalars().first():
+                            logger.info(f"410 GONE (Hard Stop): {slug}")
+                            raise HTTPException(
+                                status_code=410, 
+                                detail="Gone: This page has been permanently removed."
+                            )
+                        break 
+                except HTTPException:
+                    raise # Re-raise 410s correctly
+                except Exception as e:
+                    logger.error(f"Failed to check graveyard for {slug}: {e}")
 
         # Explicitly ignore API and unexpected system paths so they don't get swallowed by React
         if full_path.startswith("api"):
