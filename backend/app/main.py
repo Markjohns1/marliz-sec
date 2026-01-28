@@ -218,17 +218,23 @@ if os.path.exists(FRONTEND_DIST):
         if full_path.startswith("article/"):
             slug = full_path.split("/")[-1]
             try:
-                # Use a new DB session since we are in a catch-all route not an API route
+                # Use a new DB session
                 async for db in get_db():
-                    # Check Graveyard (DeletedArticle)
-                    stmt = select(models.DeletedArticle).filter_by(slug=slug)
+                    # Check for exact slug OR suffix match (handles old 'undefined/article/slug' pattern)
+                    stmt = select(models.DeletedArticle).filter(
+                        or_(
+                            models.DeletedArticle.slug == slug,
+                            models.DeletedArticle.slug.ilike(f"%{slug}")
+                        )
+                    )
                     res = await db.execute(stmt)
-                    if res.scalar():
-                        logger.info(f"410 GONE: Hard Stop for Buried Article: {slug}")
-                        raise HTTPException(status_code=410, detail="Gone: This page has been permanently removed.")
-                    break # We only need one check
-            except HTTPException:
-                raise # Re-raise the 410
+                    if res.scalars().first():
+                        logger.info(f"410 GONE (Hard Stop): {slug}")
+                        raise HTTPException(
+                            status_code=410, 
+                            detail="Gone: This page has been permanently removed."
+                        )
+                    break 
             except Exception as e:
                 logger.error(f"Failed to check graveyard for {slug}: {e}")
 

@@ -499,11 +499,20 @@ async def get_article(slug: str, request: Request, db: AsyncSession = Depends(ge
         article = fallback_result.scalars().first()
 
     if not article:
-        # Check if it was permanently deleted (410 Gone)
-        stmt_deleted = select(models.DeletedArticle).filter_by(slug=slug)
+        # Check if it was permanently deleted (410 Gone) - Be aggressive
+        # Check for exact slug AND check if it was buried as an 'undefined' variant
+        stmt_deleted = select(models.DeletedArticle).filter(
+            or_(
+                models.DeletedArticle.slug == slug,
+                models.DeletedArticle.slug.ilike(f"%{slug}")
+            )
+        )
         res_deleted = await db.execute(stmt_deleted)
         if res_deleted.scalars().first():
-            return Response(status_code=410, content="Gone: This article has been permanently removed.")
+            raise HTTPException(
+                status_code=410, 
+                detail="Gone: This page has been permanently removed."
+            )
 
         raise HTTPException(status_code=404, detail="Article not found")
     
