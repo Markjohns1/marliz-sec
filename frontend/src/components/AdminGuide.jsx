@@ -99,6 +99,61 @@ export default function AdminGuide() {
             )
         },
         {
+            title: "Editorial Strategy: From Draft to Diamond",
+            icon: PenLine,
+            color: "text-red-400",
+            content: (
+                <div className="space-y-4">
+                    <p className="text-slate-300">The AI is your researcher. You are the Analyst. Never publish an AI draft without human intervention.</p>
+                    <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-lg">
+                        <h4 className="font-bold text-red-400 mb-2">The Content Golden Rules</h4>
+                        <ul className="list-disc pl-4 text-sm text-slate-300 space-y-2">
+                            <li><strong>Inject "Unpopular Opinions":</strong> Disagree with the news source. Add a critical angle.</li>
+                            <li><strong>Rule of 3:</strong> Only process 3 articles per batch. Focus on quality, not volume.</li>
+                            <li><strong>Clean the Slugs:</strong> Ensure the URL slug is sharp and keyword-rich.</li>
+                        </ul>
+                    </div>
+                </div>
+            )
+        },
+        {
+            title: "Markdown & Pro-Formatting Guide",
+            icon: Edit3,
+            color: "text-blue-400",
+            content: (
+                <div className="space-y-4">
+                    <p className="text-slate-300 text-sm">Use these simple codes in the editor to make every article look unique.</p>
+                    <div className="grid gap-3">
+                        <div className="bg-slate-800/50 p-3 rounded border border-slate-700">
+                            <h5 className="text-blue-400 font-bold text-xs mb-1 uppercase tracking-wider">Highlight & Emphasis</h5>
+                            <ul className="text-xs text-slate-400 space-y-2">
+                                <li><code>**Bold Text**</code> for emphasis.</li>
+                                <li><code>*Italic Text*</code> for sidebars.</li>
+                                <li><code>&gt; Text here</code> to create a professional quote/analyst note.</li>
+                            </ul>
+                        </div>
+                        <div className="bg-slate-800/50 p-3 rounded border border-slate-700">
+                            <h5 className="text-amber-400 font-bold text-xs mb-1 uppercase tracking-wider">Inline HTML Hacks (For anyone)</h5>
+                            <ul className="text-xs text-slate-400 space-y-3">
+                                <li>
+                                    <p className="mb-1"><strong>Color Text:</strong> Use for "Critical" warnings.</p>
+                                    <code>&lt;span style="color: #ef4444"&gt;CRITICAL WARNING&lt;/span&gt;</code>
+                                </li>
+                                <li>
+                                    <p className="mb-1"><strong>Manual Spacing:</strong> Force a bigger gap between sections.</p>
+                                    <code>&lt;br /&gt; &lt;br /&gt;</code>
+                                </li>
+                                <li>
+                                    <p className="mb-1"><strong>Highlighting:</strong> Wrap text for a "marker" effect.</p>
+                                    <code>&lt;span style="background: rgba(59,130,246,0.2); padding: 2px 4px"&gt;Highlight&lt;/span&gt;</code>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            )
+        },
+        {
             title: "Hiring Guide: For the Next Admin",
             icon: Users,
             color: "text-emerald-400",
@@ -106,10 +161,11 @@ export default function AdminGuide() {
                 <div className="space-y-4">
                     <p className="text-slate-300 italic">"Your job isn't just to post news. Your job is to manage the Green Numbers."</p>
                     <div className="bg-emerald-900/20 p-4 rounded-lg border border-emerald-500/20">
-                        <h4 className="font-bold text-white mb-2">The Checklist</h4>
+                        <h4 className="font-bold text-white mb-2">The Success Checklist</h4>
                         <ul className="space-y-2 text-sm text-slate-300">
                             <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> Keep Weekly Growth positive.</li>
-                            <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> Find "Strike Zone" articles every Tuesday.</li>
+                            <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> Verify every 410 Gone link in Search Console.</li>
+                            <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> Spend 15 minutes manually editing every AI draft.</li>
                             <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> Never let a High-Impression article sit with a boring title.</li>
                         </ul>
                     </div>
