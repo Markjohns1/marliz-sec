@@ -98,6 +98,28 @@ body::before {
   @apply text-blue-500;
 }
 
+/* The Chief Analyst Dispatch (Triggered by standard Markdown '>') */
+.prose blockquote {
+  @apply my-12 relative p-8 bg-slate-900/60 backdrop-blur-sm rounded-xl border border-blue-500/10 shadow-2xl overflow-visible not-italic border-l-0 pl-8;
+  background: linear-gradient(165deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.4) 100%);
+}
+
+.prose blockquote::before {
+  content: "CHIEF ANALYST VERDICT";
+  @apply absolute -top-3 left-6 px-3 bg-blue-600 text-[10px] font-black tracking-[0.2em] text-white rounded-sm py-1;
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+}
+
+/* Corner Accents for Blockquotes */
+.prose blockquote::after {
+  content: "";
+  @apply absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-blue-500/40 rounded-tl-lg pointer-events-none;
+}
+
+.prose blockquote p {
+  @apply text-blue-50 font-medium leading-relaxed text-lg mb-0;
+}
+
 .prose strong {
   @apply text-white font-semibold;
 }

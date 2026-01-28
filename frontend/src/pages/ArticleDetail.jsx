@@ -350,7 +350,10 @@ export default function ArticleDetail() {
               {article.content_markdown ? (
                 /* NEW UNIFIED JOURNAL FORMAT */
                 <div className="prose prose-invert prose-blue max-w-none text-slate-300 leading-relaxed font-light">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    rehypePlugins={[rehypeRaw]}
+                  >
                     {article.content_markdown}
                   </ReactMarkdown>
                 </div>
