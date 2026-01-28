@@ -122,30 +122,36 @@ export default function AdminGuide() {
             color: "text-blue-400",
             content: (
                 <div className="space-y-4">
-                    <p className="text-slate-300 text-sm">Use these simple codes in the editor to make every article look unique.</p>
+                    <p className="text-slate-300 text-sm">Use these standard Markdown codes to structure your 1,800-word reports. This is the global standard for digital journals.</p>
                     <div className="grid gap-3">
-                        <div className="bg-slate-800/50 p-3 rounded border border-slate-700">
-                            <h5 className="text-blue-400 font-bold text-xs mb-1 uppercase tracking-wider">Highlight & Emphasis</h5>
-                            <ul className="text-xs text-slate-400 space-y-2">
-                                <li><code>**Bold Text**</code> for emphasis.</li>
-                                <li><code>*Italic Text*</code> for sidebars.</li>
-                                <li><code>&gt; Text here</code> to create a professional quote/analyst note.</li>
+                        <div className="bg-slate-800/50 p-4 rounded border border-slate-700">
+                            <h5 className="text-blue-400 font-bold text-xs mb-3 uppercase tracking-wider border-b border-slate-700 pb-2">Structure & Depth</h5>
+                            <ul className="text-xs text-slate-400 space-y-3">
+                                <li><code className="text-blue-300">## Section Header</code> - Use for major report chapters.</li>
+                                <li><code className="text-blue-300">### Sub-Header</code> - Use for specific technical points.</li>
+                                <li><code className="text-blue-300">- Bullet points</code> - For listing technical specs or IoCs.</li>
+                                <li><code className="text-blue-300">1. Numbered list</code> - For step-by-step mitigation guides.</li>
+                                <li><code className="text-blue-300">[Text](https://link.com)</code> - To cite professional sources.</li>
                             </ul>
                         </div>
-                        <div className="bg-slate-800/50 p-3 rounded border border-slate-700">
-                            <h5 className="text-amber-400 font-bold text-xs mb-1 uppercase tracking-wider">Inline HTML Hacks (For anyone)</h5>
+                        <div className="bg-slate-800/50 p-4 rounded border border-slate-700 font-mono">
+                            <h5 className="text-emerald-400 font-bold text-xs mb-3 uppercase tracking-wider border-b border-slate-700 pb-2 font-sans">Emphasis & Highlights</h5>
+                            <ul className="text-xs text-slate-400 space-y-3">
+                                <li><code className="text-emerald-300">**Bold Text**</code> - Use for "Key Takeaways."</li>
+                                <li><code className="text-emerald-300">*Italic Text*</code> - Use for context or "By our staff" notes.</li>
+                                <li><code className="text-emerald-300">&gt; Quote Block</code> - Use for Analyst Verdicts or Expert quotes.</li>
+                            </ul>
+                        </div>
+                        <div className="bg-slate-800/50 p-4 rounded border border-slate-700">
+                            <h5 className="text-amber-400 font-bold text-xs mb-3 uppercase tracking-wider border-b border-slate-700 pb-2">Premium HTML Hacks</h5>
                             <ul className="text-xs text-slate-400 space-y-3">
                                 <li>
-                                    <p className="mb-1"><strong>Color Text:</strong> Use for "Critical" warnings.</p>
-                                    <code>&lt;span style="color: #ef4444"&gt;CRITICAL WARNING&lt;/span&gt;</code>
+                                    <p className="mb-1"><strong>Color Text:</strong> Best for "CRITICAL" or "PATCH NOW".</p>
+                                    <code className="bg-slate-900 border border-slate-700 p-1 block">&lt;span style="color: #ef4444"&gt;RED TEXT HERE&lt;/span&gt;</code>
                                 </li>
                                 <li>
-                                    <p className="mb-1"><strong>Manual Spacing:</strong> Force a bigger gap between sections.</p>
-                                    <code>&lt;br /&gt; &lt;br /&gt;</code>
-                                </li>
-                                <li>
-                                    <p className="mb-1"><strong>Highlighting:</strong> Wrap text for a "marker" effect.</p>
-                                    <code>&lt;span style="background: rgba(59,130,246,0.2); padding: 2px 4px"&gt;Highlight&lt;/span&gt;</code>
+                                    <p className="mb-1"><strong>Text Highlight:</strong> Like a marker pen for key phrases.</p>
+                                    <code className="bg-slate-900 border border-slate-700 p-1 block">&lt;span style="background: rgba(59,130,246,0.2)"&gt;HIGHLIGHT&lt;/span&gt;</code>
                                 </li>
                             </ul>
                         </div>
