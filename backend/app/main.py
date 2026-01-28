@@ -149,7 +149,7 @@ async def manual_simplify(
 # ==========================================
 # DYNAMIC SEO ROUTES (Sitemaps)
 # ==========================================
-from sqlalchemy import select
+from sqlalchemy import select, or_
 from app.models import Article, ArticleStatus, DeletedArticle
 from app.database import get_db
 
@@ -216,8 +216,11 @@ if os.path.exists(FRONTEND_DIST):
 
         # 2. SEO HARD STOP: Check Graveyard for Soft 404 Prevention
         if full_path.startswith("article/"):
-            slug = full_path.split("/")[-1]
-            try:
+            # Cleanly extract slug (handles trailing slashes)
+            parts = [p for p in full_path.split("/") if p]
+            if len(parts) >= 2:
+                slug = parts[1]
+                try:
                 # Use a new DB session
                 async for db in get_db():
                     # Check for exact slug OR suffix match (handles old 'undefined/article/slug' pattern)
