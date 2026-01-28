@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, Target, Clock, Users, BarChart3, Zap, PenLine, Shield } from 'lucide-react';
+import { ChevronDown, Target, Clock, Users, BarChart3, Zap, PenLine, Shield, Edit3, Link, List, Table, Code } from 'lucide-react';
 
 export default function AdminGuide() {
     const [openSection, setOpenSection] = useState(0);
@@ -63,51 +63,100 @@ export default function AdminGuide() {
             )
         },
         {
-            title: "60-Second Editorial Mastery",
-            icon: Zap,
-            color: "text-amber-400",
+            title: "Full Markdown Masterclass (60-Sec Version)",
+            icon: Edit3,
+            color: "text-blue-400",
             content: (
-                <div className="space-y-6">
-                    <p className="text-slate-400 text-xs font-bold uppercase tracking-widest bg-slate-800/50 p-2 border-l-2 border-amber-500 inline-block">Quick Reference for Editors</p>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {/* THE ESSENTIALS */}
-                        <div className="bg-slate-900 border border-slate-700 rounded-lg p-4">
-                            <h5 className="text-blue-400 font-bold text-[10px] uppercase mb-3 tracking-widest">1. Structure (Markdown)</h5>
-                            <div className="space-y-3 font-mono text-[11px]">
-                                <div className="flex justify-between items-center bg-black/20 p-2 rounded">
-                                    <span className="text-slate-500">Big Title</span>
+                <div className="space-y-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* 1. STRUCTURAL COMMANDS */}
+                        <div className="space-y-4">
+                            <h5 className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                                <Zap className="w-3 h-3 text-amber-500" /> Structure & Formatting
+                            </h5>
+                            <div className="space-y-2">
+                                <div className="bg-slate-900 border border-slate-800 p-2 rounded flex justify-between items-center text-[11px]">
+                                    <span className="text-slate-400">Chapter Title</span>
                                     <code className="text-blue-300">## Heading</code>
                                 </div>
-                                <div className="flex justify-between items-center bg-black/20 p-2 rounded">
-                                    <span className="text-slate-500">Sub Section</span>
+                                <div className="bg-slate-900 border border-slate-800 p-2 rounded flex justify-between items-center text-[11px]">
+                                    <span className="text-slate-400">Sub-Point</span>
                                     <code className="text-blue-300">### Sub-Head</code>
                                 </div>
-                                <div className="flex justify-between items-center bg-black/20 p-2 rounded">
-                                    <span className="text-slate-500">Emphasis</span>
+                                <div className="bg-slate-900 border border-slate-800 p-2 rounded flex justify-between items-center text-[11px]">
+                                    <span className="text-slate-400">Emphasis</span>
                                     <code className="text-blue-300">**Bold Text**</code>
                                 </div>
-                                <div className="flex justify-between items-center bg-black/20 p-2 rounded">
-                                    <span className="text-slate-500">Section Line</span>
+                                <div className="bg-slate-900 border border-slate-800 p-2 rounded flex justify-between items-center text-[11px]">
+                                    <span className="text-slate-400">Analyst Verdict</span>
+                                    <code className="text-blue-300">&gt; My Quote</code>
+                                </div>
+                                <div className="bg-slate-900 border border-slate-800 p-2 rounded flex justify-between items-center text-[11px]">
+                                    <span className="text-slate-400">Horizontal Divider</span>
                                     <code className="text-blue-300">---</code>
                                 </div>
                             </div>
                         </div>
 
-                        {/* PREMIUM HACKS */}
-                        <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 shadow-xl">
-                            <h5 className="text-amber-400 font-bold text-[10px] uppercase mb-3 tracking-widest">2. Pro Visuals (Copy & Paste)</h5>
+                        {/* 2. DATA & CITATION */}
+                        <div className="space-y-4">
+                            <h5 className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                                <Link className="w-3 h-3 text-emerald-500" /> SEO & Evidence
+                            </h5>
+                            <div className="space-y-2">
+                                <div className="bg-slate-900 border border-slate-800 p-2 rounded flex justify-between items-center text-[11px]">
+                                    <span className="text-slate-400">Insert Link</span>
+                                    <code className="text-emerald-300">[Title](URL)</code>
+                                </div>
+                                <div className="bg-slate-900 border border-slate-800 p-2 rounded flex justify-between items-center text-[11px]">
+                                    <span className="text-slate-400">Bullet Points</span>
+                                    <code className="text-emerald-300">- List Item</code>
+                                </div>
+                                <div className="bg-slate-900 border border-slate-800 p-2 rounded flex justify-between items-center text-[11px]">
+                                    <span className="text-slate-400">Numbered Steps</span>
+                                    <code className="text-emerald-300">1. Step One</code>
+                                </div>
+                                <div className="bg-slate-900 border border-slate-800 p-2 rounded flex justify-between items-center text-[11px]">
+                                    <span className="text-slate-400">Tech Table</span>
+                                    <code className="text-emerald-300">|A|B|</code>
+                                </div>
+                                <div className="bg-slate-900 border border-slate-800 p-2 rounded flex justify-between items-center text-[11px]">
+                                    <span className="text-slate-400">Code/IoCs</span>
+                                    <code className="text-emerald-300">```code```</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* 3. PRO VISUAL mastery */}
+                    <div className="bg-slate-900/50 border border-blue-500/20 rounded-xl p-5">
+                        <h5 className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-4">Pro Visual "Hacks" (Copy & Paste)</h5>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-4">
                                 <div>
-                                    <p className="text-[9px] text-slate-500 mb-1">Color a word <span className="text-red-500 font-bold">RED</span> (Critical):</p>
-                                    <code className="block bg-black p-2 rounded text-[10px] text-red-400 select-all border border-red-900/30">
+                                    <p className="text-[10px] text-slate-500 mb-1">Color a word <span className="text-red-500 font-bold">RED</span> (Critical):</p>
+                                    <code className="block bg-black p-3 rounded text-[11px] text-red-400 select-all border border-red-900/30">
                                         &lt;span style="color:#ef4444"&gt;TEXT&lt;/span&gt;
                                     </code>
                                 </div>
                                 <div>
-                                    <p className="text-[9px] text-slate-500 mb-1">Marker <span className="bg-blue-500/20 px-1 text-blue-300">HIGHLIGHT</span> (Important):</p>
-                                    <code className="block bg-black p-2 rounded text-[10px] text-blue-300 select-all border border-blue-900/30">
-                                        &lt;span style="background:rgba(59,130,246,0.2)"&gt;TEXT&lt;/span&gt;
+                                    <p className="text-[10px] text-slate-500 mb-1">Color a word <span className="text-amber-500 font-bold">YELLOW</span> (Warning):</p>
+                                    <code className="block bg-black p-3 rounded text-[11px] text-amber-400 select-all border border-amber-900/30">
+                                        &lt;span style="color:#f59e0b"&gt;TEXT&lt;/span&gt;
+                                    </code>
+                                </div>
+                            </div>
+                            <div className="space-y-4">
+                                <div>
+                                    <p className="text-[10px] text-slate-500 mb-1">Marker <span className="bg-blue-500/20 px-1 text-blue-300">HIGHLIGHT</span> (Important):</p>
+                                    <code className="block bg-black p-3 rounded text-[11px] text-blue-300 select-all border border-blue-900/30">
+                                        &lt;span style="background:rgba(59,130,246,0.2); border-radius:3px"&gt;TEXT&lt;/span&gt;
+                                    </code>
+                                </div>
+                                <div>
+                                    <p className="text-[10px] text-slate-500 mb-1">Force <span className="text-slate-400 underline">LARGE GAPS</span> between sections:</p>
+                                    <code className="block bg-black p-3 rounded text-[11px] text-slate-400 select-all border border-slate-800">
+                                        &lt;br /&gt; &lt;br /&gt;
                                     </code>
                                 </div>
                             </div>
@@ -115,8 +164,8 @@ export default function AdminGuide() {
                     </div>
 
                     <div className="p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-lg">
-                        <h5 className="text-emerald-400 font-bold text-[10px] uppercase mb-2">The "Diamond" Prompt:</h5>
-                        <p className="text-xs text-slate-400 italic">"Read AI draft -&gt; Add Verdict in a <strong>&gt; Quote block</strong> -&gt; Highlight critical in <strong>RED</strong> -&gt; Publish."</p>
+                        <h5 className="text-emerald-400 font-bold text-[10px] uppercase mb-1">Expert Workflow:</h5>
+                        <p className="text-xs text-slate-400 italic leading-relaxed">"AI Report -&gt; Insert <strong>## Chapter</strong> -&gt; Add Analyst <strong>&gt; Verdict</strong> -&gt; Link <strong>Citations</strong> -&gt; Highlight <strong>RED</strong> Warnings -&gt; Publish."</p>
                     </div>
                 </div>
             )
@@ -166,7 +215,7 @@ export default function AdminGuide() {
                         </button>
 
                         <div
-                            className={`transition-all duration-300 ease-in-out ${openSection === idx ? 'max-h-[1000px] overflow-y-auto opacity-100' : 'max-h-0 overflow-hidden opacity-0'}`}
+                            className={`transition-all duration-300 ease-in-out ${openSection === idx ? 'max-h-[1500px] overflow-y-auto opacity-100' : 'max-h-0 overflow-hidden opacity-0'}`}
                         >
                             <div className="p-5 pt-0 border-t border-slate-800/50">
                                 <div className="pt-4">
