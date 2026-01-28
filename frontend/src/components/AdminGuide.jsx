@@ -93,11 +93,11 @@ export default function AdminGuide() {
             )
         },
         {
-            title: "2. Structuring the Intel (Full Markdown)",
+            title: "2. Structuring the Intel (Markdown & Tables)",
             icon: Edit3,
             color: "text-blue-400",
             content: (
-                <div className="space-y-6">
+                <div className="space-y-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-4">
                             <h5 className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">Hiearchy & Layout</h5>
@@ -105,16 +105,39 @@ export default function AdminGuide() {
                                 <div className="bg-slate-900 p-2 rounded flex justify-between border border-slate-800"><span className="text-slate-500">Main Section</span><code className="text-blue-300">## Title</code></div>
                                 <div className="bg-slate-900 p-2 rounded flex justify-between border border-slate-800"><span className="text-slate-500">Sub Section</span><code className="text-blue-300">### Title</code></div>
                                 <div className="bg-slate-900 p-2 rounded flex justify-between border border-slate-800"><span className="text-slate-500">Expert Note</span><code className="text-blue-300">&gt; Text</code></div>
-                                <div className="bg-slate-900 p-2 rounded flex justify-between border border-slate-800"><span className="text-slate-500">Separator</span><code className="text-blue-300">---</code></div>
-                            </div>
-                        </div>
-                        <div className="space-y-4">
-                            <h5 className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">Data & Evidence</h5>
-                            <div className="space-y-2 font-mono text-[11px]">
                                 <div className="bg-slate-900 p-2 rounded flex justify-between border border-slate-800"><span className="text-slate-500">Bullet Points</span><code className="text-emerald-300">- Item</code></div>
                                 <div className="bg-slate-900 p-2 rounded flex justify-between border border-slate-800"><span className="text-slate-500">Citation Link</span><code className="text-emerald-300">[A](URL)</code></div>
-                                <div className="bg-slate-900 p-2 rounded flex justify-between border border-slate-800"><span className="text-slate-500">Tech Table</span><code className="text-emerald-300">|A|B|</code></div>
-                                <div className="bg-slate-900 p-2 rounded flex justify-between border border-slate-800"><span className="text-slate-500">Code Block</span><code className="text-emerald-300">```info```</code></div>
+                            </div>
+                        </div>
+
+                        <div className="space-y-4">
+                            <h5 className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">Data Proof (Tables & Code)</h5>
+                            <div className="group">
+                                <p className="text-[9px] text-slate-500 mb-1 uppercase font-bold">Technical Data Table (Copy/Paste):</p>
+                                <div className="bg-black p-3 rounded border border-emerald-900/20">
+                                    <code className="block text-[10px] text-emerald-400 whitespace-pre select-all leading-tight">
+                                        {`| Indicator | Value | Type |
+| :--- | :--- | :--- |
+| Trojan-X | 192.168.1.1 | IPv4 |
+| Payload | file.exe | SHA256 |`}
+                                    </code>
+                                </div>
+                                <p className="text-[8px] text-slate-600 mt-1 italic">Use this for IoCs, technical comparisons, or server specs.</p>
+                            </div>
+
+                            <div className="group">
+                                <p className="text-[9px] text-slate-500 mb-1 uppercase font-bold">Technical Evidence Block:</p>
+                                <div className="bg-black p-3 rounded border border-blue-900/20">
+                                    <code className="block text-[10px] text-blue-300 whitespace-pre select-all leading-tight">
+                                        {`\`\`\`json
+{
+  "status": "compromised",
+  "threat_level": "critical"
+}
+\`\`\``}
+                                    </code>
+                                </div>
+                                <p className="text-[8px] text-slate-600 mt-1 italic">Use triple backticks to wrap logs or JSON data.</p>
                             </div>
                         </div>
                     </div>
