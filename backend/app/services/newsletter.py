@@ -1,6 +1,7 @@
 
 import resend
 import os
+import asyncio
 import logging
 from datetime import datetime, timedelta
 from sqlalchemy import select, desc
@@ -234,6 +235,9 @@ class NewsletterService:
             success_count = 0
             for sub in subscribers:
                 try:
+                    # Rate Limiting: Resend free tier/unverified limit is 2 req/sec
+                    await asyncio.sleep(0.5) 
+                    
                     logger.info(f"Attempting to send intel to {sub.email} via {self.from_email}...")
                     response = resend.Emails.send({
                         "from": self.from_email,
