@@ -55,67 +55,83 @@ class NewsletterService:
         if subscriber_email:
             unsubscribe_url += f"?email={subscriber_email}"
 
-        # This template is optimized to prevent Gmail collapsing and clipping
+        # Clean summary text to remove placeholders like "See unified markdown..."
+        def clean_summary(text, title):
+            if not text or "See unified markdown" in text or "Full article content" in text:
+                return f"New tactical intelligence published: {title}. Access the mission portal for the full technical breakdown and defensive strategy."
+            return text
+
         template_str = """
         <!DOCTYPE html>
         <html>
         <head>
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <style>
-                body { font-family: 'Inter', Helvetica, Arial, sans-serif; background-color: #020617; color: #f8fafc; margin: 0; padding: 0; -webkit-text-size-adjust: none; }
-                .wrapper { width: 100%; table-layout: fixed; background-color: #020617; padding-bottom: 60px; }
-                .container { max-width: 600px; margin: 0 auto; background-color: #0f172a; border-radius: 24px; border: 1px solid #1e293b; margin-top: 20px; overflow: hidden; }
-                .preheader { display: none; max-height: 0px; overflow: hidden; mso-hide: all; }
-                .header { padding: 40px 20px; text-align: center; border-bottom: 1px solid #1e293b; }
-                .logo { font-size: 26px; font-weight: 900; color: #ef4444; letter-spacing: -1px; text-decoration: none; }
-                .intelligence-brief { padding: 20px 30px; background-color: #1e293b; color: #94a3b8; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; text-align: center; }
-                .content { padding: 30px; }
-                .article-card { margin-bottom: 40px; background-color: #1e293b80; border-radius: 20px; padding: 25px; border: 1px solid #334155; }
-                .category { font-size: 10px; font-weight: 900; color: #ef4444; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; display: block; }
-                .title { font-size: 20px; font-weight: 800; margin-bottom: 15px; color: #ffffff; line-height: 1.3; }
-                .summary { font-size: 14px; color: #cbd5e1; line-height: 1.7; margin-bottom: 25px; }
-                .button { background-color: #ef4444; color: #ffffff !important; padding: 14px 28px; border-radius: 14px; text-decoration: none; font-weight: 800; font-size: 13px; display: inline-block; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2); }
-                .footer { padding: 40px 30px; text-align: center; font-size: 11px; color: #64748b; line-height: 1.8; }
-                .unsubscribe { color: #ef4444; text-decoration: underline; font-weight: 700; }
-                .dispatch-tag { display: inline-block; padding: 4px 10px; background-color: #1e293b; border-radius: 6px; margin-bottom: 20px; }
+                body { margin: 0; padding: 0; background-color: #020617; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #f8fafc; }
+                .wrapper { background-color: #020617; width: 100%; padding: 40px 0; }
+                .container { max-width: 700px; margin: 0 auto; background-color: #0f172a; border-radius: 12px; border: 1px solid #1e293b; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+                .top-bar { background-color: #ef4444; height: 4px; width: 100%; }
+                .header { padding: 40px; text-align: left; border-bottom: 1px solid #1e293b; }
+                .brand { font-size: 22px; font-weight: 900; color: #ffffff; letter-spacing: -0.5px; text-decoration: none; }
+                .brand span { color: #ef4444; }
+                .meta { float: right; color: #64748b; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-top: 8px; }
+                .briefing-note { padding: 30px 40px; background-color: #1e293b; border-left: 4px solid #ef4444; margin: 20px 40px; border-radius: 4px; }
+                .briefing-note p { margin: 0; font-size: 15px; font-style: italic; color: #f8fafc; line-height: 1.6; }
+                .content { padding: 40px; }
+                .article-card { margin-bottom: 50px; }
+                .tag { display: inline-block; padding: 4px 10px; background: rgba(239, 68, 68, 0.1); color: #ef4444; font-size: 10px; font-weight: 900; border-radius: 4px; margin-bottom: 15px; letter-spacing: 1px; text-transform: uppercase; border: 1px solid rgba(239, 68, 68, 0.2); }
+                .title { font-size: 24px; font-weight: 800; color: #ffffff; line-height: 1.2; margin-bottom: 15px; }
+                .summary { font-size: 15px; color: #94a3b8; line-height: 1.7; margin-bottom: 25px; }
+                .cta { background-color: #ef4444; color: #ffffff !important; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 14px; display: inline-block; }
+                .footer { background-color: #020617; padding: 40px; text-align: center; border-top: 1px solid #1e293b; color: #475569; font-size: 11px; line-height: 1.8; }
+                .unsub { color: #ef4444; text-decoration: none; font-weight: 700; }
+                
+                @media only screen and (max-width: 600px) {
+                    .container { margin: 0; border-radius: 0; border: none; }
+                    .header, .content, .footer { padding: 25px; }
+                    .meta { float: none; display: block; margin-top: 15px; }
+                    .title { font-size: 20px; }
+                    .briefing-note { margin: 10px 20px; padding: 20px; }
+                }
             </style>
         </head>
         <body>
-            <span class="preheader">Latest Intel: {{ articles[0].title[:100] }}</span>
             <div class="wrapper">
                 <div class="container">
-                    <div class="intelligence-brief">
-                        Marliz Intel Bulletin • {{ timestamp_readable }}
-                    </div>
+                    <div class="top-bar"></div>
                     <div class="header">
-                        <a href="https://marlizintel.com" class="logo">MARLIZ INTEL</a>
-                        {% if custom_note %}
-                        <div style="margin-top: 30px; padding: 25px; background-color: #ef44440a; border-radius: 20px; font-size: 15px; line-height: 1.7; color: #f8fafc; font-style: italic; border: 1px solid #ef444433; text-align: left;">
-                            "{{ custom_note }}"
-                        </div>
-                        {% endif %}
+                        <span class="meta">{{ timestamp_readable }} ALERT</span>
+                        <a href="https://marlizintel.com" class="brand">MARLIZ<span>INTEL</span></a>
                     </div>
+                    
+                    {% if custom_note %}
+                    <div class="briefing-note">
+                        <p>"{{ custom_note }}"</p>
+                    </div>
+                    {% endif %}
+
                     <div class="content">
                         {% for article in articles %}
                         <div class="article-card">
-                            <span class="category">{{ article.category.name if article.category else 'SECURITY ALERT' }}</span>
+                            <span class="tag">{{ article.category.name if article.category else 'THREAT ALERT' }}</span>
                             <div class="title">{{ article.title }}</div>
                             <div class="summary">
                                 {% if article.simplified and article.simplified.friendly_summary %}
-                                    {{ article.simplified.friendly_summary[:350] }}...
+                                    {{ clean_summary(article.simplified.friendly_summary, article.title) | truncate(350) }}
                                 {% else %}
-                                    {{ article.summary[:350] if article.summary else 'Full technical intelligence report available on the portal.' }}...
+                                    {{ clean_summary(article.summary, article.title) | truncate(350) }}
                                 {% endif %}
                             </div>
-                            <a href="https://marlizintel.com/article/{{ article.slug }}" class="button">Access Full Intelligence</a>
+                            <a href="https://marlizintel.com/article/{{ article.slug }}" class="cta">Read Intel Report</a>
                         </div>
                         {% endfor %}
                     </div>
+                    
                     <div class="footer">
-                        <div class="dispatch-tag">OFFICIAL DISPATCH #{{ timestamp }}</div><br>
+                        CONFIDENTIAL DISPATCH #{{ timestamp }}<br>
                         &copy; {{ year }} Marliz Intelligence Systems. All rights reserved.<br>
-                        Confidentiality: This briefing is intended for subscribed parties only.<br><br>
-                        <a href="{{ unsubscribe_link }}" class="unsubscribe">One-click Unsubscribe</a>
+                        This report contains time-sensitive cybersecurity intelligence.<br><br>
+                        <a href="{{ unsubscribe_link }}" class="unsub">Unsubscribe from Intel Alerts</a>
                     </div>
                 </div>
             </div>
@@ -129,8 +145,9 @@ class NewsletterService:
             year=now.year, 
             custom_note=custom_note,
             timestamp=now.strftime("%Y%m%d-%H%M%S"),
-            timestamp_readable=now.strftime("%B %d, %H:%M"),
-            unsubscribe_link=unsubscribe_url
+            timestamp_readable=now.strftime("%B %d, %H:%M").upper(),
+            unsubscribe_link=unsubscribe_url,
+            clean_summary=clean_summary
         )
 
     def _generate_verification_html(self, verification_url):
