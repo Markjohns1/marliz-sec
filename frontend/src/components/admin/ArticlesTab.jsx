@@ -251,11 +251,13 @@ export default function ArticlesTab({
                                 <div className="text-center md:w-1/4 border-r border-slate-800/30">
                                     <div className="md:hidden text-[8px] text-slate-500 font-black uppercase mb-0.5">Words</div>
                                     <div className={`text-xs font-black ${(
+                                        (article.has_draft ? (article.draft_content_markdown?.length || 0) : (article.content_markdown?.length || 0)) +
                                         (article.simplified?.friendly_summary?.length || 0) +
                                         (article.simplified?.attack_vector?.length || 0) +
                                         (article.simplified?.business_impact?.length || 0)
-                                    ) >= 6000 ? 'text-emerald-400' : 'text-rose-400 opacity-80'}`}>
+                                    ) >= 8000 ? 'text-emerald-400' : 'text-rose-400 opacity-80'}`}>
                                         {Math.round((
+                                            (article.has_draft ? (article.draft_content_markdown?.length || 0) : (article.content_markdown?.length || 0)) +
                                             (article.simplified?.friendly_summary?.length || 0) +
                                             (article.simplified?.attack_vector?.length || 0) +
                                             (article.simplified?.business_impact?.length || 0)

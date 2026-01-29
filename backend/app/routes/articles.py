@@ -441,7 +441,13 @@ async def get_admin_articles(
         # Primary sort is already applied above
         primary_sort = None 
     elif sort_by == "words":
-        word_sort = func.length(func.coalesce(models.SimplifiedContent.friendly_summary, '')) + \
+        from sqlalchemy import case
+        content_len = case(
+            (models.Article.has_draft == True, func.length(func.coalesce(models.Article.draft_content_markdown, ''))),
+            else_=func.length(func.coalesce(models.Article.content_markdown, ''))
+        )
+        word_sort = content_len + \
+                    func.length(func.coalesce(models.SimplifiedContent.friendly_summary, '')) + \
                     func.length(func.coalesce(models.SimplifiedContent.attack_vector, '')) + \
                     func.length(func.coalesce(models.SimplifiedContent.business_impact, ''))
         primary_sort = desc(word_sort) if is_desc else word_sort.asc()
