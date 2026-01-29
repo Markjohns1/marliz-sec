@@ -48,8 +48,13 @@ class NewsletterService:
             result = await db.execute(stmt)
             return result.scalars().all()
 
-    def _generate_html(self, articles, custom_note=None):
-        """Generate the HTML email content using a bulletproof premium template."""
+    def _generate_html(self, articles, custom_note=None, subscriber_email=None):
+        """Generate a premium-style HTML email template for the newsletter."""
+        # Create base unsubscribe URL
+        unsubscribe_url = f"{settings.BASE_URL}/unsubscribe"
+        if subscriber_email:
+            unsubscribe_url += f"?email={subscriber_email}"
+
         # This template is optimized to prevent Gmail collapsing and clipping
         template_str = """
         <!DOCTYPE html>
@@ -110,7 +115,7 @@ class NewsletterService:
                         <div class="dispatch-tag">OFFICIAL DISPATCH #{{ timestamp }}</div><br>
                         &copy; {{ year }} Marliz Intelligence Systems. All rights reserved.<br>
                         Confidentiality: This briefing is intended for subscribed parties only.<br><br>
-                        <a href="https://marlizintel.com/unsubscribe" class="unsubscribe">One-click Unsubscribe</a>
+                        <a href="{{ unsubscribe_link }}" class="unsubscribe">One-click Unsubscribe</a>
                     </div>
                 </div>
             </div>
@@ -124,7 +129,8 @@ class NewsletterService:
             year=now.year, 
             custom_note=custom_note,
             timestamp=now.strftime("%Y%m%d-%H%M%S"),
-            timestamp_readable=now.strftime("%B %d, %H:%M")
+            timestamp_readable=now.strftime("%B %d, %H:%M"),
+            unsubscribe_link=unsubscribe_url
         )
 
     def _generate_verification_html(self, verification_url):
@@ -238,12 +244,24 @@ class NewsletterService:
                     # Rate Limiting: Resend free tier/unverified limit is 2 req/sec
                     await asyncio.sleep(0.5) 
                     
+                    # Generate personalized HTML for this subscriber
+                    html_content_personalized = self._generate_html(articles, custom_note=custom_note, subscriber_email=sub.email)
+                    
                     logger.info(f"Attempting to send intel to {sub.email} via {self.from_email}...")
+                    
+                    # Add specialized deliverability headers
+                    unsubscribe_url = f"{settings.BASE_URL}/unsubscribe?email={sub.email}"
+                    
                     response = resend.Emails.send({
                         "from": self.from_email,
                         "to": sub.email,
                         "subject": f"INTEL ALERT: {articles[0].title[:50]}...",
-                        "html": html_content
+                        "html": html_content_personalized,
+                        "reply_to": "intelligence@marlizintel.com",
+                        "headers": {
+                            "List-Unsubscribe": f"<{unsubscribe_url}>",
+                            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click"
+                        }
                     })
                     logger.info(f"✓ Resend Response for {sub.email}: {response}")
                     success_count += 1
