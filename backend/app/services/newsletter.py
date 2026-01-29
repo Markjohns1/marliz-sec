@@ -55,11 +55,24 @@ class NewsletterService:
         if subscriber_email:
             unsubscribe_url += f"?email={subscriber_email}"
 
-        # Clean summary text to remove placeholders like "See unified markdown..."
+        # Clean summary text: scrub Markdown and create suspense
         def clean_summary(text, title):
+            import re
             if not text or "See unified markdown" in text or "Full article content" in text:
-                return f"New tactical intelligence published: {title}. Access the mission portal for the full technical breakdown and defensive strategy."
-            return text
+                return f"New tactical intelligence published: {title}. Full briefing available.."
+            
+            # 1. Remove Markdown headers and bolding
+            text = re.sub(r'#+\s*', '', text) # Remove # headers
+            text = re.sub(r'\*+', '', text)   # Remove ** bolding
+            
+            # 2. Get the first sentence only
+            sentences = re.split(r'(?<=[.!?])\s+', text)
+            first_sentence = sentences[0] if sentences else text
+            
+            # 3. Create suspense (limit length and add ..)
+            if len(first_sentence) > 140:
+                return first_sentence[:137] + ".."
+            return first_sentence + ".."
 
         template_str = """
         <!DOCTYPE html>
