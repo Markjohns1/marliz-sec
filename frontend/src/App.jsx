@@ -22,6 +22,7 @@ import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
 import Contact from './pages/Contact';
 import Glossary from './pages/Glossary';
+import VerifyEmail from './pages/VerifyEmail';
 
 
 const queryClient = new QueryClient({
@@ -70,6 +71,7 @@ function AppContent() {
           <Route path="/terms" element={<Terms />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/glossary" element={<Glossary />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
           {/* Admin Routes (Obfuscated) */}
           <Route path="/console/login" element={<AdminLogin />} />
           <Route

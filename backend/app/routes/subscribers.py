@@ -5,6 +5,7 @@ from app.database import get_db
 from app import models, schemas
 from app.services.newsletter import newsletter_service
 import logging
+import secrets
 
 from app.auth import verify_api_key
 
@@ -20,6 +21,7 @@ async def subscribe(
     Subscribe to newsletter
     - Email validation
     - Duplicate check
+    - Verification email
     """
     
     # Check if already subscribed
@@ -31,7 +33,12 @@ async def subscribe(
         if existing.unsubscribed_at:
             # Resubscribe
             existing.unsubscribed_at = None
+            existing.is_verified = False # Re-verify
+            existing.verification_token = secrets.token_urlsafe(32)
             await db.commit()
+            
+            await newsletter_service.send_verification_email(existing.email, existing.verification_token)
+            
             await db.refresh(existing)
             return existing
         else:
@@ -41,18 +48,39 @@ async def subscribe(
             )
     
     # Create new subscriber
+    token = secrets.token_urlsafe(32)
     subscriber = models.Subscriber(
         email=subscriber_data.email,
-        is_verified=False  # Send verification email in production
+        is_verified=False,
+        verification_token=token
     )
     
     db.add(subscriber)
     await db.commit()
     await db.refresh(subscriber)
     
-    logger.info(f"New subscriber: {subscriber.email}")
+    # Send verification email
+    await newsletter_service.send_verification_email(subscriber.email, token)
+    
+    logger.info(f"New subscriber: {subscriber.email} (token generated)")
     
     return subscriber
+
+@router.get("/verify/{token}")
+async def verify_email(token: str, db: AsyncSession = Depends(get_db)):
+    """Confirm a subscriber's email address"""
+    stmt = select(models.Subscriber).filter_by(verification_token=token)
+    result = await db.execute(stmt)
+    subscriber = result.scalars().first()
+    
+    if not subscriber:
+        raise HTTPException(status_code=404, detail="Invalid or expired verification token")
+    
+    subscriber.is_verified = True
+    subscriber.verification_token = None # Clear token after verification
+    await db.commit()
+    
+    return {"status": "success", "message": "Email verified successfully. You are now active."}
 
 @router.delete("/{email}")
 async def unsubscribe(email: str, db: AsyncSession = Depends(get_db)):

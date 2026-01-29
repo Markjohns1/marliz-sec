@@ -121,6 +121,7 @@ class Subscriber(Base):
     email = Column(String(255), unique=True, nullable=False, index=True)
     is_premium = Column(Boolean, default=False)
     is_verified = Column(Boolean, default=False)
+    verification_token = Column(String(100), unique=True, nullable=True)
     preferences = Column(Text)  # JSON: categories, frequency
     
     subscribed_at = Column(DateTime(timezone=True), server_default=func.now())

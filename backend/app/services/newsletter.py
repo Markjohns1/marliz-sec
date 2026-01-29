@@ -38,9 +38,12 @@ class NewsletterService:
             return result.scalars().all()
 
     async def get_active_subscribers(self):
-        """Fetch all active subscribers."""
+        """Fetch all verified and active subscribers."""
         async with AsyncSessionLocal() as db:
-            stmt = select(Subscriber).where(Subscriber.unsubscribed_at.is_(None))
+            stmt = select(Subscriber).where(
+                Subscriber.unsubscribed_at.is_(None),
+                Subscriber.is_verified == True
+            )
             result = await db.execute(stmt)
             return result.scalars().all()
 
@@ -123,6 +126,60 @@ class NewsletterService:
             timestamp_readable=now.strftime("%B %d, %H:%M")
         )
 
+    def _generate_verification_html(self, verification_url):
+        """Generate a premium-style verification email template."""
+        template_str = """
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+                body { font-family: 'Inter', Helvetica, Arial, sans-serif; background-color: #020617; color: #f8fafc; margin: 0; padding: 0; }
+                .container { max-width: 600px; margin: 40px auto; background-color: #0f172a; border-radius: 24px; border: 1px solid #1e293b; padding: 40px; text-align: center; }
+                .logo { font-size: 24px; font-weight: 900; color: #ef4444; letter-spacing: -1px; text-decoration: none; display: block; margin-bottom: 30px; }
+                .title { font-size: 28px; font-weight: 800; color: #ffffff; margin-bottom: 20px; }
+                .text { color: #94a3b8; line-height: 1.7; margin-bottom: 30px; font-size: 16px; }
+                .button { background-color: #ef4444; color: #ffffff !important; padding: 16px 32px; border-radius: 14px; text-decoration: none; font-weight: 800; font-size: 14px; display: inline-block; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2); }
+                .footer { margin-top: 40px; font-size: 12px; color: #475569; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <a href="https://marlizintel.com" class="logo">MARLIZ INTEL</a>
+                <h1 class="title">Verify Your Intelligence Access</h1>
+                <p class="text">Welcome to the inner circle. To start receiving our premium daily intelligence dispatches and tactical alerts, please confirm your email address.</p>
+                <a href="{{ verification_url }}" class="button">Confirm Subscription</a>
+                <p class="text" style="margin-top: 30px; font-size: 13px;">If you didn't request this, you can safely ignore this email.</p>
+                <div class="footer">
+                    &copy; 2026 Marliz Intelligence Systems.
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        template = Template(template_str)
+        return template.render(verification_url=verification_url)
+
+    async def send_verification_email(self, email, token):
+        """Send a verification email to a new subscriber."""
+        if not self.api_key:
+            return False, "Missing API Key"
+            
+        verification_url = f"{settings.BASE_URL}/verify-email?token={token}"
+        html_content = self._generate_verification_html(verification_url)
+        
+        try:
+            resend.Emails.send({
+                "from": self.from_email,
+                "to": email,
+                "subject": "ACTION REQUIRED: Verify your Marliz Intel subscription",
+                "html": html_content
+            })
+            return True, "Verification email sent"
+        except Exception as e:
+            logger.error(f"Failed to send verification email to {email}: {e}")
+            return False, str(e)
+
     async def send_daily_digest(self, article_ids=None, custom_note=None, to_email=None, subscriber_emails=None):
         """Main entry point to send the intelligence digest. Accepts manual article_ids or defaults to top articles.
         Can target a single to_email (test mode) or a list of subscriber_emails (targeted blast)."""
@@ -151,9 +208,13 @@ class NewsletterService:
             # Special mode for test emails
             subscribers = [type('obj', (object,), {'email': to_email, 'id': None})]
         elif subscriber_emails and len(subscriber_emails) > 0:
-            # Targeted Blast: Filter to specific email list (ONLY if list is not empty)
+            # Targeted Blast: Filter to specific email list
             async with AsyncSessionLocal() as db:
-                stmt = select(Subscriber).where(Subscriber.email.in_(subscriber_emails), Subscriber.unsubscribed_at.is_(None))
+                stmt = select(Subscriber).where(
+                    Subscriber.email.in_(subscriber_emails), 
+                    Subscriber.unsubscribed_at.is_(None),
+                    Subscriber.is_verified == True
+                )
                 result = await db.execute(stmt)
                 subscribers = result.scalars().all()
         else:
