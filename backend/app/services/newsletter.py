@@ -283,9 +283,9 @@ class NewsletterService:
                     unsubscribe_url = f"{settings.BASE_URL}/unsubscribe?email={sub.email}"
                     
                     response = resend.Emails.send({
-                        "from": self.from_email,
+                        "from": "Marliz Intel <intelligence@marlizintel.com>",
                         "to": sub.email,
-                        "subject": f"INTEL ALERT: {articles[0].title[:50]}...",
+                        "subject": f"Intel Report: {articles[0].title[:60]}",
                         "html": html_content_personalized,
                         "reply_to": "intelligence@marlizintel.com",
                         "headers": {
