@@ -67,6 +67,7 @@ def get_source_type(referer: str, user_agent: str = None, query_ref: str = None)
         if any(x in qr for x in ["dc", "discord", "s=d"]): return "Discord"
         if any(x in qr for x in ["tw", "x", "s=x"]): return "X (Twitter)"
         if "ig" in qr or "s=i" in qr: return "Instagram"
+        if "intel_alert" in qr: return "Marliz Intel Alert"
 
     # 2. THE BIG TRICK: Aggressive User-Agent Fingerprinting
     # Even if referer is missing (Direct Access), the User-Agent often betrays the source
@@ -128,7 +129,7 @@ async def track_view(article_id: int, request: Request, db: AsyncSession):
             
     referer = request.headers.get("referer")
     user_agent = request.headers.get("user-agent")
-    query_ref = request.query_params.get("ref") or request.query_params.get("s")
+    query_ref = request.query_params.get("ref") or request.query_params.get("s") or request.query_params.get("utm_source")
     
     source_type = get_source_type(referer, user_agent, query_ref)
     

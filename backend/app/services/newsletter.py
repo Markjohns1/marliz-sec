@@ -135,7 +135,7 @@ class NewsletterService:
                                     {{ clean_summary(article.summary, article.title) | truncate(350) }}
                                 {% endif %}
                             </div>
-                            <a href="https://marlizintel.com/article/{{ article.slug }}" class="cta">Read Intel Report</a>
+                            <a href="https://marlizintel.com/article/{{ article.slug }}?utm_source=intel_alert&utm_medium=email" class="cta">Read Intel Report</a>
                         </div>
                         {% endfor %}
                     </div>
@@ -182,7 +182,7 @@ class NewsletterService:
         </head>
         <body>
             <div class="container">
-                <a href="https://marlizintel.com" class="logo">MARLIZ INTEL</a>
+                <a href="https://marlizintel.com?utm_source=intel_alert&utm_medium=email" class="logo">MARLIZ INTEL</a>
                 <h1 class="title">Verify Your Intelligence Access</h1>
                 <p class="text">Welcome to the inner circle. To start receiving our premium daily intelligence dispatches and tactical alerts, please confirm your email address.</p>
                 <a href="{{ verification_url }}" class="button">Confirm Subscription</a>

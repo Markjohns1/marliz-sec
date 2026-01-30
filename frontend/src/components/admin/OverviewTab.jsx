@@ -135,6 +135,7 @@ export default function OverviewTab({
                                         'Search Engine Bot': 'Indexing crawler (SEO active)',
                                         'AI Intelligence Bot': 'LLM / AI training agent',
                                         'Other Referrals': 'External site links',
+                                        'Marliz Intel Alert': 'Traffic from email newsletters',
                                         'other': 'Undocumented signal'
                                     };
                                     const explanation = explanations[source.platform] || 'External channel traffic';
