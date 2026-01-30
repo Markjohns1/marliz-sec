@@ -327,7 +327,7 @@ async def get_articles(
     query = select(models.Article).join(
         models.SimplifiedContent
     ).filter(
-        models.Article.status.in_([ArticleStatus.EDITED, ArticleStatus.PUBLISHED])
+        models.Article.status == ArticleStatus.PUBLISHED
     ).options(selectinload(models.Article.simplified), selectinload(models.Article.category))
     
     # Filter by category slug
@@ -482,7 +482,7 @@ async def get_article(slug: str, request: Request, db: AsyncSession = Depends(ge
     
     stmt = select(models.Article).filter(
         models.Article.slug == slug,
-        models.Article.status.in_([ArticleStatus.EDITED, ArticleStatus.PUBLISHED])
+        models.Article.status == ArticleStatus.PUBLISHED
     ).options(selectinload(models.Article.simplified), selectinload(models.Article.category))
     
     result = await db.execute(stmt)
@@ -496,7 +496,7 @@ async def get_article(slug: str, request: Request, db: AsyncSession = Depends(ge
                 models.Article.slug.ilike(f"%{slug}%"),
                 models.Article.title.ilike(f"%{slug.replace('-', ' ')}%")
             ),
-            models.Article.status.in_([ArticleStatus.EDITED, ArticleStatus.PUBLISHED])
+            models.Article.status == ArticleStatus.PUBLISHED
         ).order_by(desc(models.Article.published_at)).options(
             selectinload(models.Article.simplified), 
             selectinload(models.Article.category)
