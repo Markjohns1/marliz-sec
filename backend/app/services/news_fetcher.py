@@ -67,10 +67,15 @@ class NewsFetcher:
                     break
                     
                 try:
-                    result = await self._fetch_keyword(client, keyword)
+                    # Calculate remaining limit to ensure we don't exceed the batch limit
+                    remaining_limit = limit - total_new
+                    if remaining_limit <= 0:
+                        break
+                        
+                    result = await self._fetch_keyword(client, keyword, remaining_limit)
                     total_fetched += result["fetched"]
                     total_new += result["new"]
-                    logger.info(f"Keyword '{keyword}': {result['new']} new articles")
+                    logger.info(f"Keyword '{keyword}': {result['new']} new articles (Limit: {limit}, Total: {total_new})")
                 except Exception as e:
                     logger.error(f"Error fetching '{keyword}': {str(e)}")
         
@@ -81,15 +86,19 @@ class NewsFetcher:
             "timestamp": datetime.now().isoformat()
         }
     
-    async def _fetch_keyword(self, client: httpx.AsyncClient, keyword: str) -> dict:
-        """Fetch articles for a single keyword"""
+    async def _fetch_keyword(self, client: httpx.AsyncClient, keyword: str, limit: int = 10) -> dict:
+        """Fetch articles for a single keyword with a specific limit"""
         
+        # Guard against zero/negative limit
+        if limit <= 0:
+            return {"fetched": 0, "new": 0}
+            
         params = {
             "apikey": self.api_key,
             "q": keyword,
             "language": "en",
             "category": "technology",
-            "size": 10  # Fetch 10 per keyword
+            "size": min(limit, 10)  # Fetch up to limit, max per API call is usually 10-50
         }
         
         try:
