@@ -33,7 +33,7 @@ async def subscribe(
         if existing.unsubscribed_at:
             # Resubscribe
             existing.unsubscribed_at = None
-            existing.is_verified = False # Re-verify
+            existing.is_verified = True # Auto-verify on return
             existing.verification_token = secrets.token_urlsafe(32)
             await db.commit()
             
@@ -47,11 +47,11 @@ async def subscribe(
                 detail="Email already subscribed"
             )
     
-    # Create new subscriber
+    # Create new subscriber: Auto-verify enabled
     token = secrets.token_urlsafe(32)
     subscriber = models.Subscriber(
         email=subscriber_data.email,
-        is_verified=False,
+        is_verified=True, # Auto-verify for immediate access
         verification_token=token
     )
     
