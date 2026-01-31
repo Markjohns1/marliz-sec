@@ -9,10 +9,8 @@ from app.database import init_db, get_db
 from app.config import settings
 from app import models, auth
 from app.routes import articles
-from app.routes import admin
 from app.routes import subscribers
 from app.routes import seo
-from app.routes import rss
 from app.routes.articles import track_view
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -105,10 +103,8 @@ async def security_and_cache_middleware(request, call_next):
     return response
 
 app.include_router(articles.router)
-app.include_router(admin.router)
 app.include_router(subscribers.router)
 app.include_router(seo.router)
-app.include_router(rss.router)
 
 @app.get("/api/health")
 async def health_check():
