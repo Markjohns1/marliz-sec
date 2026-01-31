@@ -51,3 +51,5 @@ extract_*.py
 list_sheets.py
 coverage_report.txt
 
+# Sub-projects
+portfolio/
