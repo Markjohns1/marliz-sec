@@ -84,12 +84,12 @@ async def security_and_cache_middleware(request, call_next):
     csp = (
         "upgrade-insecure-requests; "
         "default-src 'self' https:; "
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.googlesyndication.com https://*.google.com https://*.googletagservices.com https://*.adtrafficquality.google; "
-        "frame-src 'self' https://*.google.com https://*.googlesyndication.com https://*.doubleclick.net; "
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.googlesyndication.com https://*.google.com https://*.googletagservices.com https://*.adtrafficquality.google https://*.googletagmanager.com https://www.googletagmanager.com; "
+        "frame-src 'self' https://*.google.com https://*.googlesyndication.com https://*.doubleclick.net https://*.adtrafficquality.google; "
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
         "font-src 'self' https://fonts.gstatic.com; "
         "img-src 'self' data: https:; "
-        "connect-src 'self' https: https://*.google-analytics.com https://*.doubleclick.net https://*.googlesyndication.com;"
+        "connect-src 'self' https: https://*.google-analytics.com https://*.doubleclick.net https://*.googlesyndication.com https://*.google.com;"
     )
     response.headers["Content-Security-Policy"] = csp
 
