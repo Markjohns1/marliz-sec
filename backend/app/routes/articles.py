@@ -11,6 +11,8 @@ import json
 import asyncio
 from datetime import datetime, timedelta
 from slugify import slugify
+from app.services.google_indexing import google_indexing
+from app.config import settings
 
 router = APIRouter(prefix="/api/articles", tags=["articles"])
 
@@ -614,7 +616,17 @@ async def create_manual_article(
     # Eager load for validation
     stmt = select(models.Article).filter_by(id=article.id).options(selectinload(models.Article.category))
     res = await db.execute(stmt)
-    return res.scalars().first()
+    final_article = res.scalars().first()
+
+    # Auto-Index on Creation if Published
+    try:
+        url = f"{settings.BASE_URL}/article/{final_article.slug}"
+        print(f"Auto-Indexing Manual Article: {url}")
+        await google_indexing.notify_url_update(url)
+    except Exception as e:
+        print(f"Failed to auto-index manual article: {e}")
+
+    return final_article
 
 @router.put("/{article_id}", response_model=schemas.Article)
 async def update_article(
@@ -710,6 +722,14 @@ async def publish_article(
         article.status = ArticleStatus.PUBLISHED
         
         await db.commit()
+        
+        # Auto-Index on Publish
+        try:
+            url = f"{settings.BASE_URL}/article/{article.slug}"
+            print(f"Auto-Indexing Published Article: {url}")
+            await google_indexing.notify_url_update(url)
+        except Exception as e:
+            print(f"Failed to auto-index published article: {e}")
         
     return {"status": "published", "article_id": article_id}
 
