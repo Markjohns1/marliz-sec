@@ -8,7 +8,10 @@ import logging
 from app.database import init_db, get_db
 from app.config import settings
 from app import models, auth
-from app.routes import articles, categories, subscribers, seo
+from app.routes import articles, admin, subscribers, seo, rss, contact
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 from app.routes.articles import track_view
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -55,6 +58,8 @@ app.add_middleware(
         "http://localhost:3000",
         "http://localhost:5173",
         f"https://{settings.DOMAIN}",
+        "https://www.marlizintel.com",
+        "https://markjohns1.github.io",  # ALLOW PORTFOLIO TRAFFIC
         f"https://www.{settings.DOMAIN}"
     ],
     allow_credentials=True,
@@ -100,10 +105,17 @@ async def security_and_cache_middleware(request, call_next):
     return response
 
 # Include routers
+# Initialize Limiter
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 app.include_router(articles.router)
-app.include_router(categories.router)
+app.include_router(admin.router)
 app.include_router(subscribers.router)
 app.include_router(seo.router)
+app.include_router(rss.router)
+app.include_router(contact.router)
 
 @app.get("/api/health")
 async def health_check():
