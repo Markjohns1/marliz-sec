@@ -8,7 +8,11 @@ import logging
 from app.database import init_db, get_db
 from app.config import settings
 from app import models, auth
-from app.routes import articles, admin, subscribers, seo, rss
+from app.routes import articles
+from app.routes import admin
+from app.routes import subscribers
+from app.routes import seo
+from app.routes import rss
 from app.routes.articles import track_view
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
