@@ -56,7 +56,6 @@ app.add_middleware(
         "http://localhost:5173",
         f"https://{settings.DOMAIN}",
         "https://www.marlizintel.com",
-        "https://markjohns1.github.io",  # ALLOW PORTFOLIO TRAFFIC
         f"https://www.{settings.DOMAIN}"
     ],
     allow_credentials=True,
