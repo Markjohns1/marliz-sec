@@ -9,9 +9,6 @@ from app.database import init_db, get_db
 from app.config import settings
 from app import models, auth
 from app.routes import articles, admin, subscribers, seo, rss, contact
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
-from slowapi.errors import RateLimitExceeded
 from app.routes.articles import track_view
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -105,11 +102,6 @@ async def security_and_cache_middleware(request, call_next):
     return response
 
 # Include routers
-# Initialize Limiter
-limiter = Limiter(key_func=get_remote_address)
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
-
 app.include_router(articles.router)
 app.include_router(admin.router)
 app.include_router(subscribers.router)
