@@ -199,8 +199,26 @@ if os.path.exists(FRONTEND_DIST):
     # Catch-all route for React Router (SPA)
     @app.api_route("/{full_path:path}", methods=["GET", "HEAD"])
     async def serve_react_app(full_path: str, request: Request):
+        # ============================================================
+        # 🚨 CRITICAL SECURITY: PATH TRAVERSAL PROTECTION
+        # ============================================================
+        # Block ANY request containing path traversal sequences
+        if ".." in full_path or full_path.startswith("/"):
+            logger.warning(f"SECURITY ALERT: Path traversal attempt blocked - {full_path} from {request.client.host}")
+            raise HTTPException(status_code=403, detail="Forbidden")
+        
+        # Additional path normalization check - ensure resolved path stays in dist
+        try:
+            abs_dist = os.path.abspath(FRONTEND_DIST)
+            requested_path = os.path.abspath(os.path.join(FRONTEND_DIST, full_path))
+            if not requested_path.startswith(abs_dist):
+                logger.warning(f"SECURITY ALERT: Path escape attempt blocked - {full_path} from {request.client.host}")
+                raise HTTPException(status_code=403, detail="Forbidden")
+        except Exception:
+            raise HTTPException(status_code=403, detail="Forbidden")
+        
         # 🚨 SECURITY: Block access to hidden system files and secrets
-        if any(x in full_path for x in [".git", ".env", "docker-compose", ".yml", ".ini"]):
+        if any(x in full_path.lower() for x in [".git", ".env", "docker-compose", ".yml", ".ini", ".ssh", ".aws", ".docker", "passwd", "shadow", "/proc/", "/etc/"]):
             logger.warning(f"SECURITY ALERT: Blocked attempt to access {full_path} from {request.client.host}")
             raise HTTPException(status_code=403, detail="Forbidden")
 
