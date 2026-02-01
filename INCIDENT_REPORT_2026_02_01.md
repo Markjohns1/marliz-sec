@@ -79,3 +79,75 @@ if not requested_path.startswith(abs_dist):
 ---
 **Verified by:** Marliz Sec SOC Office
 **Case Status:** CLOSED (February 1, 2026)
+
+---
+
+## Appendix: Raw Evidence Logs
+The following logs were captured during the live attack, showing the IP `45.88.186.70` attempting to traverse directories to access sensitive system files. Note the `200 OK` responses before the patch was applied.
+
+```text
+marliz-sec-news  | INFO:     45.88.186.70:27636 - "GET /../../../../../../etc/passwd HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:56130 - "GET /../../../../../../root/.bash_history HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:56146 - "GET /../../../../../../root/.zsh_history HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:56182 - "GET /../../../../../../root/.viminfo HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:56196 - "GET /../../../../../../root/.bashrc HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:56230 - "GET /../../../../../../root/.zshrc HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:56238 - "GET /../../../../../../root/.oh_my_zsh HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:56264 - "GET /../../../../../../root/.npmrc HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:56266 - "GET /../../../../../../root/.profile HTTP/1.1" 200 OK
+marliz-sec-news  | WARNING:app.main:SECURITY ALERT: Blocked attempt to access ../../../../../../root/docker-compose.yml from 45.88.186.70
+marliz-sec-news  | INFO:     45.88.186.70:56290 - "GET /../../../../../../root/docker-compose.yml HTTP/1.1" 403 Forbidden
+marliz-sec-news  | WARNING:app.main:SECURITY ALERT: Blocked attempt to access ../../../../../../root/.git-credentials from 45.88.186.70
+marliz-sec-news  | INFO:     45.88.186.70:56300 - "GET /../../../../../../root/.git-credentials HTTP/1.1" 403 Forbidden
+marliz-sec-news  | INFO:     45.88.186.70:56328 - "GET /../../../../../../root/.docker/config.json HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:56340 - "GET /../../../../../../root/.ssh/id_ed25519 HTTP/1.1" 200 OK
+marliz-sec-news  | WARNING:app.main:SECURITY ALERT: Blocked attempt to access ../../../../../../root/.git/config from 45.88.186.70
+marliz-sec-news  | INFO:     45.88.186.70:56398 - "GET /../../../../../../root/.git/config HTTP/1.1" 403 Forbidden
+marliz-sec-news  | INFO:     45.88.186.70:56384 - "GET /../../../../../../root/.ssh/id_rsa HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:56408 - "GET /../../../../../../bin/.bash_history HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:56424 - "GET /../../../../../../bin/.zsh_history HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:56456 - "GET /../../../../../../bin/.bashrc HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:56440 - "GET /../../../../../../bin/.viminfo HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:56470 - "GET /../../../../../../bin/.zshrc HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:56480 - "GET /../../../../../../bin/.oh_my_zsh HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:56508 - "GET /../../../../../../bin/.npmrc HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:56510 - "GET /../../../../../../bin/.profile HTTP/1.1" 200 OK
+marliz-sec-news  | WARNING:app.main:SECURITY ALERT: Blocked attempt to access ../../../../../../bin/.git-credentials from 45.88.186.70
+marliz-sec-news  | INFO:     45.88.186.70:56558 - "GET /../../../../../../bin/.git-credentials HTTP/1.1" 403 Forbidden
+marliz-sec-news  | WARNING:app.main:SECURITY ALERT: Blocked attempt to access ../../../../../../bin/docker-compose.yml from 45.88.186.70
+marliz-sec-news  | INFO:     45.88.186.70:56556 - "GET /../../../../../../bin/docker-compose.yml HTTP/1.1" 403 Forbidden
+marliz-sec-news  | INFO:     45.88.186.70:56586 - "GET /../../../../../../bin/.docker/config.json HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:56590 - "GET /../../../../../../bin/.ssh/id_ed25519 HTTP/1.1" 200 OK
+marliz-sec-news  | WARNING:app.main:SECURITY ALERT: Blocked attempt to access ../../../../../../bin/.git/config from 45.88.186.70
+marliz-sec-news  | INFO:     45.88.186.70:56636 - "GET /../../../../../../bin/.git/config HTTP/1.1" 403 Forbidden
+marliz-sec-news  | INFO:     45.88.186.70:56626 - "GET /../../../../../../bin/.ssh/id_rsa HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:56650 - "GET /../../../../../../etc/shadow HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:56658 - "GET /../../../../../../proc/self/cmdline HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:56692 - "GET /../../../../../../proc/self/environ HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:56694 - "GET /../../../../../../proc/self/cwd HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:56720 - "GET /../../../../../../proc/self/cwd/app.py HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:56736 - "GET /../../../../../../proc/self/cwd/config.py HTTP/1.1" 200 OK
+marliz-sec-news  | WARNING:app.main:SECURITY ALERT: Blocked attempt to access ../../../../../../proc/self/cwd/.env from 45.88.186.70
+marliz-sec-news  | INFO:     45.88.186.70:56752 - "GET /../../../../../../proc/self/cwd/.env HTTP/1.1" 403 Forbidden
+marliz-sec-news  | INFO:     45.88.186.70:56766 - "GET /../../../../../../proc/self/cwd/.aws/credentials HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:56806 - "GET /../../../../../../proc/self/cwd/.bash_history HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:56816 - "GET /../../../../../../proc/self/cwd/.zsh_history HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:56852 - "GET /../../../../../../proc/self/cwd/.zshrc HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:56866 - "GET /../../../../../../proc/self/cwd/.oh_my_zsh HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:56882 - "GET /../../../../../../proc/self/cwd/.bashrc HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:56890 - "GET /../../../../../../proc/self/cwd/.viminfo HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:56920 - "GET /../../../../../../proc/self/cwd/.ssh/id_rsa HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:56936 - "GET /../../../../../../proc/self/cwd/.ssh/id_ed25519 HTTP/1.1" 200 OK
+marliz-sec-news  | WARNING:app.main:SECURITY ALERT: Blocked attempt to access ../../../../../../proc/self/cwd/.git-credentials from 45.88.186.70
+marliz-sec-news  | INFO:     45.88.186.70:56958 - "GET /../../../../../../proc/self/cwd/.git-credentials HTTP/1.1" 403 Forbidden
+marliz-sec-news  | INFO:     45.88.186.70:56972 - "GET /../../../../../../proc/self/cwd/.npmrc HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:56998 - "GET /../../../../../../proc/self/cwd/.docker/config.json HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:57002 - "GET /../../../../../../proc/self/cwd/.profile HTTP/1.1" 200 OK
+marliz-sec-news  | WARNING:app.main:SECURITY ALERT: Blocked attempt to access ../../../../../../proc/self/cwd/docker-compose.yml from 45.88.186.70
+marliz-sec-news  | INFO:     45.88.186.70:57040 - "GET /../../../../../../proc/self/cwd/docker-compose.yml HTTP/1.1" 403 Forbidden
+marliz-sec-news  | INFO:     45.88.186.70:57056 - "GET /../../../../../../etc/shells HTTP/1.1" 200 OK
+marliz-sec-news  | INFO:     45.88.186.70:57070 - "GET /../../../../../../proc/self/maps HTTP/1.1" 200 OK
+marliz-sec-news  | WARNING:app.main:SECURITY ALERT: Blocked attempt to access ../../../../../../proc/self/cwd/.git/config from 45.88.186.70
+marliz-sec-news  | INFO:     45.88.186.70:57074 - "GET /../../../../../../proc/self/cwd/.git/config HTTP/1.1" 403 Forbidden
+```
+
