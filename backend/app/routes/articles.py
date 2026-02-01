@@ -552,14 +552,29 @@ async def get_related_articles(
     if not article:
         raise HTTPException(status_code=404, detail="Article not found")
     
+    # Try getting articles from the same category first
     stmt = select(models.Article).filter(
         models.Article.category_id == article.category_id,
         models.Article.id != article_id,
-        models.Article.status.in_([ArticleStatus.READY, ArticleStatus.EDITED])
+        models.Article.status == ArticleStatus.PUBLISHED
     ).order_by(desc(models.Article.published_at)).limit(limit).options(selectinload(models.Article.category))
     
     result = await db.execute(stmt)
     related = result.scalars().all()
+    
+    # Fallback: if we don't have enough related articles in this category,
+    # get the most recent ones from ANY category
+    if len(related) < limit:
+        needed = limit - len(related)
+        exclude_ids = [article_id] + [a.id for a in related]
+        
+        fallback_stmt = select(models.Article).filter(
+            models.Article.id.notin_(exclude_ids),
+            models.Article.status == ArticleStatus.PUBLISHED
+        ).order_by(desc(models.Article.published_at)).limit(needed).options(selectinload(models.Article.category))
+        
+        fallback_result = await db.execute(fallback_stmt)
+        related.extend(fallback_result.scalars().all())
     
     return related
 
