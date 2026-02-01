@@ -217,7 +217,7 @@ class NewsletterService:
             logger.error(f"Failed to send verification email to {email}: {e}")
             return False, str(e)
 
-    async def send_daily_digest(self, article_ids=None, custom_note=None, to_email=None, subscriber_emails=None):
+    async def send_daily_digest(self, article_ids=None, custom_note=None, to_email=None, subscriber_emails=None, limit=1):
         """Main entry point to send the intelligence digest. Accepts manual article_ids or defaults to top articles.
         Can target a single to_email (test mode) or a list of subscriber_emails (targeted blast)."""
         if not self.api_key:
@@ -234,8 +234,9 @@ class NewsletterService:
                 result = await db.execute(stmt)
                 articles = result.scalars().all()
         else:
-            # Auto Mode: Fetch top articles (for the morning scheduler)
-            articles = await self.get_top_articles()
+            # Auto Mode: Fetch top articles (for the morning scheduler or quick blast)
+            # Default to limit (1 for quick blast, 5 for scheduler)
+            articles = await self.get_top_articles(limit=limit)
 
         if not articles:
             logger.info("No articles found for newsletter.")
@@ -312,6 +313,6 @@ class NewsletterService:
         if success_count == 0 and last_error:
             return False, f"API Error: {last_error}"
                 
-        return True, f"Sent {len(articles)} articles to {success_count} recipients"
+        return True, f"Sent {len(articles)} {'article' if len(articles) == 1 else 'articles'} to {success_count} recipients"
 
 newsletter_service = NewsletterService()

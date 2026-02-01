@@ -76,11 +76,11 @@ async def newsletter_digest_job():
     
     logger.info("📧 Starting daily newsletter digest job...")
     try:
-        success = await newsletter_service.send_daily_digest()
+        success, message = await newsletter_service.send_daily_digest(limit=1)
         if success:
-            logger.info("✓ Newsletter digest sent successfully")
+            logger.info(f"✓ Newsletter digest sent: {message}")
         else:
-            logger.info("! Newsletter digest skipped (no content or subscribers)")
+            logger.info(f"! Newsletter digest skipped: {message}")
     except Exception as e:
         logger.error(f"✗ Newsletter digest job failed: {str(e)}")
 
