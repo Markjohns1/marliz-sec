@@ -240,33 +240,40 @@ if os.path.exists(FRONTEND_DIST):
             raise HTTPException(status_code=404)
 
         # 2. SEO HARD STOP: Check Graveyard for Soft 404 Prevention
-        if full_path.startswith("article/"):
-            # Cleanly extract slug (handles trailing slashes)
-            parts = [p for p in full_path.split("/") if p]
-            if len(parts) >= 2:
-                slug = parts[1]
+        # We check any path that looks like an article request
+        if "article/" in full_path:
+            import urllib.parse
+            # 1. Decode and clean the path (Handles %20, special chars, etc)
+            clean_path = urllib.parse.unquote(full_path).strip("/")
+            parts = [p for p in clean_path.split("/") if p]
+            
+            # Find the slug (usually the last part of an article URL)
+            test_slug = parts[-1] if parts else None
+            
+            if test_slug:
                 try:
-                    # Use a new DB session
-                    async for db in get_db():
-                        # Check for exact slug OR suffix match (handles old 'undefined/article/slug' pattern)
+                    from app.database import get_db_context
+                    async with get_db_context() as db:
+                        # SUPER AGGRESSIVE CHECK: 
+                        # Check for exact match OR if the slug is a suffix of a buried one
                         stmt = select(models.DeletedArticle).filter(
                             or_(
-                                models.DeletedArticle.slug == slug,
-                                models.DeletedArticle.slug.ilike(f"%{slug}")
+                                models.DeletedArticle.slug == test_slug,
+                                models.DeletedArticle.slug.ilike(f"%{test_slug}"),
+                                models.DeletedArticle.slug.ilike(f"{test_slug}%")
                             )
                         )
                         res = await db.execute(stmt)
                         if res.scalars().first():
-                            logger.info(f"410 GONE (Hard Stop): {slug}")
+                            logger.info(f"410 GONE (Hard Stop): {test_slug}")
                             raise HTTPException(
                                 status_code=410, 
                                 detail="Gone: This page has been permanently removed."
                             )
-                        break 
                 except HTTPException:
-                    raise # Re-raise 410s correctly
+                    raise 
                 except Exception as e:
-                    logger.error(f"Failed to check graveyard for {slug}: {e}")
+                    logger.error(f"Failed to check graveyard for {test_slug}: {e}")
 
         # Explicitly ignore API and unexpected system paths so they don't get swallowed by React
         if full_path.startswith("api"):
