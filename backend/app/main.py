@@ -218,8 +218,16 @@ if os.path.exists(FRONTEND_DIST):
             raise HTTPException(status_code=403, detail="Forbidden")
         
         # 🚨 SECURITY: Block access to hidden system files and secrets
-        if any(x in full_path.lower() for x in [".git", ".env", "docker-compose", ".yml", ".ini", ".ssh", ".aws", ".docker", "passwd", "shadow", "/proc/", "/etc/"]):
-            logger.warning(f"SECURITY ALERT: Blocked attempt to access {full_path} from {request.client.host}")
+        # Only block if NOT an article path (articles can have words like "shadow" in titles)
+        if not full_path.startswith("article/"):
+            blocked_patterns = [".git", ".env", "docker-compose", ".yml", ".ini", ".ssh", ".aws", ".docker", "passwd", "/proc/", "/etc/", "wp-includes", "xmlrpc", "wp-admin"]
+            if any(x in full_path.lower() for x in blocked_patterns):
+                logger.warning(f"SECURITY ALERT: Blocked attempt to access {full_path} from {request.client.host}")
+                raise HTTPException(status_code=403, detail="Forbidden")
+        
+        # Extra check: Block direct access to system files even in article paths (path traversal protection)
+        if any(x in full_path for x in ["../", "/etc/shadow", "/etc/passwd", ".ssh/", ".aws/"]):
+            logger.warning(f"SECURITY ALERT: Path traversal blocked - {full_path} from {request.client.host}")
             raise HTTPException(status_code=403, detail="Forbidden")
 
         # 0. Catch broken 'undefined' URLs (Common SEO issue)
