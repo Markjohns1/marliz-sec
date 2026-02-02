@@ -90,11 +90,21 @@ async def get_deleted_sitemap(db: AsyncSession = Depends(get_db)):
 
 @router.api_route("/robots.txt", methods=["GET", "HEAD"])
 def get_robots():
-    """Serve robots.txt"""
+    """Serve robots.txt - Optimized for Indexing vs Eradication"""
     content = f"""User-agent: *
 Allow: /
+Allow: /article/
+Allow: /category/
 
-Sitemap: {settings.BASE_URL}/sitemap.xml"""
+# BLOCK GARBAGE & DUPLICATES
+Disallow: /search?
+Disallow: /*?utm_source=
+Disallow: /*?fbclid=
+Disallow: /*?_escaped_fragment_=
+Disallow: /api/
+
+Sitemap: {settings.BASE_URL}/sitemap.xml
+Sitemap: {settings.BASE_URL}/sitemap-deleted.xml"""
     return Response(content=content, media_type="text/plain")
 
 @router.api_route("/ads.txt", methods=["GET", "HEAD"])

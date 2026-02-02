@@ -270,6 +270,26 @@ if os.path.exists(FRONTEND_DIST):
                                 status_code=410, 
                                 detail="Gone: This page has been permanently removed."
                             )
+                        
+                        # --- LONG TERM SOLUTION: PASSIVE AUTO-BURIAL ---
+                        # If we are here, it means the URL contains 'article/' but it's NOT in the grave.
+                        # Now check if it's in the LIVE articles.
+                        stmt_live = select(models.Article).filter_by(slug=test_slug)
+                        res_live = await db.execute(stmt_live)
+                        if not res_live.scalars().first():
+                            # It's not in the Grave and not in Live -> It's a GHOST.
+                            # We bury it automatically for future requests.
+                            logger.warning(f"AUTO-BURYING GHOST URL: {test_slug}")
+                            new_grave = models.DeletedArticle(
+                                slug=test_slug, 
+                                reason="Autonomous Passive Burial (404 Detection)"
+                            )
+                            db.add(new_grave)
+                            await db.commit()
+                            raise HTTPException(
+                                status_code=410, 
+                                detail="Gone: This page has been permanently removed."
+                            )
                 except HTTPException:
                     raise 
                 except Exception as e:
