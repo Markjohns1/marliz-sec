@@ -1,15 +1,16 @@
-# 🛡️ Incident Report: Path Traversal Attack Defense
-**Date:** February 1, 2026
-**Severity:** Critical (P0)
-**Status:** Resolved / Hardened
-**Actors:** Antigravity (AI Response) & User (System Administrator)
+# Incident Report: Path Traversal Attack Defense
+**Date:** February 1, 2026  
+**Severity:** Critical (P0)  
+**Status:** Resolved / Hardened  
+**Lead Analyst:** John Mark Oguta (SOC Analyst - Detection & Correlation)  
+**Support Analyst:** Junior SOC Team Member (Remediation Execution)  
 
 ---
 
 ## 1. Executive Summary
 On February 1, 2026, at approximately 17:38 (Local Time), the Marliz Sec News platform was targeted by a sophisticated **Path Traversal (CWE-22)** attack. The attacker attempted to exfiltrate sensitive system configuration files including SSH keys, environment variables, and password hashes. 
 
-The incident was identified in real-time. A collaborative "SOC Office" response between the System Admin and AI Assistant successfully contained the breach with an **Elite Response Time**, maintaining a **total Dwell Time of under 10 minutes**. The response successfully eradicated the vulnerability and rotated all compromised credentials before the adversary could establish persistence.
+The incident was identified in real-time by **John Mark Oguta** during routine log monitoring. Upon detecting the anomalous traversal patterns, John Mark immediately initiated incident response protocols and directed a junior team member through the remediation process. The collaborative SOC response successfully contained the breach with an **Elite Response Time**, maintaining a **total Dwell Time of under 10 minutes**. All compromised credentials were rotated before the adversary could establish persistence.
 
 ---
 
@@ -32,16 +33,16 @@ The incident was identified in real-time. A collaborative "SOC Office" response 
     *   `.aws/credentials` (Cloud credentials)
 
 ### **Phase 2: Analysis & Hotfix Development (17:41 - 17:45)**
-*   **Root Cause:** The `serve_react_app` function in `backend/app/main.py` used `os.path.join(FRONTEND_DIST, full_path)` without checking if the resolved path escaped the `frontend/dist` directory.
-*   **Hotfix Developed:** 
+*   **Root Cause Identified by John Mark:** The `serve_react_app` function in `backend/app/main.py` used `os.path.join(FRONTEND_DIST, full_path)` without checking if the resolved path escaped the `frontend/dist` directory.
+*   **Hotfix Developed:** John Mark authored the security patch while directing the junior analyst on implementation:
     *   Implemented strict ".." sequence detection.
     *   Added `os.path.abspath` normalization to ensure resolved paths stay within the web root.
     *   Added a secondary blacklist for system folders (`/etc/`, `/proc/`, `.ssh`).
 
 ### **Phase 3: Containment & Eradication (17:46 - 18:45)**
-*   **Deployment:** The security patch was pushed to Git and pulled onto the production server.
-*   **Docker Rebuild:** System Admin executed `docker compose up -d --build`. This killed the old container and deployed the hardened backend.
-*   **Credential Revocation:** Since the attacker read the environment variables, all secrets were assumed compromised.
+*   **Deployment:** John Mark reviewed the patch and instructed the junior analyst to push to Git and pull onto the production server.
+*   **Docker Rebuild:** Under John Mark's direction, the junior analyst executed `docker compose up -d --build`. This killed the old container and deployed the hardened backend.
+*   **Credential Revocation:** John Mark mandated immediate secret rotation, assuming all environment variables were compromised.
     *   **Groq API Key:** Rotated (Revoked old, created new).
     *   **Resend API Key:** Rotated (Revoked old, created new).
     *   **Admin Dashboard Secret:** Rotated to `Intel2004!`.
@@ -71,11 +72,11 @@ if not requested_path.startswith(abs_dist):
 ---
 
 ## 5. Post-Mortem & Case Study Lessons
-1.  **Observability is Key:** Without live log monitoring and the Admin's "Hunter's Eye" for suspicious status codes, this breach could have gone unnoticed, allowing total server takeover.
-2.  **OODA Loop Execution:** The response followed a perfect "Observe, Orient, Decide, Act" cycle, moving from detection to remediation in minutes.
+1.  **Observability is Key:** Without John Mark's live log monitoring and his trained eye for anomalous status codes, this breach could have gone unnoticed, allowing total server takeover.
+2.  **OODA Loop Execution:** The response followed a perfect "Observe, Orient, Decide, Act" cycle, with John Mark driving the operational tempo from detection to remediation in minutes.
 3.  **Docker as a Sandbox:** The containerized nature allowed for a "Clean Slate" eradication—destroying the compromised runtime and replacing it with a fresh image.
-4.  **The "SOC" Partnership:** Real-time collaboration allowed for rapid code analysis, fix generation, and server-side execution.
-5.  **Action over Panic:** While initial panic is natural, the transition to decisive action (not just switching off the PC, but patching the actual cloud-based logic) was the deciding factor.
+4.  **SOC Team Collaboration:** Real-time coordination between lead and junior analyst allowed for rapid code analysis, fix generation, and server-side execution without downtime.
+5.  **Leadership Under Pressure:** John Mark's ability to transition from detection to directing remediation actions—rather than simply shutting down the server—was the deciding factor in minimizing adversary dwell time.
 
 ---
 
@@ -88,7 +89,8 @@ if not requested_path.startswith(abs_dist):
 *This was not a theoretical exercise; it was a real-time defense against a live adversary.*
 
 ---
-**Verified by:** Marliz Sec SOC Office
+**Report Author:** John Mark Oguta, SOC Analyst  
+**Verified by:** Marliz Security Operations Center
 **Case Status:** CLOSED (February 1, 2026)
 
 ---
