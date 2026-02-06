@@ -219,8 +219,14 @@ if os.path.exists(FRONTEND_DIST):
         
         # 🚨 SECURITY: Block access to hidden system files and secrets
         # Only block if NOT an article path (articles can have words like "shadow" in titles)
+        # Added more patterns from recent bot scans (phpinfo, wp-config, etc.)
         if not full_path.startswith("article/"):
-            blocked_patterns = [".git", ".env", "docker-compose", ".yml", ".ini", ".ssh", ".aws", ".docker", "passwd", "/proc/", "/etc/", "wp-includes", "xmlrpc", "wp-admin"]
+            blocked_patterns = [
+                ".git", ".env", "docker-compose", ".yml", ".yaml", ".ini", ".ssh", ".aws", 
+                ".docker", "passwd", "/proc/", "/etc/", "wp-includes", "xmlrpc", "wp-admin",
+                "wp-config", "phpinfo", "xampp", "_profiler", ".sql", ".bak", ".backup", 
+                "aws-secret", "config.js", "docker-stack", ".temp", ".tmp"
+            ]
             if any(x in full_path.lower() for x in blocked_patterns):
                 logger.warning(f"SECURITY ALERT: Blocked attempt to access {full_path} from {request.client.host}")
                 raise HTTPException(status_code=403, detail="Forbidden")
