@@ -224,8 +224,8 @@ if os.path.exists(FRONTEND_DIST):
             blocked_patterns = [
                 ".git", ".env", "docker-compose", ".yml", ".yaml", ".ini", ".ssh", ".aws", 
                 ".docker", "passwd", "/proc/", "/etc/", "wp-includes", "xmlrpc", "wp-admin",
-                "wp-config", "phpinfo", "xampp", "_profiler", ".sql", ".bak", ".backup", 
-                "aws-secret", "config.js", "docker-stack", ".temp", ".tmp"
+                "wp-config", "wp-login", "wp-content", "phpinfo", ".php", "xampp", "_profiler", 
+                ".sql", ".bak", ".backup", "aws-secret", "config.js", "docker-stack", ".temp", ".tmp"
             ]
             if any(x in full_path.lower() for x in blocked_patterns):
                 logger.warning(f"SECURITY ALERT: Blocked attempt to access {full_path} from {request.client.host}")
