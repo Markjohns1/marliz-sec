@@ -110,21 +110,8 @@ Sitemap: {settings.BASE_URL}/sitemap-deleted.xml"""
 @router.api_route("/ads.txt", methods=["GET", "HEAD"])
 def get_ads_txt():
     """Serve ads.txt for AdSense"""
-    # Hardcoded or from a file - let's try to read it from the public folder first for flexibility
-    # but fallback to a known value if needed to prevent 404
-    import os
-    public_path = os.path.join(os.path.dirname(__file__), "../../../frontend/public/ads.txt")
-    
-    try:
-        if os.path.exists(public_path):
-            with open(public_path, "r") as f:
-                content = f.read()
-            return Response(content=content, media_type="text/plain")
-    except Exception:
-        pass
-    
-    # Fallback to the known valid content if the file can't be read
-    # This prevents the "Not Found" error that breaks AdSense verification
+    # Hardcoded to ensure 100% uptime for AdSense bot
+    # We purposefully AVOID reading from disk to prevent I/O locks or permission errors
     content = "google.com, pub-5581330887172926, DIRECT, f08c47fec0942fa0"
     return Response(content=content, media_type="text/plain")
 
