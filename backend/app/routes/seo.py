@@ -112,7 +112,7 @@ def get_ads_txt():
     """Serve ads.txt for AdSense"""
     # Hardcoded to ensure 100% uptime for AdSense bot
     # We purposefully AVOID reading from disk to prevent I/O locks or permission errors
-    content = "google.com, pub-5581330887172926, DIRECT, f08c47fec0942fa0"
+    content = "google.com, pub-5581330887172926, DIRECT, f08c47fec0942fa0\n"
     return Response(content=content, media_type="text/plain")
 
 @router.get("/api/seo/health-check")
