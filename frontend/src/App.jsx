@@ -23,6 +23,7 @@ import Privacy from './pages/Privacy';
 import Contact from './pages/Contact';
 import Glossary from './pages/Glossary';
 import VerifyEmail from './pages/VerifyEmail';
+import SecurityIntelligence from './pages/SecurityIntelligence';
 
 
 const queryClient = new QueryClient({
@@ -72,6 +73,7 @@ function AppContent() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/glossary" element={<Glossary />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/security-intelligence" element={<SecurityIntelligence />} />
           {/* Admin Routes (Obfuscated) */}
           <Route path="/console/login" element={<AdminLogin />} />
           <Route

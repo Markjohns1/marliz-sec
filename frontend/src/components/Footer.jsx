@@ -79,6 +79,11 @@ export default function Footer({ categories }) {
                   Glossary
                 </Link>
               </li>
+              <li>
+                <Link to="/security-intelligence" className="text-red-500 font-bold hover:text-red-400 transition-colors uppercase text-[10px] tracking-widest">
+                  Security Intelligence
+                </Link>
+              </li>
             </ul>
           </div>
 

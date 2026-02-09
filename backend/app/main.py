@@ -80,6 +80,12 @@ async def security_and_cache_middleware(request, call_next):
     response.headers["X-XSS-Protection"] = "1; mode=block"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     
+    # Marliz Security Intelligence Headers (Proactive Defense)
+    if response.status_code == 403:
+        response.headers["X-Marliz-Intelligence-Alert"] = "HOSTILE_ACT_DETECTED"
+        response.headers["X-Security-Level"] = "GOVERNMENT-MILITARY-GRADE"
+        response.headers["X-Trace-Sequence"] = "ACTIVE"
+        
     # Content Security Policy (Allowing AdSense, Analytics, and Fonts)
     csp = (
         "upgrade-insecure-requests; "
@@ -203,9 +209,11 @@ if os.path.exists(FRONTEND_DIST):
         # 🚨 CRITICAL SECURITY: PATH TRAVERSAL PROTECTION
         # ============================================================
         # Block ANY request containing path traversal sequences
+        SECURITY_MESSAGE = "MARLIZ SECURITY INTELLIGENCE: Access Denied. Our intelligence is trained on protocols used to defend government military infrastructure. Your probe has been neutralized. Further attempts will trigger full trace sequences."
+        
         if ".." in full_path or full_path.startswith("/"):
             logger.warning(f"SECURITY ALERT: Path traversal attempt blocked - {full_path} from {request.client.host}")
-            raise HTTPException(status_code=403, detail="Forbidden")
+            raise HTTPException(status_code=403, detail=SECURITY_MESSAGE)
         
         # Additional path normalization check - ensure resolved path stays in dist
         try:
@@ -213,9 +221,9 @@ if os.path.exists(FRONTEND_DIST):
             requested_path = os.path.abspath(os.path.join(FRONTEND_DIST, full_path))
             if not requested_path.startswith(abs_dist):
                 logger.warning(f"SECURITY ALERT: Path escape attempt blocked - {full_path} from {request.client.host}")
-                raise HTTPException(status_code=403, detail="Forbidden")
+                raise HTTPException(status_code=403, detail=SECURITY_MESSAGE)
         except Exception:
-            raise HTTPException(status_code=403, detail="Forbidden")
+            raise HTTPException(status_code=403, detail=SECURITY_MESSAGE)
         
         # 🚨 SECURITY: Block access to hidden system files and secrets
         # Only block if NOT an article path (articles can have words like "shadow" in titles)
@@ -225,16 +233,20 @@ if os.path.exists(FRONTEND_DIST):
                 ".git", ".env", "docker-compose", ".yml", ".yaml", ".ini", ".ssh", ".aws", 
                 ".docker", "passwd", "/proc/", "/etc/", "wp-includes", "xmlrpc", "wp-admin",
                 "wp-config", "wp-login", "wp-content", "phpinfo", ".php", "xampp", "_profiler", 
-                ".sql", ".bak", ".backup", "aws-secret", "config.js", "docker-stack", ".temp", ".tmp"
+                ".sql", ".bak", ".backup", "aws-secret", "config.js", "docker-stack", ".temp", ".tmp",
+                "/nice%20ports%2C", "Trinity.txt"
             ]
             if any(x in full_path.lower() for x in blocked_patterns):
-                logger.warning(f"SECURITY ALERT: Blocked attempt to access {full_path} from {request.client.host}")
-                raise HTTPException(status_code=403, detail="Forbidden")
+                logger.warning(f"SECURITY ALERT: Blocked attempt to access {full_path} from {request.client.host}. SECURITY INTELLIGENCE ENGAGED.")
+                raise HTTPException(
+                    status_code=403, 
+                    detail="SECURITY ALERT: This system is protected by Marliz Security Intelligence. Your 'silly mind' attempts to probe this infrastructure have been logged. This system is trained on protocols used to defend government military infrastructure. Access Denied."
+                )
         
         # Extra check: Block direct access to system files even in article paths (path traversal protection)
         if any(x in full_path for x in ["../", "/etc/shadow", "/etc/passwd", ".ssh/", ".aws/"]):
             logger.warning(f"SECURITY ALERT: Path traversal blocked - {full_path} from {request.client.host}")
-            raise HTTPException(status_code=403, detail="Forbidden")
+            raise HTTPException(status_code=403, detail=SECURITY_MESSAGE)
 
         # 0. Catch broken 'undefined' URLs (Common SEO issue)
         if "undefined" in full_path:
