@@ -11,7 +11,8 @@ import json
 import sys
 import os
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'backend'))
+# Add current directory to path so 'app' can be imported
+sys.path.append(os.getcwd())
 
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
