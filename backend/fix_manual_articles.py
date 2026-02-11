@@ -16,12 +16,12 @@ sys.path.append(os.getcwd())
 
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.database import async_session_maker
+from app.database import AsyncSessionLocal
 from app import models
 
 
 async def fix_manual_articles():
-    async with async_session_maker() as db:
+    async with AsyncSessionLocal() as db:
         # Find all published articles with NULL or empty content_markdown
         stmt = select(models.Article).filter(
             models.Article.status == models.ArticleStatus.PUBLISHED,
