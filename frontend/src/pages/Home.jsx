@@ -12,9 +12,17 @@ import config from '../config';
 
 const stripHtml = (html) => {
   return (html || '')
-    .replace(/<[^>]+>/g, '')    // Remove HTML
-    .replace(/^#+\s*/gm, '')    // Remove Markdown headers at start of lines
-    .replace(/#+/g, '')         // Remove any stray hashtags
+    .replace(/<[^>]+>/g, '')         // Remove HTML
+    .replace(/^#+\s*/gm, '')         // Remove headers
+    .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold
+    .replace(/\*(.*?)\*/g, '$1')     // Remove italics
+    .replace(/__(.*?)__/g, '$1')     // Remove bold alt
+    .replace(/_(.*?)_/g, '$1')       // Remove italics alt
+    .replace(/\[(.*?)\]\(.*?\)/g, '$1') // Remove links but keep text
+    .replace(/!\[.*?\]\(.*?\)/g, '')    // Remove images
+    .replace(/`{1,3}.*?`{1,3}/g, '')   // Remove code
+    .replace(/>\s*(.*)/gm, '$1')     // Remove blockquotes
+    .replace(/#+/g, '')              // Remove stray hashtags
     .trim();
 };
 
