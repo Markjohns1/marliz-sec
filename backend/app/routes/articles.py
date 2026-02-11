@@ -618,10 +618,10 @@ async def create_manual_article(
     
     simplified = models.SimplifiedContent(
         article_id=article.id,
-        friendly_summary=article_data.friendly_summary,
+        friendly_summary=article_data.friendly_summary or (article_data.content_markdown[:300] if article_data.content_markdown else article_data.title),
         attack_vector=article_data.attack_vector,
-        business_impact=article_data.business_impact,
-        action_steps=json.dumps(article_data.action_steps),
+        business_impact=article_data.business_impact or "See full intelligence report for details.",
+        action_steps=json.dumps(article_data.action_steps or ["Review the full intelligence report", "Apply recommended mitigations"]),
         threat_level=article_data.threat_level
     )
     db.add(simplified)

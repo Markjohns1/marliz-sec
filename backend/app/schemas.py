@@ -107,14 +107,14 @@ class ArticleList(BaseModel):
 class ManualArticleCreate(BaseModel):
     title: str = Field(..., min_length=10, max_length=500)
     category_id: int
-    friendly_summary: str = Field(..., min_length=50)
+    content_markdown: Optional[str] = None  # THE master content field
+    friendly_summary: Optional[str] = None  # Optional - extracted from markdown or auto-set
     attack_vector: Optional[str] = None
-    business_impact: str = Field(..., min_length=30)
-    action_steps: List[str] = Field(..., min_items=2, max_items=5)
-    content_markdown: Optional[str] = None # Support unified markdown in manual creation
-    threat_level: ThreatLevel
+    business_impact: Optional[str] = None   # Optional - extracted from markdown or auto-set 
+    action_steps: Optional[List[str]] = None  # Optional - extracted from markdown or auto-set
+    threat_level: ThreatLevel = ThreatLevel.MEDIUM
     original_url: Optional[str] = None
-    source_name: Optional[str] = "Staff Writer"
+    source_name: Optional[str] = "Marliz Intel Staff"
     image_url: Optional[str] = None
     meta_description: Optional[str] = None
     keywords: Optional[str] = None
