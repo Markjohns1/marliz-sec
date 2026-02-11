@@ -54,6 +54,7 @@ class ArticleUpdate(BaseModel):
     action_steps: Optional[str] = None
     threat_level: Optional[ThreatLevel] = None
     category_id: Optional[int] = None
+    image_url: Optional[str] = None
     edited_by: str
     content_type: Optional[str] = None
     protected_from_deletion: Optional[bool] = None

@@ -668,6 +668,7 @@ async def update_article(
     if updates.title: article.title = updates.title
     if updates.category_id: article.category_id = updates.category_id
     if updates.content_type: article.content_type = updates.content_type
+    if updates.image_url: article.image_url = updates.image_url
     if updates.protected_from_deletion is not None: article.protected_from_deletion = updates.protected_from_deletion
 
     # Update fields (Simplified Level - Optional)

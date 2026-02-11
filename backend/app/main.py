@@ -5,6 +5,11 @@ from fastapi.responses import FileResponse
 from contextlib import asynccontextmanager
 import logging
 import os
+import mimetypes
+
+# Initialize mimetypes and add WebP support explicitly
+mimetypes.init()
+mimetypes.add_type('image/webp', '.webp')
 
 from app.database import init_db, get_db
 from app.config import settings
@@ -101,9 +106,14 @@ async def security_and_cache_middleware(request, call_next):
     )
     response.headers["Content-Security-Policy"] = csp
 
-    # 2. Caching Logic
+    # 2. Caching & MIME Fixes
     if request.method == "GET" and response.status_code == 200:
         path = request.url.path
+        
+        # Explicit MIME fix for WebP (Fail-safe for systems with broken mimetypes)
+        if path.endswith(".webp"):
+            response.headers["Content-Type"] = "image/webp"
+
         # NEVER cache API data or the main HTML entry points
         if path.startswith("/api/") or path == "/" or path.startswith("/console") or "index.html" in path:
             response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
