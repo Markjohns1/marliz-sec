@@ -1,15 +1,17 @@
 import os
 import shutil
 import uuid
+import io
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, desc
+from sqlalchemy import select, desc, func
 from app.database import AsyncSessionLocal
 from app import models, schemas
 from app.routes.admin import verify_api_key
 from app.config import settings
+from PIL import Image
 
 router = APIRouter(prefix="/media", tags=["media"])
 
@@ -17,36 +19,80 @@ UPLOAD_DIR = "uploads"
 # Ensure the upload directory exists
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+MAX_RES = 1600 # Maximum width/height for optimization
+
 @router.post("/upload", response_model=schemas.MediaAsset)
 async def upload_media(
     file: UploadFile = File(...),
+    alt_text: Optional[str] = Form(None),
     api_key: str = Depends(verify_api_key),
     db: AsyncSession = Depends(AsyncSessionLocal)
 ):
-    """Upload a file to self-hosted storage"""
-    # Create unique filename
+    """
+    Upload a file, optimize it (WebP), and verify security.
+    """
     ext = os.path.splitext(file.filename)[1].lower()
     if ext not in ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg']:
         raise HTTPException(status_code=400, detail="Unsupported file type")
     
-    unique_filename = f"{uuid.uuid4().hex}{ext}"
-    file_path = os.path.join(UPLOAD_DIR, unique_filename)
+    # Read file content
+    content = await file.read()
     
-    # Save file to disk
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+    # Security & Optimization: Process with Pillow
+    try:
+        # Open image to verify it's actually an image
+        img = Image.open(io.BytesIO(content))
+        img_format = img.format
+        
+        # Verify it's a valid image format
+        if img_format not in ['JPEG', 'PNG', 'WEBP', 'GIF', 'SVG']:
+            # Some SVGs might fail Pillow check, but we handle standard images here
+            if ext != '.svg':
+                raise Exception("Invalid image headers")
+
+        # Optimization Logic
+        # 1. Handle Orientation (EXIF)
+        try:
+            from PIL import ImageOps
+            img = ImageOps.exif_transpose(img)
+        except:
+            pass
+
+        # 2. Resize if too big
+        if img.width > MAX_RES or img.height > MAX_RES:
+            img.thumbnail((MAX_RES, MAX_RES), Image.Resampling.LANCZOS)
+
+        # 3. Convert to WebP for maximum performance
+        unique_filename = f"{uuid.uuid4().hex}.webp"
+        file_path = os.path.join(UPLOAD_DIR, unique_filename)
+        
+        # Save optimized WebP
+        img.save(file_path, "WEBP", quality=85, optimize=True)
+        
+        final_mime = "image/webp"
+        
+    except Exception as e:
+        # Fallback for SVG or failure
+        if ext == '.svg':
+            unique_filename = f"{uuid.uuid4().hex}.svg"
+            file_path = os.path.join(UPLOAD_DIR, unique_filename)
+            with open(file_path, "wb") as buffer:
+                buffer.write(content)
+            final_mime = "image/svg+xml"
+        else:
+            raise HTTPException(status_code=400, detail=f"Invalid or corrupted image: {str(e)}")
     
     # Calculate URL
-    # We serve from /uploads/ static mount
     file_url = f"{settings.BASE_URL}/uploads/{unique_filename}"
     
     # Save to database
     media = models.MediaAsset(
         filename=unique_filename,
         original_name=file.filename,
-        mime_type=file.content_type,
+        mime_type=final_mime,
         size_bytes=os.path.getsize(file_path),
-        url=file_url
+        url=file_url,
+        alt_text=alt_text
     )
     
     db.add(media)
@@ -67,15 +113,33 @@ async def list_media(
     res = await db.execute(stmt)
     media_items = res.scalars().all()
     
-    # Get total count
-    total_stmt = select(models.Article).with_only_columns(models.Article.id) # Re-using Article ID column for simple count or just len
-    # Correct way to count
-    from sqlalchemy import func
     count_stmt = select(func.count()).select_from(models.MediaAsset)
     count_res = await db.execute(count_stmt)
     total = count_res.scalar()
     
     return {"media": media_items, "total": total}
+
+@router.put("/{asset_id}", response_model=schemas.MediaAsset)
+async def update_media_meta(
+    asset_id: int,
+    data: schemas.MediaUpdate,
+    api_key: str = Depends(verify_api_key),
+    db: AsyncSession = Depends(AsyncSessionLocal)
+):
+    """Update media metadata (like Alt Text)"""
+    stmt = select(models.MediaAsset).filter_by(id=asset_id)
+    res = await db.execute(stmt)
+    media = res.scalars().first()
+    
+    if not media:
+        raise HTTPException(status_code=404, detail="Media not found")
+    
+    if data.alt_text is not None:
+        media.alt_text = data.alt_text
+        
+    await db.commit()
+    await db.refresh(media)
+    return media
 
 @router.delete("/{asset_id}")
 async def delete_media(
@@ -83,7 +147,7 @@ async def delete_media(
     api_key: str = Depends(verify_api_key),
     db: AsyncSession = Depends(AsyncSessionLocal)
 ):
-    """Delete a media asset (deletes from DB and disk)"""
+    """Delete a media asset"""
     stmt = select(models.MediaAsset).filter_by(id=asset_id)
     res = await db.execute(stmt)
     media = res.scalars().first()
@@ -96,7 +160,6 @@ async def delete_media(
     if os.path.exists(file_path):
         os.remove(file_path)
     
-    # Delete from DB
     await db.delete(media)
     await db.commit()
     

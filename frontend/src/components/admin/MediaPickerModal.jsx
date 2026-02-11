@@ -93,8 +93,9 @@ export default function MediaPickerModal({ isOpen, onClose, onSelect }) {
                                             <Check className="w-4 h-4 text-white" />
                                         </div>
                                     </div>
-                                    <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent">
-                                        <p className="text-[9px] font-bold text-white truncate">{item.original_name}</p>
+                                    <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black text-white">
+                                        <p className="text-[10px] font-black uppercase tracking-widest truncate">{item.alt_text || item.original_name}</p>
+                                        <p className="text-[8px] opacity-60 truncate font-mono">{item.filename}</p>
                                     </div>
                                 </button>
                             ))}

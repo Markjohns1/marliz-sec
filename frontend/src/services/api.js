@@ -223,4 +223,9 @@ export const deleteMedia = async (id) => {
   return data;
 };
 
+export const updateMedia = async (id, updates) => {
+  const { data } = await api.put(`/api/media/${id}`, updates);
+  return data;
+};
+
 export default api;

@@ -177,4 +177,5 @@ class MediaAsset(Base) :
     mime_type = Column(String(100))
     size_bytes = Column(Integer)
     url = Column(String(500))
+    alt_text = Column(String(500), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

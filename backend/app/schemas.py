@@ -147,8 +147,12 @@ class MediaAsset(BaseModel):
     url: str
     size_bytes: int
     mime_type: str
+    alt_text: Optional[str] = None
     created_at: datetime
 
 class MediaList(BaseModel):
     media: List[MediaAsset]
     total: int
+
+class MediaUpdate(BaseModel):
+    alt_text: Optional[str] = None
