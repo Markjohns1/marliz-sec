@@ -118,6 +118,7 @@ class ManualArticleCreate(BaseModel):
     image_url: Optional[str] = None
     meta_description: Optional[str] = None
     keywords: Optional[str] = None
+    slug: Optional[str] = None  # Allow custom URLs
     admin_secret: str
 
 class ManualNewsletterTrigger(BaseModel):

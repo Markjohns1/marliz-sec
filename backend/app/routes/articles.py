@@ -586,7 +586,8 @@ async def create_manual_article(
 ):
     """Create article manually (Protected)"""
     
-    base_slug = slugify(article_data.title)
+    # Use provided slug or generate from title
+    base_slug = article_data.slug or slugify(article_data.title)
     slug = base_slug
     counter = 1
     

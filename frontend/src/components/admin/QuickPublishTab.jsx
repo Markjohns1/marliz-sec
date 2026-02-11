@@ -23,6 +23,7 @@ export default function QuickPublishTab({ onPublishSuccess }) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [message, setMessage] = useState(null);
     const [publishedSlug, setPublishedSlug] = useState(null);
+    const [customSlug, setCustomSlug] = useState('');
 
     // Core Fields
     const [title, setTitle] = useState('');
@@ -53,6 +54,7 @@ export default function QuickPublishTab({ onPublishSuccess }) {
         setImageUrl('');
         setMetaDescription('');
         setKeywords('');
+        setCustomSlug('');
         setPublishedSlug(null);
         setMessage(null);
     };
@@ -84,6 +86,7 @@ export default function QuickPublishTab({ onPublishSuccess }) {
                 image_url: imageUrl || null,
                 meta_description: metaDescription || null,
                 keywords: keywords || null,
+                slug: customSlug || null,
                 source_name: 'Marliz Intel Staff',
                 admin_secret: localStorage.getItem('admin_api_key')
             };
@@ -244,21 +247,21 @@ export default function QuickPublishTab({ onPublishSuccess }) {
 
                         <div className="grid sm:grid-cols-2 gap-4">
                             <div className="space-y-1.5">
+                                <label className="text-[9px] font-black text-slate-600 uppercase tracking-tighter ml-1">Custom URL Slug</label>
+                                <input
+                                    type="text"
+                                    value={customSlug}
+                                    onChange={(e) => setCustomSlug(e.target.value.toLowerCase().replace(/ /g, '-'))}
+                                    placeholder="e.g. ai-chatbot-breach-2026"
+                                    className="w-full px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-blue-600 text-xs font-mono"
+                                />
+                            </div>
+                            <div className="space-y-1.5">
                                 <label className="text-[9px] font-black text-slate-600 uppercase tracking-tighter ml-1">Featured Image URL</label>
                                 <input
                                     type="url"
                                     value={imageUrl}
                                     onChange={(e) => setImageUrl(e.target.value)}
-                                    placeholder="https://..."
-                                    className="w-full px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-slate-600 text-xs"
-                                />
-                            </div>
-                            <div className="space-y-1.5">
-                                <label className="text-[9px] font-black text-slate-600 uppercase tracking-tighter ml-1">Original Source URL</label>
-                                <input
-                                    type="url"
-                                    value={sourceUrl}
-                                    onChange={(e) => setSourceUrl(e.target.value)}
                                     placeholder="https://..."
                                     className="w-full px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-slate-600 text-xs"
                                 />
