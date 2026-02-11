@@ -13,7 +13,7 @@ from app.routes.admin import verify_api_key
 from app.config import settings
 from PIL import Image
 
-router = APIRouter(prefix="/media", tags=["media"])
+router = APIRouter(prefix="/api/media", tags=["media"])
 
 UPLOAD_DIR = "uploads"
 # Ensure the upload directory exists
