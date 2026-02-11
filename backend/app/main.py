@@ -112,14 +112,6 @@ async def security_and_cache_middleware(request, call_next):
             response.headers["Cache-Control"] = "public, max-age=3600"
         
     return response
-
-app.include_router(articles.router)
-app.include_router(admin.router)
-app.include_router(subscribers.router)
-app.include_router(seo.router)
-app.include_router(rss.router)
-app.include_router(media.router)
-
 # Ensure upload directory exists before mounting
 UPLOAD_DIR = "uploads"
 if not os.path.exists(UPLOAD_DIR):
@@ -127,6 +119,13 @@ if not os.path.exists(UPLOAD_DIR):
 
 # Mount media uploads
 app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
+
+app.include_router(articles.router)
+app.include_router(admin.router)
+app.include_router(subscribers.router)
+app.include_router(seo.router)
+app.include_router(rss.router)
+app.include_router(media.router)
 app.include_router(categories.router)
 
 @app.get("/api/health")
