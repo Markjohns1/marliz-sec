@@ -7,9 +7,9 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, desc, func
-from app.database import AsyncSessionLocal
+from app.database import get_db
 from app import models, schemas
-from app.routes.admin import verify_api_key
+from app.auth import verify_api_key
 from app.config import settings
 from PIL import Image
 
@@ -25,8 +25,8 @@ MAX_RES = 1600 # Maximum width/height for optimization
 async def upload_media(
     file: UploadFile = File(...),
     alt_text: Optional[str] = Form(None),
-    api_key: str = Depends(verify_api_key),
-    db: AsyncSession = Depends(AsyncSessionLocal)
+    api_key = Depends(verify_api_key),
+    db: AsyncSession = Depends(get_db)
 ):
     """
     Upload a file, optimize it (WebP), and verify security.
@@ -105,8 +105,8 @@ async def upload_media(
 async def list_media(
     skip: int = 0,
     limit: int = 50,
-    api_key: str = Depends(verify_api_key),
-    db: AsyncSession = Depends(AsyncSessionLocal)
+    api_key = Depends(verify_api_key),
+    db: AsyncSession = Depends(get_db)
 ):
     """List all uploaded media assets"""
     stmt = select(models.MediaAsset).order_by(desc(models.MediaAsset.created_at)).offset(skip).limit(limit)
@@ -123,8 +123,8 @@ async def list_media(
 async def update_media_meta(
     asset_id: int,
     data: schemas.MediaUpdate,
-    api_key: str = Depends(verify_api_key),
-    db: AsyncSession = Depends(AsyncSessionLocal)
+    api_key = Depends(verify_api_key),
+    db: AsyncSession = Depends(get_db)
 ):
     """Update media metadata (like Alt Text)"""
     stmt = select(models.MediaAsset).filter_by(id=asset_id)
@@ -144,8 +144,8 @@ async def update_media_meta(
 @router.delete("/{asset_id}")
 async def delete_media(
     asset_id: int,
-    api_key: str = Depends(verify_api_key),
-    db: AsyncSession = Depends(AsyncSessionLocal)
+    api_key = Depends(verify_api_key),
+    db: AsyncSession = Depends(get_db)
 ):
     """Delete a media asset"""
     stmt = select(models.MediaAsset).filter_by(id=asset_id)
