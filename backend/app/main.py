@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from contextlib import asynccontextmanager
 import logging
+import os
 
 from app.database import init_db, get_db
 from app.config import settings
