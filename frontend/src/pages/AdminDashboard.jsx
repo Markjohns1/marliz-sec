@@ -68,7 +68,6 @@ import OverviewTab from '../components/admin/OverviewTab';
 import ArticlesTab from '../components/admin/ArticlesTab';
 import InsightsTab from '../components/admin/InsightsTab';
 import SettingsTab from '../components/admin/SettingsTab';
-import QuickPublishTab from '../components/admin/QuickPublishTab';
 import NewsletterTab from '../components/admin/NewsletterTab';
 import HealthTab from '../components/admin/HealthTab';
 import IndexingTab from '../components/admin/IndexingTab';
