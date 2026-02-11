@@ -7,5 +7,6 @@ services:
       - "3005:3000"
     volumes:
       - ./backend/cybersec_news.db:/app/backend/cybersec_news.db
+      - ./backend/uploads:/app/backend/uploads
     env_file:
       - .env

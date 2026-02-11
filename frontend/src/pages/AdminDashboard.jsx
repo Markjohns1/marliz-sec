@@ -35,7 +35,9 @@ import {
     Copy,
     Share,
     PenLine,
-    Mail
+    Mail,
+    Image as ImageIcon,
+    Users
 } from 'lucide-react';
 
 // API & Components
@@ -56,6 +58,8 @@ import AdminGuide from '../components/AdminGuide';
 import StatCard from '../components/admin/StatCard';
 import GrowthBadge from '../components/admin/GrowthBadge';
 import QuickEditModal from '../components/admin/QuickEditModal';
+import QuickPublishTab from '../components/admin/QuickPublishTab';
+import MediaVault from '../components/admin/MediaVault';
 import ShareModal from '../components/admin/ShareModal';
 import SourceStatsModal from '../components/admin/SourceStatsModal';
 
@@ -270,6 +274,8 @@ export default function AdminDashboard() {
                             { id: 'categories', label: 'Insights', icon: FolderOpen },
                             { id: 'indexing', label: 'Global Indexing', icon: Globe },
                             { id: 'health', label: 'Health', icon: Activity },
+                            { id: 'subscribers', label: 'Subscribers', icon: Users },
+                            { id: 'media', label: 'Media Vault', icon: ImageIcon },
                             { id: 'settings', label: 'Settings', icon: SettingsIcon },
                             { id: 'guide', label: 'Playbook', icon: BookOpen },
                         ].map((tab) => (
@@ -347,6 +353,17 @@ export default function AdminDashboard() {
 
                 {activeTab === 'publish' && (
                     <QuickPublishTab onPublishSuccess={() => { refetch(); artRefetch(); }} />
+                )}
+
+                {activeTab === 'media' && (
+                    <MediaVault />
+                )}
+
+                {activeTab === 'subscribers' && (
+                    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+                        <h2 className="text-xl font-bold mb-4">Subscriber Management</h2>
+                        <p className="text-slate-400">View and manage your intelligence subscribers here.</p>
+                    </div>
                 )}
 
                 {activeTab === 'newsletter' && (

@@ -164,3 +164,17 @@ class SystemSettings(Base):
     key = Column(String(50), unique=True, index=True)  # e.g., 'scheduler_enabled'
     value = Column(String(200)) # Store as string, parse as needed
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+class MediaAsset(Base) :
+    """
+    Stores metadata for self-hosted images and files.
+    """
+    __tablename__ = "media_assets"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    filename = Column(String(255), unique=True, index=True)
+    original_name = Column(String(255))
+    mime_type = Column(String(100))
+    size_bytes = Column(Integer)
+    url = Column(String(500))
+    created_at = Column(DateTime(timezone=True), server_default=func.now())

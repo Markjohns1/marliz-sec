@@ -137,3 +137,18 @@ class Subscriber(BaseModel):
     is_premium: bool
     is_verified: bool
     subscribed_at: datetime
+
+# Media Schemas
+class MediaAsset(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    filename: str
+    original_name: str
+    url: str
+    size_bytes: int
+    mime_type: str
+    created_at: datetime
+
+class MediaList(BaseModel):
+    media: List[MediaAsset]
+    total: int

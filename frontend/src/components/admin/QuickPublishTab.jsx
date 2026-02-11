@@ -8,9 +8,11 @@ import {
     ExternalLink,
     Plus,
     ShieldAlert,
-    Layout
+    Layout,
+    Cloud
 } from 'lucide-react';
 import { getCategories, createManualArticle } from '../../services/api';
+import MediaPickerModal from './MediaPickerModal';
 
 const THREAT_LEVELS = [
     { value: 'low', label: 'Low', color: 'text-emerald-400', active: 'bg-emerald-500 text-white' },
@@ -24,6 +26,7 @@ export default function QuickPublishTab({ onPublishSuccess }) {
     const [message, setMessage] = useState(null);
     const [publishedSlug, setPublishedSlug] = useState(null);
     const [customSlug, setCustomSlug] = useState('');
+    const [isMediaPickerOpen, setIsMediaPickerOpen] = useState(false);
 
     // Core Fields
     const [title, setTitle] = useState('');
@@ -258,13 +261,23 @@ export default function QuickPublishTab({ onPublishSuccess }) {
                             </div>
                             <div className="space-y-1.5">
                                 <label className="text-[9px] font-black text-slate-600 uppercase tracking-tighter ml-1">Featured Image URL</label>
-                                <input
-                                    type="url"
-                                    value={imageUrl}
-                                    onChange={(e) => setImageUrl(e.target.value)}
-                                    placeholder="https://..."
-                                    className="w-full px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-slate-600 text-xs"
-                                />
+                                <div className="flex gap-2">
+                                    <input
+                                        type="url"
+                                        value={imageUrl}
+                                        onChange={(e) => setImageUrl(e.target.value)}
+                                        placeholder="https://..."
+                                        className="flex-1 px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-slate-600 text-xs"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsMediaPickerOpen(true)}
+                                        className="px-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-[10px] font-bold flex items-center gap-1.5 transition-all shadow-lg shadow-blue-900/40"
+                                    >
+                                        <Cloud className="w-3 h-3" />
+                                        Vault
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -327,6 +340,12 @@ export default function QuickPublishTab({ onPublishSuccess }) {
                     </div>
                 </div>
             )}
+
+            <MediaPickerModal
+                isOpen={isMediaPickerOpen}
+                onClose={() => setIsMediaPickerOpen(false)}
+                onSelect={(url) => setImageUrl(url)}
+            />
         </div>
     );
 }

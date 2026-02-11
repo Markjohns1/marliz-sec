@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Edit3, X, RefreshCw, Zap, Layout, FileText, ListChecks, ShieldAlert, Plus, Trash2 } from 'lucide-react';
+import { Edit3, X, RefreshCw, Zap, Layout, FileText, ListChecks, ShieldAlert, Plus, Trash2, Cloud } from 'lucide-react';
+import MediaPickerModal from './MediaPickerModal';
 
 export default function QuickEditModal({ article, onClose, onSave }) {
     const [activeSubTab, setActiveSubTab] = useState('seo'); // seo, content
@@ -27,6 +28,7 @@ export default function QuickEditModal({ article, onClose, onSave }) {
     const [markdownContent, setMarkdownContent] = useState(article.draft_content_markdown || article.content_markdown || '');
 
     const [saving, setSaving] = useState(false);
+    const [isMediaPickerOpen, setIsMediaPickerOpen] = useState(false);
 
     const handleAction = async (isPublish) => {
         setSaving(true);
@@ -151,13 +153,23 @@ export default function QuickEditModal({ article, onClose, onSave }) {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div className="space-y-2">
                                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">Featured Image URL</label>
-                                    <input
-                                        type="text"
-                                        value={imageUrl}
-                                        onChange={(e) => setImageUrl(e.target.value)}
-                                        className="w-full px-5 py-3 rounded-xl bg-slate-950 border border-slate-800 focus:ring-2 focus:ring-primary-500 outline-none transition-all text-xs font-bold text-slate-400"
-                                        placeholder="https://..."
-                                    />
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            value={imageUrl}
+                                            onChange={(e) => setImageUrl(e.target.value)}
+                                            className="flex-1 px-5 py-3 rounded-xl bg-slate-950 border border-slate-800 focus:ring-2 focus:ring-primary-500 outline-none transition-all text-xs font-bold text-slate-400"
+                                            placeholder="https://..."
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsMediaPickerOpen(true)}
+                                            className="px-4 bg-primary-600 hover:bg-primary-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all shadow-lg"
+                                        >
+                                            <Cloud className="w-4 h-4" />
+                                            Vault
+                                        </button>
+                                    </div>
                                 </div>
                                 <div className="space-y-2">
                                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">Original Source URL</label>
@@ -305,6 +317,12 @@ export default function QuickEditModal({ article, onClose, onSave }) {
                     </div>
                 </div>
             </div>
+
+            <MediaPickerModal
+                isOpen={isMediaPickerOpen}
+                onClose={() => setIsMediaPickerOpen(false)}
+                onSelect={(url) => setImageUrl(url)}
+            />
         </div>
     );
 }

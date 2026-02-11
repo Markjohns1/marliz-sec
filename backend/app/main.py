@@ -14,6 +14,7 @@ from app.routes import subscribers
 from app.routes import seo
 from app.routes import rss
 from app.routes import categories
+from app.routes import media
 from app.routes.articles import track_view
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -116,6 +117,15 @@ app.include_router(admin.router)
 app.include_router(subscribers.router)
 app.include_router(seo.router)
 app.include_router(rss.router)
+app.include_router(media.router)
+
+# Ensure upload directory exists before mounting
+UPLOAD_DIR = "uploads"
+if not os.path.exists(UPLOAD_DIR):
+    os.makedirs(UPLOAD_DIR)
+
+# Mount media uploads
+app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 app.include_router(categories.router)
 
 @app.get("/api/health")

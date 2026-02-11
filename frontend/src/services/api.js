@@ -203,5 +203,24 @@ export const requestStaticUrlIndexing = async (path) => {
   return data;
 };
 
+// Media Management
+export const getMediaList = async ({ skip = 0, limit = 50 } = {}) => {
+  const { data } = await api.get('/api/media/list', { params: { skip, limit } });
+  return data;
+};
+
+export const uploadMedia = async (file) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  const { data } = await api.post('/api/media/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
+  return data;
+};
+
+export const deleteMedia = async (id) => {
+  const { data } = await api.delete(`/api/media/${id}`);
+  return data;
+};
 
 export default api;
