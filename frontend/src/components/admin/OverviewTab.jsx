@@ -132,6 +132,7 @@ export default function OverviewTab({
                                         'Discord': 'Community referral (Discord)',
                                         'Instagram': 'Visual social referral',
                                         'Instagram App': 'Mobile Instagram Referral',
+                                        'TikTok': 'Short-video platform referral',
                                         'Search Engine Bot': 'Indexing crawler (SEO active)',
                                         'AI Intelligence Bot': 'LLM / AI training agent',
                                         'Other Referrals': 'External site links',

@@ -171,6 +171,11 @@ export const getArticleStats = async (articleId) => {
   return data;
 };
 
+export const trackLandingVisit = async (params) => {
+  const { data } = await api.get('/api/articles/track-landing-visit', { params });
+  return data;
+};
+
 // Manual Article Creation (Quick Publish)
 export const createManualArticle = async (articleData) => {
   const { data } = await api.post('/api/articles/manual', articleData);

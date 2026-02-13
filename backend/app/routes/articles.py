@@ -68,6 +68,7 @@ def get_source_type(referer: str, user_agent: str = None, query_ref: str = None)
         if any(x in qr for x in ["tg", "telegram", "s=t"]): return "Telegram"
         if any(x in qr for x in ["dc", "discord", "s=d"]): return "Discord"
         if any(x in qr for x in ["tw", "x", "s=x"]): return "X (Twitter)"
+        if any(x in qr for x in ["tt", "tiktok", "s=tt"]): return "TikTok"
         if "ig" in qr or "s=i" in qr: return "Instagram"
         if "intel_alert" in qr: return "Marliz Intel Alert"
 
@@ -87,6 +88,9 @@ def get_source_type(referer: str, user_agent: str = None, query_ref: str = None)
         
         # Twitter / X
         if any(x in ua for x in ["twitter", "twttr"]): return "X (Twitter) App"
+        
+        # TikTok In-App Browser
+        if "tiktok" in ua: return "TikTok"
 
     # 3. Third: Referer Header (Standard web clicks)
     if not referer:
@@ -159,6 +163,31 @@ async def track_view(article_id: int, request: Request, db: AsyncSession):
         # Remove keys older than 1 hour
         expired_keys = [k for k, v in view_dedup_cache.items() if (now - v) > timedelta(hours=1)]
         for k in expired_keys: del view_dedup_cache[k]
+
+@router.get("/track-landing-visit")
+async def track_landing_visit(request: Request, db: AsyncSession = Depends(get_db)):
+    """
+    Log a hit on the landing page/root when a referral parameter is present.
+    """
+    referer = request.headers.get("referer")
+    user_agent = request.headers.get("user-agent")
+    query_ref = request.query_params.get("ref") or request.query_params.get("s") or request.query_params.get("utm_source")
+    
+    if not query_ref and not referer:
+        return {"status": "skipped", "reason": "no tracking info"}
+        
+    source_type = get_source_type(referer, user_agent, query_ref)
+    
+    # Log the general hit (article_id=None)
+    view_log = models.ViewLog(
+        article_id=None,
+        referrer=referer,
+        source_type=source_type
+    )
+    db.add(view_log)
+    await db.commit()
+    
+    return {"status": "tracked", "source": source_type}
 
 @router.get("/stats/dashboard")
 async def get_dashboard_stats(

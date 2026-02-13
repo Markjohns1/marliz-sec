@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { HelmetProvider } from 'react-helmet-async';
 import { getCategories } from './services/api';
 
@@ -57,6 +58,23 @@ function AppContent() {
     queryKey: ['categories'],
     queryFn: getCategories
   });
+
+  // Track referrals (Tiktok, etc)
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const ref = params.get('ref') || params.get('s') || params.get('utm_source');
+
+    if (ref) {
+      // Avoid re-tracking in same session
+      const alreadyTracked = sessionStorage.getItem(`tracked_${ref}`);
+      if (!alreadyTracked) {
+        import('./services/api').then(m => {
+          m.trackLandingVisit({ ref }).catch(err => console.error("Tracking failed:", err));
+          sessionStorage.setItem(`tracked_${ref}`, 'true');
+        });
+      }
+    }
+  }, [location]);
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100">
