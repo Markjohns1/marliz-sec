@@ -89,8 +89,8 @@ export default function MediaVault() {
     };
 
     const filteredMedia = data?.media?.filter(item => {
-        const matchesSearch = item.original_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            item.alt_text?.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesSearch = (item.original_name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (item.alt_text || '').toLowerCase().includes(searchQuery.toLowerCase());
 
         const isPdf = item.mime_type === 'application/pdf';
         const matchesTab = activeTab === 'pdfs' ? isPdf : !isPdf;
