@@ -118,7 +118,7 @@ class ManualArticleCreate(BaseModel):
     source_name: Optional[str] = "Marliz Intel Staff"
     image_url: Optional[str] = None
     meta_description: Optional[str] = None
-    keywords: Optional[Text] = None
+    keywords: Optional[str] = None
     slug: Optional[str] = None  # Allow custom URLs
     admin_secret: str
 
