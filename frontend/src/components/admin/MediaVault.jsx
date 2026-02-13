@@ -56,13 +56,18 @@ export default function MediaVault() {
                 setActiveTab('photos');
             }
         },
-        onError: () => setIsUploading(false)
+        onError: (error) => {
+            setIsUploading(false);
+            console.error("Upload failed:", error);
+            window.alert(`Intelligence Upload Failed: ${error.response?.data?.detail || error.message}. Check server logs for forensic details.`);
+        }
     });
 
     // Delete mutation
     const deleteMutation = useMutation({
         mutationFn: deleteMedia,
-        onSuccess: () => queryClient.invalidateQueries(['media'])
+        onSuccess: () => queryClient.invalidateQueries(['media']),
+        onError: (error) => window.alert(`Deletion Failed: ${error.message}`)
     });
 
     // Update Meta mutation

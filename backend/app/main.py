@@ -11,7 +11,7 @@ import mimetypes
 mimetypes.init()
 mimetypes.add_type('image/webp', '.webp')
 
-from app.database import init_db, get_db
+from app.database import init_db, get_db, get_db_context
 from app.config import settings
 from app import models, auth
 from app.routes import articles
@@ -41,6 +41,29 @@ async def lifespan(app: FastAPI):
     
     # Initialize database
     await init_db()
+    
+    # Auto-Migration: Ensure media_assets has the new columns
+    from sqlalchemy import text
+    try:
+        async with get_db_context() as db:
+            # Add summary if missing
+            try:
+                await db.execute(text("ALTER TABLE media_assets ADD COLUMN summary TEXT"))
+                await db.commit()
+                logger.info("✓ Added 'summary' column to media_assets")
+            except Exception:
+                await db.rollback() # Likely already exists
+                
+            # Add is_published if missing
+            try:
+                await db.execute(text("ALTER TABLE media_assets ADD COLUMN is_published BOOLEAN DEFAULT 0"))
+                await db.commit()
+                logger.info("✓ Added 'is_published' column to media_assets")
+            except Exception:
+                await db.rollback() # Likely already exists
+    except Exception as e:
+        logger.error(f"Migration check failed: {e}")
+
     logger.info("✓ Database initialized")
     
     # Start background scheduler
