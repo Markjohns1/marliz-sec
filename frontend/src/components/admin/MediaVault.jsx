@@ -45,9 +45,16 @@ export default function MediaVault() {
     // Upload mutation
     const uploadMutation = useMutation({
         mutationFn: uploadMedia,
-        onSuccess: () => {
+        onSuccess: (newItem) => {
             queryClient.invalidateQueries(['media']);
             setIsUploading(false);
+
+            // AUTO-SWITCH TAB: Show the user their new file immediately
+            if (newItem && newItem.mime_type === 'application/pdf') {
+                setActiveTab('pdfs');
+            } else {
+                setActiveTab('photos');
+            }
         },
         onError: () => setIsUploading(false)
     });
@@ -175,10 +182,12 @@ export default function MediaVault() {
             ) : filteredMedia.length === 0 ? (
                 <div className="bg-slate-900/40 border-2 border-dashed border-slate-800 rounded-3xl p-24 text-center">
                     <div className="w-20 h-20 bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <ImageIcon className="w-10 h-10 text-slate-600" />
+                        {activeTab === 'pdfs' ? <FileText className="w-10 h-10 text-slate-600" /> : <ImageIcon className="w-10 h-10 text-slate-600" />}
                     </div>
                     <h3 className="text-xl font-bold text-white mb-2">Vault Empty</h3>
-                    <p className="text-slate-500 max-w-xs mx-auto text-sm">Upload images to auto-optimize them for Marliz Intel.</p>
+                    <p className="text-slate-500 max-w-xs mx-auto text-sm">
+                        {activeTab === 'pdfs' ? 'No intelligence manuals found.' : 'No optimized photos found.'} Upload files to secure them.
+                    </p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
