@@ -118,7 +118,7 @@ class ManualArticleCreate(BaseModel):
     source_name: Optional[str] = "Marliz Intel Staff"
     image_url: Optional[str] = None
     meta_description: Optional[str] = None
-    keywords: Optional[str] = None
+    keywords: Optional[Text] = None
     slug: Optional[str] = None  # Allow custom URLs
     admin_secret: str
 
@@ -149,6 +149,8 @@ class MediaAsset(BaseModel):
     size_bytes: int
     mime_type: str
     alt_text: Optional[str] = None
+    summary: Optional[str] = None
+    is_published: bool = False
     created_at: datetime
 
 class MediaList(BaseModel):
@@ -157,3 +159,5 @@ class MediaList(BaseModel):
 
 class MediaUpdate(BaseModel):
     alt_text: Optional[str] = None
+    summary: Optional[str] = None
+    is_published: Optional[bool] = None

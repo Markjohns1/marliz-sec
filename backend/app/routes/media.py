@@ -32,55 +32,64 @@ async def upload_media(
     Upload a file, optimize it (WebP), and verify security.
     """
     ext = os.path.splitext(file.filename)[1].lower()
-    if ext not in ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg']:
+    if ext not in ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg', '.pdf']:
         raise HTTPException(status_code=400, detail="Unsupported file type")
     
     # Read file content
     content = await file.read()
     
-    # Security & Optimization: Process with Pillow
-    try:
-        # Open image to verify it's actually an image
-        img = Image.open(io.BytesIO(content))
-        img_format = img.format
-        
-        # Verify it's a valid image format
-        if img_format not in ['JPEG', 'PNG', 'WEBP', 'GIF', 'SVG']:
-            # Some SVGs might fail Pillow check, but we handle standard images here
-            if ext != '.svg':
-                raise Exception("Invalid image headers")
-
-        # Optimization Logic
-        # 1. Handle Orientation (EXIF)
-        try:
-            from PIL import ImageOps
-            img = ImageOps.exif_transpose(img)
-        except:
-            pass
-
-        # 2. Resize if too big
-        if img.width > MAX_RES or img.height > MAX_RES:
-            img.thumbnail((MAX_RES, MAX_RES), Image.Resampling.LANCZOS)
-
-        # 3. Convert to WebP for maximum performance
-        unique_filename = f"{uuid.uuid4().hex}.webp"
+    # Logic for PDFs
+    if ext == '.pdf':
+        unique_filename = f"{uuid.uuid4().hex}.pdf"
         file_path = os.path.join(UPLOAD_DIR, unique_filename)
-        
-        # Save optimized WebP
-        img.save(file_path, "WEBP", quality=85, optimize=True)
-        
-        final_mime = "image/webp"
-        
-    except Exception as e:
-        # Fallback for SVG or failure
-        if ext == '.svg':
-            unique_filename = f"{uuid.uuid4().hex}.svg"
+        with open(file_path, "wb") as buffer:
+            buffer.write(content)
+        final_mime = "application/pdf"
+    
+    # Logic for Images
+    else:
+        try:
+            # Security & Optimization: Process with Pillow
+            img = Image.open(io.BytesIO(content))
+            img_format = img.format
+            
+            # Verify it's a valid image format
+            if img_format not in ['JPEG', 'PNG', 'WEBP', 'GIF', 'SVG']:
+                # Some SVGs might fail Pillow check, but we handle standard images here
+                if ext != '.svg':
+                    raise Exception("Invalid image headers")
+
+            # Optimization Logic
+            # 1. Handle Orientation (EXIF)
+            try:
+                from PIL import ImageOps
+                img = ImageOps.exif_transpose(img)
+            except:
+                pass
+
+            # 2. Resize if too big
+            if img.width > MAX_RES or img.height > MAX_RES:
+                img.thumbnail((MAX_RES, MAX_RES), Image.Resampling.LANCZOS)
+
+            # 3. Convert to WebP for maximum performance
+            unique_filename = f"{uuid.uuid4().hex}.webp"
             file_path = os.path.join(UPLOAD_DIR, unique_filename)
-            with open(file_path, "wb") as buffer:
-                buffer.write(content)
-            final_mime = "image/svg+xml"
-        else:
-            raise HTTPException(status_code=400, detail=f"Invalid or corrupted image: {str(e)}")
+            
+            # Save optimized WebP
+            img.save(file_path, "WEBP", quality=85, optimize=True)
+            
+            final_mime = "image/webp"
+            
+        except Exception as e:
+            # Fallback for SVG or failure
+            if ext == '.svg':
+                unique_filename = f"{uuid.uuid4().hex}.svg"
+                file_path = os.path.join(UPLOAD_DIR, unique_filename)
+                with open(file_path, "wb") as buffer:
+                    buffer.write(content)
+                final_mime = "image/svg+xml"
+            else:
+                raise HTTPException(status_code=400, detail=f"Invalid or corrupted image: {str(e)}")
     
     # Calculate URL
     file_url = f"{settings.BASE_URL}/uploads/{unique_filename}"
@@ -136,10 +145,29 @@ async def update_media_meta(
     
     if data.alt_text is not None:
         media.alt_text = data.alt_text
+    if data.summary is not None:
+        media.summary = data.summary
+    if data.is_published is not None:
+        media.is_published = data.is_published
         
     await db.commit()
     await db.refresh(media)
     return media
+
+@router.get("/resources", response_model=schemas.MediaList)
+async def list_public_resources(
+    db: AsyncSession = Depends(get_db)
+):
+    """Public endpoint to list all published PDF resources"""
+    stmt = select(models.MediaAsset).filter(
+        models.MediaAsset.is_published == True,
+        models.MediaAsset.mime_type == 'application/pdf'
+    ).order_by(desc(models.MediaAsset.created_at))
+    
+    res = await db.execute(stmt)
+    media_items = res.scalars().all()
+    
+    return {"media": media_items, "total": len(media_items)}
 
 @router.delete("/{asset_id}")
 async def delete_media(
@@ -164,3 +192,25 @@ async def delete_media(
     await db.commit()
     
     return {"status": "success", "message": "Media deleted"}
+
+@router.get("/public/{asset_id}")
+async def get_public_media(
+    asset_id: int,
+    db: AsyncSession = Depends(get_db)
+):
+    """Public endpoint to fetch media details (for download page)"""
+    stmt = select(models.MediaAsset).filter_by(id=asset_id)
+    res = await db.execute(stmt)
+    media = res.scalars().first()
+    
+    if not media:
+        raise HTTPException(status_code=404, detail="Resource not found")
+    
+    return {
+        "id": media.id,
+        "filename": media.filename,
+        "original_name": media.original_name,
+        "url": media.url,
+        "mime_type": media.mime_type,
+        "size_bytes": media.size_bytes
+    }

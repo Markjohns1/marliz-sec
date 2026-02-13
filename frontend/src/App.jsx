@@ -24,6 +24,8 @@ import Contact from './pages/Contact';
 import Glossary from './pages/Glossary';
 import VerifyEmail from './pages/VerifyEmail';
 import SecurityIntelligence from './pages/SecurityIntelligence';
+import DownloadPage from './pages/DownloadPage';
+import Resources from './pages/Resources';
 
 
 const queryClient = new QueryClient({
@@ -74,6 +76,8 @@ function AppContent() {
           <Route path="/glossary" element={<Glossary />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/security-intelligence" element={<SecurityIntelligence />} />
+          <Route path="/download/:assetId" element={<DownloadPage />} />
+          <Route path="/resources" element={<Resources />} />
           {/* Admin Routes (Obfuscated) */}
           <Route path="/console/login" element={<AdminLogin />} />
           <Route

@@ -25,10 +25,10 @@ export const getArticles = async ({
   category = '',
   search = '',
   threat_level = '',
-  sort_by = 'date'
+  sort_by = 'date',
 } = {}) => {
   const params = { page, limit };
-  if (category) params.category = category;  // CRITICAL: Pass category to API
+  if (category) params.category = category;
   if (search) params.search = search;
   if (threat_level) params.threat_level = threat_level;
   if (sort_by) params.sort_by = sort_by;
@@ -44,7 +44,7 @@ export const getAdminArticles = async ({
   status = '',
   sort_by = 'date',
   order = 'desc',
-  search = ''
+  search = '',
 } = {}) => {
   const params = { page, limit, sort_by, order };
   if (category) params.category = category;
@@ -116,15 +116,13 @@ export const triggerNewsletterDigest = async (articleIds, customNote, subscriber
   const { data } = await api.post('/api/subscribers/admin/trigger-digest', {
     article_ids: articleIds,
     subscriber_emails: subscriberEmails,
-    custom_note: customNote
+    custom_note: customNote,
   });
   return data;
 };
 
 // Admin
 export const login = async (key) => {
-  // We verified the key by trying to fetch stats. 
-  // If it fails (401), the key is invalid.
   localStorage.setItem('admin_api_key', key);
   try {
     const { data } = await api.get('/api/articles/stats/dashboard');
@@ -157,7 +155,7 @@ export const getSystemStatus = async () => {
 
 export const toggleScheduler = async (enabled) => {
   const { data } = await api.post('/api/articles/system/toggle-scheduler', null, {
-    params: { enabled }
+    params: { enabled },
   });
   return data;
 };
@@ -179,15 +177,12 @@ export const createManualArticle = async (articleData) => {
   return data;
 };
 
-
 // SEO
 export const getSeoHealth = async () => {
-  // Cache-bust to prevent CDN caching
   const { data } = await api.get(`/api/seo/health-check?_t=${Date.now()}`);
   return data;
 };
 
-// SEO & Indexing
 export const requestIndexing = async (articleId) => {
   const { data } = await api.post(`/api/seo/request-indexing/${articleId}`);
   return data;
@@ -213,7 +208,7 @@ export const uploadMedia = async (file) => {
   const formData = new FormData();
   formData.append('file', file);
   const { data } = await api.post('/api/media/upload', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
+    headers: { 'Content-Type': 'multipart/form-data' },
   });
   return data;
 };
@@ -225,6 +220,16 @@ export const deleteMedia = async (id) => {
 
 export const updateMedia = async (id, updates) => {
   const { data } = await api.put(`/api/media/${id}`, updates);
+  return data;
+};
+
+export const getPublicResources = async () => {
+  const { data } = await api.get('/api/media/resources');
+  return data;
+};
+
+export const getPublicAsset = async (id) => {
+  const { data } = await api.get(`/api/media/public/${id}`);
   return data;
 };
 

@@ -178,4 +178,6 @@ class MediaAsset(Base) :
     size_bytes = Column(Integer)
     url = Column(String(500))
     alt_text = Column(String(500), nullable=True)
+    summary = Column(Text, nullable=True) # For the resources page card
+    is_published = Column(Boolean, default=False) # Only published PDFs show on Resources page
     created_at = Column(DateTime(timezone=True), server_default=func.now())

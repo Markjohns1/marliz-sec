@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Search, Bell, Shield, Activity, ChevronRight } from 'lucide-react';
+import { Menu, X, Search, Bell, Shield, Activity, ChevronRight, BookOpen } from 'lucide-react';
 import config from '../config';
 import QuickSearch from './QuickSearch';
 
@@ -82,6 +82,10 @@ export default function Header({ categories }) {
             <Link to="/all-threats" className={`text-sm font-medium transition-colors hover:text-white ${isActive('/all-threats') ? 'text-white' : 'text-slate-400'}`}>
               All Threats
             </Link>
+
+            <Link to="/resources" className={`text-sm font-medium transition-colors hover:text-white ${isActive('/resources') ? 'text-white' : 'text-slate-400'}`}>
+              Resources
+            </Link>
           </div>
 
           <div className="hidden md:flex items-center space-x-4 flex-1 justify-end max-w-md ml-auto mr-4">
@@ -152,6 +156,15 @@ export default function Header({ categories }) {
                 >
                   <Shield className="w-4 h-4 mr-3 text-blue-500" />
                   All Threats
+                </Link>
+
+                <Link
+                  to="/resources"
+                  className={`py-3 px-3 rounded-md font-medium transition-colors text-left flex items-center ${isActive('/resources') ? 'text-white bg-slate-800' : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                    }`}
+                >
+                  <BookOpen className="w-4 h-4 mr-3 text-emerald-500" />
+                  Resources
                 </Link>
 
                 <div className="pt-2 pb-1 text-xs font-bold text-slate-500 uppercase tracking-widest px-3">
