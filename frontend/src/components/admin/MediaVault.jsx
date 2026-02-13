@@ -20,7 +20,9 @@ import {
     Globe,
     FileQuestion,
     Eye,
-    EyeOff
+    EyeOff,
+    ShieldCheck,
+    HardDrive
 } from 'lucide-react';
 import { getMediaList, uploadMedia, deleteMedia, updateMedia } from '../../services/api';
 
