@@ -278,7 +278,9 @@ if os.path.exists(FRONTEND_DIST):
                 "wp-config", "wp-login", "wp-content", "phpinfo", ".php", "xampp", "_profiler", 
                 ".sql", ".bak", ".backup", "aws-secret", "config.js", "docker-stack", ".temp", ".tmp",
                 "/nice%20ports%2C", "Trinity.txt", "/sse", "/mcp", "config.json", "/portal", "/setup",
-                "/.well-known/security.txt", "phpmyadmin", "adminer", "webdav"
+                "/.well-known/security.txt", "phpmyadmin", "adminer", "webdav",
+                "wordpress", "wp", "cgi-bin", "shell", "cmd", "upload.php", "login.php",
+                "backup", "old-site", "test-site"
             ]
             if any(x in full_path.lower() for x in blocked_patterns):
                 logger.warning(f"SECURITY ALERT: Blocked attempt to access {full_path} from {request.client.host}. SECURITY INTELLIGENCE ENGAGED.")

@@ -103,6 +103,7 @@ Disallow: /*?fbclid=
 Disallow: /*?_escaped_fragment_=
 Disallow: /api/
 
+
 Sitemap: {settings.BASE_URL}/sitemap.xml
 Sitemap: {settings.BASE_URL}/sitemap-deleted.xml"""
     return Response(content=content, media_type="text/plain")

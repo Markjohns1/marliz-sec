@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Shield, ShieldAlert, Cpu, Lock, Globe, Terminal, Activity } from 'lucide-react';
 import './SecurityIntelligence.css';
 
+import { Helmet } from 'react-helmet-async';
+
 const SecurityIntelligence = () => {
     const [counter, setCounter] = useState(0);
     const [scrambledIp, setScrambledIp] = useState('');
@@ -23,7 +25,7 @@ const SecurityIntelligence = () => {
 
         const scrambleInterval = setInterval(() => {
             setScrambledIp(generateScramble());
-        }, 50);
+        }, 500); // Slower scramble for better visibility
 
         return () => {
             clearInterval(interval);
@@ -33,6 +35,10 @@ const SecurityIntelligence = () => {
 
     return (
         <div className="security-intel-container">
+            <Helmet>
+                <title>SECURITY INTELLIGENCE | Marliz Sec</title>
+                <meta name="robots" content="noindex, nofollow" />
+            </Helmet>
             <div className="scanline"></div>
             <div className="noise"></div>
 
