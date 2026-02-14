@@ -339,33 +339,30 @@ if os.path.exists(FRONTEND_DIST):
                                 detail="Gone: This page has been permanently removed."
                             )
                         
-                        # --- LONG TERM SOLUTION: PASSIVE AUTO-BURIAL ---
-                        # If we are here, it means the URL contains 'article/' but it's NOT in the grave.
-                        # Now check if it's in the LIVE articles.
-                        stmt_live = select(models.Article).filter_by(slug=test_slug)
-                        res_live = await db.execute(stmt_live)
-                        if not res_live.scalars().first():
-                            # It's not in the Grave and not in Live -> It's a GHOST.
-                            # 🚨 SECURITY: Only auto-bury if it SMELLS like garbage (undefined, wp, php, etc.)
-                            # We DON'T bury real-looking slugs automatically to avoid 'friendly fire'.
-                            garbage_indicators = ["undefined", "wp-", ".php", "index.php", "admin", "test", "setup", "backup", "config"]
-                            if any(x in test_slug.lower() for x in garbage_indicators):
-                                logger.warning(f"AUTO-BURYING GHOST URL: {test_slug}")
-                                new_grave = models.DeletedArticle(
-                                    slug=test_slug, 
-                                    reason="Autonomous Passive Burial (Garbage Detected)"
-                                )
-                                db.add(new_grave)
-                                await db.commit()
-                                raise HTTPException(
-                                    status_code=410, 
-                                    detail="Gone: This page has been permanently removed."
-                                )
-                            else:
-                                # It's a missing article, but looks like it might be real/new.
-                                # Let it 404 or redirect to home normally. DON'T BURY.
-                                logger.info(f"404 (Missing Article): {test_slug} - Not burying as it looks like a real slug.")
-                                pass
+                        # --- LONG TERM SOLUTION: PASSIVE AUTO-BURIAL (PAUSED FOR SAFETY) ---
+                        # We have successfully buried 920 historical bad links. 
+                        # To ensure 100% safety of live content during AdSense review,
+                        # we are pausing the autonomous burial of new links.
+                        
+                        # if not res_live.scalars().first():
+                        #     # It's not in the Grave and not in Live -> It's a GHOST.
+                        #     # 🚨 SECURITY: Only auto-bury if it SMELLS like garbage (undefined, wp, php, etc.)
+                        #     garbage_indicators = ["undefined", "wp-", ".php", "index.php", "admin", "test", "setup", "backup", "config"]
+                        #     if any(x in test_slug.lower() for x in garbage_indicators):
+                        #         logger.warning(f"AUTO-BURYING GHOST URL: {test_slug}")
+                        #         new_grave = models.DeletedArticle(
+                        #             slug=test_slug, 
+                        #             reason="Autonomous Passive Burial (Garbage Detected)"
+                        #         )
+                        #         db.add(new_grave)
+                        #         await db.commit()
+                        #         raise HTTPException(
+                        #             status_code=410, 
+                        #             detail="Gone: This page has been permanently removed."
+                        #         )
+                        #     else:
+                        #         pass
+
 
                 except HTTPException:
                     raise 
