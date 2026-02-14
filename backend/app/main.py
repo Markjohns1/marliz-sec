@@ -350,18 +350,27 @@ if os.path.exists(FRONTEND_DIST):
                         res_live = await db.execute(stmt_live)
                         if not res_live.scalars().first():
                             # It's not in the Grave and not in Live -> It's a GHOST.
-                            # We bury it automatically for future requests.
-                            logger.warning(f"AUTO-BURYING GHOST URL: {test_slug}")
-                            new_grave = models.DeletedArticle(
-                                slug=test_slug, 
-                                reason="Autonomous Passive Burial (404 Detection)"
-                            )
-                            db.add(new_grave)
-                            await db.commit()
-                            raise HTTPException(
-                                status_code=410, 
-                                detail="Gone: This page has been permanently removed."
-                            )
+                            # 🚨 SECURITY: Only auto-bury if it SMELLS like garbage (undefined, wp, php, etc.)
+                            # We DON'T bury real-looking slugs automatically to avoid 'friendly fire'.
+                            garbage_indicators = ["undefined", "wp-", ".php", "index.php", "admin", "test", "setup", "backup", "config"]
+                            if any(x in test_slug.lower() for x in garbage_indicators):
+                                logger.warning(f"AUTO-BURYING GHOST URL: {test_slug}")
+                                new_grave = models.DeletedArticle(
+                                    slug=test_slug, 
+                                    reason="Autonomous Passive Burial (Garbage Detected)"
+                                )
+                                db.add(new_grave)
+                                await db.commit()
+                                raise HTTPException(
+                                    status_code=410, 
+                                    detail="Gone: This page has been permanently removed."
+                                )
+                            else:
+                                # It's a missing article, but looks like it might be real/new.
+                                # Let it 404 or redirect to home normally. DON'T BURY.
+                                logger.info(f"404 (Missing Article): {test_slug} - Not burying as it looks like a real slug.")
+                                pass
+
                 except HTTPException:
                     raise 
                 except Exception as e:
