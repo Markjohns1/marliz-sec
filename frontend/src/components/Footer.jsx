@@ -29,7 +29,7 @@ export default function Footer({ categories }) {
               <a href="#" className="hover:text-primary-400 transition-colors">
                 <Twitter className="w-5 h-5" />
               </a>
-              <a href="#" className="hover:text-primary-400 transition-colors">
+              <a href="https://linkedin.com/in/johnmarkoguta" target="_blank" rel="noopener noreferrer" className="hover:text-primary-400 transition-colors">
                 <Linkedin className="w-5 h-5" />
               </a>
               <a href="mailto:johnmarkoguta@gmail.com" className="hover:text-primary-400 transition-colors">
