@@ -326,17 +326,13 @@ if os.path.exists(FRONTEND_DIST):
                 try:
                     from app.database import get_db_context
                     async with get_db_context() as db:
-                        # SUPER AGGRESSIVE CHECK: 
-                        # Check for exact match OR if the slug is a suffix of a buried one
-                        stmt = select(models.DeletedArticle).filter(
-                            or_(
-                                models.DeletedArticle.slug == test_slug,
-                                models.DeletedArticle.slug.ilike(f"%{test_slug}"),
-                                models.DeletedArticle.slug.ilike(f"{test_slug}%")
-                            )
-                        )
+                        # 🚨 ACCURATE SECURITY: 
+                        # Only block if the slug is an EXACT match for a buried one.
+                        # No fuzzy matching to avoid 'friendly fire' on live articles.
+                        stmt = select(models.DeletedArticle).filter_by(slug=test_slug)
                         res = await db.execute(stmt)
                         if res.scalars().first():
+
                             logger.info(f"410 GONE (Hard Stop): {test_slug}")
                             raise HTTPException(
                                 status_code=410, 
